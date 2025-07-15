@@ -33,7 +33,7 @@ router.post('/', (req, res, next) => {
   const { full_name, email, password_hash, phone_number, address, role } = req.body;
   const created_at = new Date().toISOString();
   const updated_at = created_at;
-
+  
   db.run(
     `INSERT INTO Users (full_name, email, password_hash, phone_number, address, role, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -83,5 +83,7 @@ router.delete('/:id', (req, res, next) => {
     res.json({ message: 'User deleted successfully' });
   });
 });
+
+//
 
 module.exports = router;

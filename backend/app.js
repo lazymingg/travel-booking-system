@@ -22,6 +22,7 @@ dotenv.config();
 
 // declare routes
 const usersRouter = require('./routes/users');
+
 const home = require("./routes/index");
 // connect to db
 const db = new sqlite3.Database('./db/db.db', (err) => {
@@ -32,7 +33,7 @@ const db = new sqlite3.Database('./db/db.db', (err) => {
   console.log('Connected to SQLite database');
 });
 
-// Middleware
+// middleware
 app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
@@ -42,7 +43,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/users', usersRouter);
+
 app.use('/', home);
+
 // middleware serve the err
 app.use((err, req, res, next) => {
   console.error(err.stack);
