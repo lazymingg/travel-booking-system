@@ -16,6 +16,8 @@ const sqlite3 = require('sqlite3').verbose();
 // dot env file 
 const dotenv = require('dotenv');
 
+// define port
+const port = 8000;
 
 var app = express();
 dotenv.config();
@@ -53,7 +55,7 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app
-// // start app
-// app.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
+// start app
+app.listen(port, (req, res) => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
