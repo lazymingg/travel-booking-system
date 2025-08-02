@@ -21,7 +21,9 @@ var app = express();
 dotenv.config();
 
 // declare routes
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/Users');
+// const paymentsRouter = require('./router/User');
+// const reviewRouter = require('./router/Router');
 
 const home = require("./routes/index");
 // connect to db
@@ -43,7 +45,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/users', usersRouter);
-
+// app.use('/payments', paymentsRouter);
+// app.use('/review', reviewRouter);
 app.use('/', home);
 
 // middleware serve the err
