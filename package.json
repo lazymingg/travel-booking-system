@@ -1,0 +1,24 @@
+{
+  "name": "travel-booking-system-test",
+  "version": "1.0.0",
+  "description": "\"# travel-booking-system-test\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazymingg/travel-booking-system-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lazymingg/travel-booking-system-test/issues"
+  },
+  "homepage": "https://github.com/lazymingg/travel-booking-system-test#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
