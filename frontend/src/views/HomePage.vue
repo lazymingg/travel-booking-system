@@ -22,9 +22,6 @@
               <p class="region-cities">Hà Nội • Hạ Long • Sapa</p>
             </div>
             <div class="favorite-btn" @click.stop="toggleFavorite('north')">
-              <svg :class="{ 'favorited': favorites.north }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
             </div>
           </div>
           <div class="region-info">
@@ -47,9 +44,6 @@
               <p class="region-cities">Huế • Hội An • Đà Nẵng</p>
             </div>
             <div class="favorite-btn" @click.stop="toggleFavorite('central')">
-              <svg :class="{ 'favorited': favorites.central }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
             </div>
           </div>
           <div class="region-info">
@@ -72,9 +66,6 @@
               <p class="region-cities">TP.HCM • Cần Thơ • Phú Quốc</p>
             </div>
             <div class="favorite-btn" @click.stop="toggleFavorite('south')">
-              <svg :class="{ 'favorited': favorites.south }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
             </div>
           </div>
           <div class="region-info">
@@ -324,31 +315,6 @@ const handleSearch = () => {
 .region-cities {
   font-size: 0.875rem;
   opacity: 0.9;
-}
-
-.favorite-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  cursor: pointer;
-}
-
-.favorite-btn svg {
-  width: 24px;
-  height: 24px;
-  color: var(--color-text-white);
-  opacity: 0.7;
-  transition: all 0.2s ease;
-}
-
-.favorite-btn:hover svg {
-  opacity: 1;
-}
-
-.favorite-btn svg.favorited {
-  color: var(--color-secondary);
-  fill: currentColor;
-  opacity: 1;
 }
 
 .region-info {
@@ -607,33 +573,11 @@ const handleSearch = () => {
   color: rgba(255, 255, 255, 0.3);
 }
 
-.north-bg {
-  background: linear-gradient(135deg, var(--color-primary), #3b82f6);
-}
-
-.central-bg {
-  background: linear-gradient(135deg, #059669, #10b981);
-}
-
-.south-bg {
-  background: linear-gradient(135deg, var(--color-secondary), #f59e0b);
-}
 
 .region-card:hover .placeholder-image {
   transform: scale(1.1);
 }
 
-.north-bg::before {
-  content: "🏔️";
-}
-
-.central-bg::before {
-  content: "🏛️";
-}
-
-.south-bg::before {
-  content: "🏖️";
-}
 
 @media (max-width: 768px) {
   .hero-title {
