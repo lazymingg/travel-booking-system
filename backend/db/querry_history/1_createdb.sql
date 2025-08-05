@@ -16,7 +16,7 @@ CREATE TABLE Owners (
     owner_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER UNIQUE NOT NULL,
     host_status TEXT CHECK(host_status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',
-    bank_account TEXT,y
+    bank_account TEXT,
     id_card TEXT,
     business_license TEXT,
     created_at TEXT DEFAULT (datetime('now')),

@@ -12,7 +12,16 @@
         </div>
 
         <div class="profile-content">
-          <div class="info-grid">
+          <div v-if="loading" class="loading-state">
+            <p>Đang tải thông tin...</p>
+          </div>
+
+          <div v-else-if="error" class="error-state">
+            <p>{{ error }}</p>
+            <button @click="fetchUserInfo" class="btn btn-primary">Thử lại</button>
+          </div>
+
+          <div v-else class="info-grid">
             <div class="info-item">
               <label>Họ và tên</label>
               <div class="info-value">{{ userInfo.full_name }}</div>
@@ -35,7 +44,7 @@
 
             <div class="info-item">
               <label>Vai trò</label>
-              <div class="info-value role-badge">{{ getRoleDisplay(userInfo.role) }}</div>
+              <div class="info-value role-badge">{{ roleDisplay }}</div>
             </div>
 
             <div class="info-item">
@@ -49,8 +58,8 @@
             </div>
           </div>
 
-          <div class="action-buttons">
-            <button @click="openEditModal" class="btn btn-primary">
+          <div v-if="!loading && !error" class="action-buttons">
+            <button @click="showEditModal = true" class="btn btn-primary">
               <span class="btn-icon">✏️</span>
               Cập nhật thông tin
             </button>
@@ -60,7 +69,7 @@
               Quản lý đặt chỗ
             </button>
 
-            <button @click="showDeleteConfirm" class="btn btn-danger">
+            <button @click="showDeleteModal = true" class="btn btn-danger">
               <span class="btn-icon">🗑️</span>
               Xóa tài khoản
             </button>
@@ -73,102 +82,114 @@
     <EditProfileModal
       :show="showEditModal"
       :userInfo="userInfo"
-      @close="closeEditModal"
+      @close="showEditModal = false"
       @update="handleUpdateProfile"
     />
 
     <!-- Delete Account Modal Component -->
     <DeleteAccountModal
       :show="showDeleteModal"
-      @close="closeDeleteModal"
+      @close="showDeleteModal = false"
       @delete="handleDeleteAccount"
     />
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
 
-export default {
-  name: 'UserInfo',
-  components: {
-    EditProfileModal,
-    DeleteAccountModal
-  },
-  data() {
-    return {
-      userInfo: {
-        user_id: 1,
-        full_name: 'Nguyễn Văn An',
-        email: 'an.nguyen@example.com',
-        phone_number: '0901234567',
-        address: '123 Đường Láng, Hà Nội',
-        role: 'customer',
-        created_at: '2025-07-30 03:32:02',
-        updated_at: '2025-07-30 03:32:02'
-      },
-      showEditModal: false,
-      showDeleteModal: false
-    }
-  },
-  methods: {
-    getRoleDisplay(role) {
-      const roleMap = {
-        'customer': 'Khách hàng',
-        'admin': 'Quản trị viên',
-        'staff': 'Nhân viên'
+const router = useRouter()
+
+// State
+const userInfo = reactive({
+  user_id: null,
+  full_name: '',
+  email: '',
+  phone_number: '',
+  address: '',
+  role: '',
+  created_at: '',
+  updated_at: ''
+})
+
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+const loading = ref(true)
+const error = ref(null)
+
+// Computed
+const roleDisplay = computed(() => {
+  const roleMap = {
+    'customer': 'Khách hàng',
+    'admin': 'Quản trị viên',
+    'staff': 'Nhân viên'
+  }
+  return roleMap[userInfo.role] || userInfo.role
+})
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('vi-VN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+// API
+const fetchUserInfo = async () => {
+  try {
+    loading.value = true
+    error.value = null
+
+    const response = await fetch('http://localhost:3000/users/', {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        router.push('/login')
+        return
       }
-      return roleMap[role] || role
-    },
-
-    formatDate(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('vi-VN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    },
-
-    openEditModal() {
-      this.showEditModal = true
-    },
-
-    closeEditModal() {
-      this.showEditModal = false
-    },
-
-    handleUpdateProfile(updatedData) {
-      // Simulate API call
-      this.userInfo = {
-        ...this.userInfo,
-        ...updatedData
-      }
-      alert('Cập nhật thông tin thành công!')
-    },
-
-    manageBookings() {
-      alert('Chuyển đến trang quản lý đặt chỗ...')
-      // Navigate to booking management page
-    },
-
-    showDeleteConfirm() {
-      this.showDeleteModal = true
-    },
-
-    closeDeleteModal() {
-      this.showDeleteModal = false
-    },
-
-    handleDeleteAccount() {
-      alert('Tài khoản đã được xóa!')
-      // Navigate to login page or home
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
+
+    const data = await response.json()
+    if (data.user) {
+      Object.assign(userInfo, data.user)
+    }
+
+  } catch (err) {
+    error.value = 'Không thể tải thông tin người dùng: ' + err.message
+    if (err.message.includes('401')) {
+      router.push('/login')
+    }
+  } finally {
+    loading.value = false
   }
 }
+
+// Actions
+const handleUpdateProfile = (updatedData) => {
+  Object.assign(userInfo, updatedData)
+  alert('Cập nhật thông tin thành công!')
+}
+
+const manageBookings = () => {
+  alert('Chuyển đến trang quản lý đặt chỗ...')
+}
+
+const handleDeleteAccount = () => {
+  alert('Tài khoản đã được xóa!')
+}
+
+// Lifecycle
+onMounted(fetchUserInfo)
 </script>
 
 <style scoped>
@@ -449,5 +470,22 @@ export default {
   .btn {
     font-size: 0.75rem;
   }
+}
+
+.loading-state, .error-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text);
+}
+
+.loading-state p {
+  font-size: 1.2rem;
+  color: var(--vt-c-text-light-2);
+}
+
+.error-state p {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 </style>
