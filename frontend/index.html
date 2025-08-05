@@ -10,30 +10,7 @@
     <link rel="stylesheet" href="/style/footer.css">
   </head>
   <body>
-    <div id="app">
-      <header id="header" class="container">
-        <div id="logo-container" class="container">
-          <h1>{{ web_name }}</h1>
-        </div>
-        <nav id="nav" class="container">
-          <ul id="nav-list">
-            <li><a href="/">Trang chủ</a></li>
-            <li><a href="/">Giới thiệu</a></li>
-            <li><a href="/">Đăng nhập</a></li>
-            <li><a href="/">Đăng ký</a></li>
-          </ul>
-        </nav>
-      </header>
-    </div>
-
-    <script type="module">
-      Vue.createApp({
-        data() {
-          return {
-            web_name: 'WeGo'
-          };
-        }
-      }).mount('#app');
-    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
