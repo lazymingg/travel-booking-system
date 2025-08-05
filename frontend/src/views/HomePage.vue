@@ -233,8 +233,10 @@ const handleSearch = () => {
 
 <style scoped>
 :root {
-  --color-primary: #dc2626;
-  --color-primary-hover: #b91c1c;
+  --color-primary: #1e40af;
+  --color-primary-hover: #1d4ed8;
+  --color-secondary: #fbbf24;
+  --color-secondary-hover: #f59e0b;
   --color-background: #ffffff;
   --color-background-soft: #f8fafc;
   --color-border: #e2e8f0;
@@ -344,7 +346,7 @@ const handleSearch = () => {
 }
 
 .favorite-btn svg.favorited {
-  color: var(--color-primary);
+  color: var(--color-secondary);
   fill: currentColor;
   opacity: 1;
 }
@@ -372,18 +374,18 @@ const handleSearch = () => {
 
 .explore-btn {
   padding: 8px 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-primary);
   border-radius: 6px;
   background: var(--color-background);
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .explore-btn:hover {
-  background: var(--color-background-soft);
-  border-color: var(--color-border-hover);
+  background: var(--color-primary);
+  color: var(--color-text-white);
 }
 
 /* Filter Section */
@@ -429,6 +431,7 @@ const handleSearch = () => {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text);
+  text-align: center;
 }
 
 .invisible-label {
@@ -458,6 +461,7 @@ const handleSearch = () => {
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s ease;
+  text-align: center;
 }
 
 .form-group input:focus,
@@ -479,11 +483,13 @@ const handleSearch = () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .search-btn:hover {
   background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
 .btn-icon {
@@ -494,27 +500,54 @@ const handleSearch = () => {
 /* Slogan Section */
 .slogan-section {
   padding: 80px 16px;
-  background: linear-gradient(to right, var(--color-primary), #ea580c);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   color: var(--color-text-white);
+  position: relative;
+  overflow: hidden;
+}
+
+.slogan-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.slogan-section:hover::before {
+  opacity: 1;
 }
 
 .slogan-content {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.slogan-section:hover .slogan-content {
+  transform: translateY(-5px);
 }
 
 .slogan-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .slogan-text {
   font-size: 1.25rem;
   line-height: 1.6;
-  opacity: 0.9;
+  opacity: 0.95;
   margin-bottom: 32px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .slogan-actions {
@@ -526,18 +559,22 @@ const handleSearch = () => {
 
 .primary-btn {
   padding: 12px 24px;
-  background: var(--color-background);
+  background: var(--color-text-white);
   color: var(--color-primary);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .primary-btn:hover {
-  background: var(--color-background-soft);
+  background: var(--color-secondary);
+  color: var(--color-text-white);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .secondary-btn {
@@ -549,12 +586,14 @@ const handleSearch = () => {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .secondary-btn:hover {
   background: var(--color-text-white);
   color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .placeholder-image {
@@ -569,7 +608,7 @@ const handleSearch = () => {
 }
 
 .north-bg {
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  background: linear-gradient(135deg, var(--color-primary), #3b82f6);
 }
 
 .central-bg {
@@ -577,7 +616,7 @@ const handleSearch = () => {
 }
 
 .south-bg {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: linear-gradient(135deg, var(--color-secondary), #f59e0b);
 }
 
 .region-card:hover .placeholder-image {
