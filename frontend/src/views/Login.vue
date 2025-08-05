@@ -1,16 +1,60 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+const email = ref('')
+const password = ref('')
+const router = useRouter()
+
+const handleLogin = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Quan trọng: để gửi và nhận session cookies
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value
+      })
+    })
+
+    const data = await response.json()
+
+    console.log('Response status:', response.status)
+    console.log('Response ok:', response.ok)
+    console.log('Response data:', data)
+
+    if (response.ok) {
+      console.log('Login success:', data)
+      // Không cần lưu token vì dùng session cookies
+      console.log('About to navigate to /userProfile')
+      await router.push('/userProfile')
+      console.log('Navigation completed')
+    } else {
+      console.error('Login failed:', data.message)
+      alert('Đăng nhập thất bại: ' + (data.error || 'Vui lòng thử lại'))
+    }
+  } catch (error) {
+    console.error('Network error:', error)
+    alert('Lỗi kết nối. Vui lòng kiểm tra internet và thử lại.')
+  }
+}
+</script>
+
 <template>
   <div class="main-bg">
     <div class="main-container">
       <div class="sign-in-form">
         <h2 class="form-title">Đăng nhập</h2>
-        <form>
+        <form @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Nhập email" />
+            <input type="email" id="email" v-model="email" placeholder="Nhập email" />
           </div>
           <div class="form-group">
             <label for="password">Mật khẩu</label>
-            <input type="password" id="password" placeholder="Nhập mật khẩu" />
+            <input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu" />
           </div>
           <button type="submit" class="login-btn">Đăng nhập</button>
         </form>
