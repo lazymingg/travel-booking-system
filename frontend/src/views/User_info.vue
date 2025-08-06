@@ -100,7 +100,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
-
+import api from '@/frontend-api-helper.js'
 const router = useRouter()
 
 // State
@@ -143,36 +143,30 @@ const formatDate = (dateString) => {
 // API
 const fetchUserInfo = async () => {
   try {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
 
-    const response = await fetch('http://localhost:3000/users/', {
-      method: 'GET',
-      credentials: 'include'
-    })
+    const result = await api.get('/users/');
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        router.push('/login')
-        return
-      }
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.user) {
-      Object.assign(userInfo, data.user)
+    if (result.success) {
+      // Success - data có trong result.data
+      // console.log('User info fetched successfully:', result.data);
+      Object.assign(userInfo, result.data);
+      console.log('Success:', result.message);
+    } else {
+      // Error - message có trong result.error hoặc result.message
+      throw new Error(result.error || result.message || 'Unknown error');
     }
 
   } catch (err) {
-    error.value = 'Không thể tải thông tin người dùng: ' + err.message
-    if (err.message.includes('401')) {
-      router.push('/login')
+    error.value = 'Không thể tải thông tin người dùng: ' + err.message;
+    if (err.message.includes('401') || result?.status === 401) {
+      router.push('/login');
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Actions
 const handleUpdateProfile = (updatedData) => {
@@ -193,7 +187,6 @@ onMounted(fetchUserInfo)
 </script>
 
 <style scoped>
-/* Root font size for rem calculations */
 :root {
   font-size: 16px;
 }

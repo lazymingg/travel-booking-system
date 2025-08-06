@@ -27,8 +27,8 @@ var app = express();
 dotenv.config();
 
 // declare routes
-const usersRouter = require('./routes/Users');
-const paymentsRouter = require('./routes/Payments');
+const usersRouter = require('./routes/users');
+const paymentsRouter = require('./routes/payments');
 const reviewRouter = require('./routes/Review');
 const accommodationsRouter = require('./routes/Accommodations');
 const bookingsRouter = require('./routes/Bookings');

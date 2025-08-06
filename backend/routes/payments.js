@@ -1,3 +1,4 @@
+const responseHelper = require('../utils/responseHelper');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const router = express.Router();
@@ -8,7 +9,7 @@ const db = new sqlite3.Database('./db/db.db');
 router.get('/', (req, res, next) => {
     db.all('SELECT * FROM Payments', [], (err, rows) => {
         if (err) return next(err);
-        res.json(rows);
+        return responseHelper.success(res, rows, 'Payments retrieved successfully');
     });
 });
 
@@ -18,12 +19,11 @@ router.get('/:id', (req, res, next) => {
     db.get('SELECT * FROM Payments WHERE payment_id = ?', [id], (err, row) => {
         if (err) return next(err);
         if (!row) {
-            return res.status(404).json({ error: 'Payment not found' });
+            return responseHelper.error(res, 'Payment not found', 404);
         }
-        res.json(row);
+        return responseHelper.success(res, row, 'Payment retrieved successfully');
     });
 });
-
 // create payment
 router.post('/', (req, res, next) => {
     const { payment_id, booking_id, amount, host_amount, payment_method, payment_status, payment_date } = req.body;
@@ -33,7 +33,7 @@ router.post('/', (req, res, next) => {
         [payment_id, booking_id, amount, host_amount, payment_method, payment_status, payment_date],
         function (err) {
             if (err) return next(err);
-            res.status(201).json({ message: 'Payment created successfully', id: this.lastID });
+            return responseHelper.success(res, { message: 'Payment created successfully', id: this.lastID }, 'Payment created successfully', 201);
         }
     );
 });
@@ -49,9 +49,9 @@ router.put('/:id', (req, res, next) => {
         function (err) {
             if (err) return next(err);
             if (this.changes === 0) {
-                return res.status(404).json({ error: 'Payment not found' });
+                return responseHelper.error(res, 'Payment not found', 404);
             }
-            res.json({ message: 'Payment updated successfully' });
+            return responseHelper.success(res, { message: 'Payment updated successfully' }, 'Payment updated successfully');
         }
     );
 });
@@ -63,9 +63,9 @@ router.delete('/:id', (req, res, next) => {
     db.run('DELETE FROM Payments WHERE payment_id = ?', [id], function (err) {
         if (err) return next(err);
         if (this.changes === 0) {
-            return res.status(404).json({ error: 'Payment not found' });
+            return responseHelper.error(res, 'Payment not found', 404);
         }
-        res.json({ message: 'Payment deleted successfully' });
+        return responseHelper.success(res, { message: 'Payment deleted successfully' }, 'Payment deleted successfully');
     });
 });
 

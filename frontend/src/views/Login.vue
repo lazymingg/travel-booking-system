@@ -1,45 +1,31 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '@/frontend-api-helper.js'
+
 const email = ref('')
 const password = ref('')
 const router = useRouter()
 
 const handleLogin = async () => {
   try {
-    const response = await fetch('http://localhost:3000/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // Quan trọng: để gửi và nhận session cookies
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value
-      })
-    })
+    const result = await api.post('/auth/login', {
+      email: email.value,
+      password: password.value
+    });
 
-    const data = await response.json()
-
-    console.log('Response status:', response.status)
-    console.log('Response ok:', response.ok)
-    console.log('Response data:', data)
-
-    if (response.ok) {
-      console.log('Login success:', data)
-      // Không cần lưu token vì dùng session cookies
-      console.log('About to navigate to /userProfile')
-      await router.push('/userProfile')
-      console.log('Navigation completed')
+    if (result.success) {
+      console.log('Login thành công:', result.message);
+      // userInfo.value = result.data;
+      router.push('/userProfile');
     } else {
-      console.error('Login failed:', data.message)
-      alert('Đăng nhập thất bại: ' + (data.error || 'Vui lòng thử lại'))
+      throw new Error(result.message || 'Đăng nhập thất bại');
     }
   } catch (error) {
-    console.error('Network error:', error)
-    alert('Lỗi kết nối. Vui lòng kiểm tra internet và thử lại.')
+    console.error('Login error:', error.message);
+    alert('Lỗi đăng nhập: ' + error.message);
   }
-}
+};
 </script>
 
 <template>

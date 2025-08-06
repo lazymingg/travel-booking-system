@@ -1,3 +1,4 @@
+const responseHelper = require('../utils/responseHelper');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const router = express.Router();
@@ -8,7 +9,7 @@ const db = new sqlite3.Database('./db/db.db');
 router.get('/', (req, res, next) => {
   db.all('SELECT * FROM Reviews', [], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    responseHelper.success(res, rows);
   });
 });
 
@@ -17,8 +18,8 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   db.get('SELECT * FROM Reviews WHERE review_id = ?', [id], (err, row) => {
     if (err) return next(err);
-    if (!row) return res.status(404).json({ error: 'Review not found' });
-    res.json(row);
+    if (!row) return responseHelper.error(res, 'Review not found' );
+    responseHelper.success(res, row);
   });
 });
 
@@ -32,7 +33,7 @@ router.post('/', (req, res, next) => {
     [user_id, accommodation_id, rating, comment, created_at],
     function (err) {
       if (err) return next(err);
-      res.status(201).json({ message: 'Review created', review_id: this.lastID });
+      responseHelper.success(res, { message: 'Review created', review_id: this.lastID });
     }
   );
 });
@@ -47,8 +48,8 @@ router.put('/:id', (req, res, next) => {
     [rating, comment, review_id],
     function (err) {
       if (err) return next(err);
-      if (this.changes === 0) return res.status(404).json({ error: 'Review not found' });
-      res.json({ message: 'Review updated' });
+      if (this.changes === 0) return responseHelper.error(res, 'Review not found' );
+      responseHelper.success(res, { message: 'Review updated' });
     }
   );
 });
@@ -59,8 +60,8 @@ router.delete('/:id', (req, res, next) => {
 
   db.run('DELETE FROM Reviews WHERE review_id = ?', [id], function (err) {
     if (err) return next(err);
-    if (this.changes === 0) return res.status(404).json({ error: 'Review not found' });
-    res.json({ message: 'Review deleted' });
+    if (this.changes === 0) return responseHelper.error(res, 'Review not found' );
+    responseHelper.success(res, { message: 'Review deleted' });
   });
 });
 

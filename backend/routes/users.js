@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const responseHelper = require('../utils/responseHelper');
 const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
 
@@ -11,7 +12,7 @@ const db = new sqlite3.Database('./db/db.db');
 //     if (err) {
 //       return next(err);
 //     }
-//     res.json(rows);
+//     responseHelper.success(res, rows);
 //   });
 // });
 
@@ -20,17 +21,15 @@ router.get('/', requireAuth, (req, res, next) => {
   const id = req.session.user.user_id;
 
   db.get(
-    'SELECT user_id, full_name, email, role, created_at, updated_at FROM Users WHERE user_id = ?',
+    'SELECT user_id, full_name, email, role, created_at, updated_at, phone_number, address FROM Users WHERE user_id = ?',
     [id],
     (err, row) => {
       if (err) return next(err);
       if (!row) {
-        return res.status(404).json({ error: 'User not found' });
+        return responseHelper.error(res, 'User not found', 404);
       }
-      res.json({
-        message: 'User info retrieved successfully',
-        user: row
-      });
+      // console.log(row);
+      return responseHelper.success(res, row, 'User info retrieved successfully');
     }
   );
 });
@@ -49,7 +48,7 @@ router.get('/', requireAuth, (req, res, next) => {
 //       if (err) {
 //         return next(err);
 //       }
-//       res.status(201).json({ user_id: this.lastID });
+//       responseHelper.success(res, { user_id: this.lastID });
 //     }
 //   );
 // });
@@ -69,9 +68,9 @@ router.put('/:id', (req, res, next) => {
         return next(err);
       }
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'User not found' });
+        return responseHelper.error(res, 'User not found', 404);
       }
-      res.json({ message: 'User updated successfully' });
+      return responseHelper.success(res, null, 'User updated successfully');
     }
   );
 });
@@ -85,9 +84,9 @@ router.delete('/:id', (req, res, next) => {
       return next(err);
     }
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return responseHelper.error(res, 'User not found', 404);
     }
-    res.json({ message: 'User deleted successfully' });
+    return responseHelper.success(res, null, 'User deleted successfully');
   });
 });
 

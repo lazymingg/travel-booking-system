@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const responseHelper = require('../utils/responseHelper');
 const router = express.Router();
 
 const db = new sqlite3.Database('./db/db.db');
@@ -20,7 +21,7 @@ router.get('/', (req, res, next) => {
 
   db.all(query, params, (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    return responseHelper.success(res, rows, 'Owners retrieved successfully');
   });
 });
 
@@ -36,9 +37,9 @@ router.get('/:id', (req, res, next) => {
   db.get(query, [id], (err, row) => {
     if (err) return next(err);
     if (!row) {
-      return res.status(404).json({ error: 'Owner not found' });
+      return responseHelper.error(res, 'Owner not found' );
     }
-    res.json(row);
+    responseHelper.success(res, row);
   });
 });
 
@@ -54,9 +55,9 @@ router.get('/user/:user_id', (req, res, next) => {
   db.get(query, [user_id], (err, row) => {
     if (err) return next(err);
     if (!row) {
-      return res.status(404).json({ error: 'Owner not found' });
+      return responseHelper.error(res, 'Owner not found' );
     }
-    res.json(row);
+    responseHelper.success(res, row);
   });
 });
 
@@ -69,7 +70,7 @@ router.post('/', (req, res, next) => {
   db.get('SELECT * FROM Owners WHERE user_id = ?', [user_id], (err, existingOwner) => {
     if (err) return next(err);
     if (existingOwner) {
-      return res.status(400).json({ error: 'User is already registered as an owner' });
+      return responseHelper.validationError(res, 'User is already registered as an owner' );
     }
 
     db.run(
@@ -78,7 +79,7 @@ router.post('/', (req, res, next) => {
       [user_id, bank_account, id_card, business_license, created_at],
       function (err) {
         if (err) return next(err);
-        res.status(201).json({ 
+        responseHelper.success(res, { 
           message: 'Owner registration submitted successfully',
           owner_id: this.lastID 
         });
@@ -99,9 +100,9 @@ router.put('/:id', (req, res, next) => {
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Owner not found' });
+        return responseHelper.error(res, 'Owner not found' );
       }
-      res.json({ message: 'Owner information updated successfully' });
+      responseHelper.success(res, { message: 'Owner information updated successfully' });
     }
   );
 });
@@ -112,7 +113,7 @@ router.patch('/:id/status', (req, res, next) => {
   const { host_status } = req.body;
 
   if (!['pending', 'approved', 'rejected'].includes(host_status)) {
-    return res.status(400).json({ error: 'Invalid status' });
+    return responseHelper.validationError(res, 'Invalid status' );
   }
 
   db.run(
@@ -121,9 +122,9 @@ router.patch('/:id/status', (req, res, next) => {
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Owner not found' });
+        return responseHelper.error(res, 'Owner not found' );
       }
-      res.json({ message: `Owner status updated to ${host_status}` });
+      responseHelper.success(res, { message: `Owner status updated to ${host_status}` });
     }
   );
 });
@@ -134,7 +135,7 @@ router.get('/:id/accommodations', (req, res, next) => {
   
   db.all('SELECT * FROM Accommodations WHERE owner_id = ?', [id], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    responseHelper.success(res, rows);
   });
 });
 
@@ -153,7 +154,7 @@ router.get('/:id/bookings', (req, res, next) => {
 
   db.all(query, [id], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    responseHelper.success(res, rows);
   });
 });
 
@@ -174,7 +175,7 @@ router.get('/:id/stats', (req, res, next) => {
 
   db.get(statsQuery, [id], (err, stats) => {
     if (err) return next(err);
-    res.json(stats);
+    responseHelper.success(res, stats);
   });
 });
 
