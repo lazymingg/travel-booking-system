@@ -1,4 +1,5 @@
 <script setup>
+defineOptions({ name: 'UserLoginView' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/frontend-api-helper.js'

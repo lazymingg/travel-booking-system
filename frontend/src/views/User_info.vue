@@ -160,7 +160,7 @@ const fetchUserInfo = async () => {
 
   } catch (err) {
     error.value = 'Không thể tải thông tin người dùng: ' + err.message;
-    if (err.message.includes('401') || result?.status === 401) {
+    if (err.message.includes('401') || result.status === 401) {
       router.push('/login');
     }
   } finally {
