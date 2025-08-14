@@ -29,7 +29,7 @@ router.get('/', (req, res, next) => {
   }
 
   db.all(query, params, (err, rows) => {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error retrieving accommodations', 500, err.message);
     return responseHelper.success(res, rows, 'Accommodations retrieved successfully');
   });
 });
@@ -40,14 +40,14 @@ router.get('/:id', (req, res, next) => {
   
   // Get accommodation details
   db.get('SELECT * FROM Accommodations WHERE accommodation_id = ?', [id], (err, accommodation) => {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error retrieving accommodation', 500, err.message);
     if (!accommodation) {
       return responseHelper.error(res, 'Accommodation not found', 404);
     }
 
     // Get rooms for this accommodation
     db.all('SELECT * FROM Rooms WHERE accommodation_id = ?', [id], (err, rooms) => {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error retrieving rooms', 500, err.message);
       
       accommodation.rooms = rooms;
       return responseHelper.success(res, accommodation, 'Accommodation retrieved successfully');
@@ -70,7 +70,7 @@ router.post('/', (req, res, next) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [owner_id, name, address, city, country, description, accommodation_type, created_at],
     function (err) {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error creating accommodation', 500, err.message);
       return responseHelper.success(res, { accommodation_id: this.lastID }, 'Accommodation created successfully', 201);
     }
   );
@@ -87,7 +87,7 @@ router.put('/:id', (req, res, next) => {
      WHERE accommodation_id = ?`,
     [name, address, city, country, description, accommodation_type, status, id],
     function (err) {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error updating accommodation', 500, err.message);
       if (this.changes === 0) {
         return responseHelper.error(res, 'Accommodation not found', 404);
       }
@@ -101,7 +101,7 @@ router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   db.run('DELETE FROM Accommodations WHERE accommodation_id = ?', [id], function (err) {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error deleting accommodation', 500, err.message);
     if (this.changes === 0) {
       return responseHelper.error(res, 'Accommodation not found', 404);
     }
@@ -120,7 +120,7 @@ router.get('/search/:term', (req, res, next) => {
      AND status = 'approved'`,
     [searchTerm, searchTerm, searchTerm, searchTerm],
     (err, rows) => {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error searching accommodations', 500, err.message);
       return responseHelper.success(res, rows, 'Search results retrieved successfully');
     }
   );

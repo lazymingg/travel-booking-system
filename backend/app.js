@@ -23,6 +23,8 @@ const sqlite3 = require('sqlite3').verbose();
 const dotenv = require('dotenv');
 
 
+const responseHelper = require('./utils/responseHelper');
+
 var app = express();
 dotenv.config();
 
@@ -31,6 +33,7 @@ const usersRouter = require('./routes/users');
 const paymentsRouter = require('./routes/payments');
 const reviewRouter = require('./routes/Review');
 const accommodationsRouter = require('./routes/Accommodations');
+const accommodationsImagesRouter = require('./routes/Accommodations_images');
 const bookingsRouter = require('./routes/Bookings');
 const roomsRouter = require('./routes/Rooms');
 const ownersRouter = require('./routes/Owners');
@@ -77,6 +80,7 @@ app.use('/users', usersRouter);
 app.use('/payments', paymentsRouter);
 app.use('/reviews', reviewRouter);
 app.use('/accommodations', accommodationsRouter);
+app.use('/accommodations', accommodationsImagesRouter);
 app.use('/bookings', bookingsRouter);
 app.use('/rooms', roomsRouter);
 app.use('/owners', ownersRouter);
@@ -86,7 +90,8 @@ app.use('/', home);
 // middleware serve the err
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  // Sử dụng responseHelper để trả về format thống nhất
+  return responseHelper.error(res, 'Internal Server Error', 500, err.message);
 });
 
 module.exports = app

@@ -9,7 +9,7 @@ const db = new sqlite3.Database('./db/db.db');
 router.get('/', (req, res, next) => {
     db.all('SELECT * FROM Payments', [], (err, rows) => {
         if (err) return next(err);
-        return responseHelper.success(res, rows, 'Payments retrieved successfully');
+        responseHelper.success(res, rows);
     });
 });
 
@@ -19,9 +19,9 @@ router.get('/:id', (req, res, next) => {
     db.get('SELECT * FROM Payments WHERE payment_id = ?', [id], (err, row) => {
         if (err) return next(err);
         if (!row) {
-            return responseHelper.error(res, 'Payment not found', 404);
+            return responseHelper.error(res, 'Payment not found' );
         }
-        return responseHelper.success(res, row, 'Payment retrieved successfully');
+        responseHelper.success(res, row);
     });
 });
 // create payment
@@ -33,7 +33,7 @@ router.post('/', (req, res, next) => {
         [payment_id, booking_id, amount, host_amount, payment_method, payment_status, payment_date],
         function (err) {
             if (err) return next(err);
-            return responseHelper.success(res, { message: 'Payment created successfully', id: this.lastID }, 'Payment created successfully', 201);
+            responseHelper.success(res, { message: 'Payment created successfully', id: this.lastID });
         }
     );
 });
@@ -49,9 +49,9 @@ router.put('/:id', (req, res, next) => {
         function (err) {
             if (err) return next(err);
             if (this.changes === 0) {
-                return responseHelper.error(res, 'Payment not found', 404);
+                return responseHelper.error(res, 'Payment not found' );
             }
-            return responseHelper.success(res, { message: 'Payment updated successfully' }, 'Payment updated successfully');
+            responseHelper.success(res, { message: 'Payment updated successfully' });
         }
     );
 });
@@ -63,9 +63,9 @@ router.delete('/:id', (req, res, next) => {
     db.run('DELETE FROM Payments WHERE payment_id = ?', [id], function (err) {
         if (err) return next(err);
         if (this.changes === 0) {
-            return responseHelper.error(res, 'Payment not found', 404);
+            return responseHelper.error(res, 'Payment not found' );
         }
-        return responseHelper.success(res, { message: 'Payment deleted successfully' }, 'Payment deleted successfully');
+        responseHelper.success(res, { message: 'Payment deleted successfully' });
     });
 });
 

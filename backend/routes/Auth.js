@@ -15,7 +15,7 @@ router.post('/login', (req, res, next) => {
   }
   
   db.get('SELECT * FROM Users WHERE email = ?', [email], (err, user) => {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error checking user credentials', 500, err.message);
     
     if (!user || user.password_hash !== password) {
       return responseHelper.error(res, 'Invalid email or password', 401);
@@ -52,7 +52,7 @@ router.post('/register', (req, res, next) => {
         if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
           return responseHelper.error(res, 'Email already exists', 409);
         }
-        return next(err);
+        return responseHelper.error(res, 'Error creating user', 500, err.message);
       }
       
       return responseHelper.success(res, { user_id: this.lastID }, 'Registration successful', 201);
