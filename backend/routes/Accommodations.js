@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const responseHelper = require('../utils/responseHelper');
 const router = express.Router();
 
 const db = new sqlite3.Database('./db/db.db');
@@ -28,8 +29,8 @@ router.get('/', (req, res, next) => {
   }
 
   db.all(query, params, (err, rows) => {
-    if (err) return next(err);
-    res.json(rows);
+    if (err) return responseHelper.error(res, 'Error retrieving accommodations', 500, err.message);
+    return responseHelper.success(res, rows, 'Accommodations retrieved successfully');
   });
 });
 
@@ -39,17 +40,17 @@ router.get('/:id', (req, res, next) => {
   
   // Get accommodation details
   db.get('SELECT * FROM Accommodations WHERE accommodation_id = ?', [id], (err, accommodation) => {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error retrieving accommodation', 500, err.message);
     if (!accommodation) {
-      return res.status(404).json({ error: 'Accommodation not found' });
+      return responseHelper.error(res, 'Accommodation not found', 404);
     }
 
     // Get rooms for this accommodation
     db.all('SELECT * FROM Rooms WHERE accommodation_id = ?', [id], (err, rooms) => {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error retrieving rooms', 500, err.message);
       
       accommodation.rooms = rooms;
-      res.json(accommodation);
+      return responseHelper.success(res, accommodation, 'Accommodation retrieved successfully');
     });
   });
 });
@@ -57,6 +58,11 @@ router.get('/:id', (req, res, next) => {
 // Create new accommodation
 router.post('/', (req, res, next) => {
   const { owner_id, name, address, city, country, description, accommodation_type } = req.body;
+  
+  if (!owner_id || !name || !address || !city || !country || !accommodation_type) {
+    return responseHelper.validationError(res, 'Owner ID, name, address, city, country, and accommodation type are required');
+  }
+  
   const created_at = new Date().toISOString();
 
   db.run(
@@ -64,11 +70,8 @@ router.post('/', (req, res, next) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [owner_id, name, address, city, country, description, accommodation_type, created_at],
     function (err) {
-      if (err) return next(err);
-      res.status(201).json({ 
-        message: 'Accommodation created successfully',
-        accommodation_id: this.lastID 
-      });
+      if (err) return responseHelper.error(res, 'Error creating accommodation', 500, err.message);
+      return responseHelper.success(res, { accommodation_id: this.lastID }, 'Accommodation created successfully', 201);
     }
   );
 });
@@ -84,11 +87,11 @@ router.put('/:id', (req, res, next) => {
      WHERE accommodation_id = ?`,
     [name, address, city, country, description, accommodation_type, status, id],
     function (err) {
-      if (err) return next(err);
+      if (err) return responseHelper.error(res, 'Error updating accommodation', 500, err.message);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Accommodation not found' });
+        return responseHelper.error(res, 'Accommodation not found', 404);
       }
-      res.json({ message: 'Accommodation updated successfully' });
+      return responseHelper.success(res, null, 'Accommodation updated successfully');
     }
   );
 });
@@ -98,11 +101,11 @@ router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   db.run('DELETE FROM Accommodations WHERE accommodation_id = ?', [id], function (err) {
-    if (err) return next(err);
+    if (err) return responseHelper.error(res, 'Error deleting accommodation', 500, err.message);
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'Accommodation not found' });
+      return responseHelper.error(res, 'Accommodation not found', 404);
     }
-    res.json({ message: 'Accommodation deleted successfully' });
+    return responseHelper.success(res, null, 'Accommodation deleted successfully');
   });
 });
 
@@ -117,8 +120,8 @@ router.get('/search/:term', (req, res, next) => {
      AND status = 'approved'`,
     [searchTerm, searchTerm, searchTerm, searchTerm],
     (err, rows) => {
-      if (err) return next(err);
-      res.json(rows);
+      if (err) return responseHelper.error(res, 'Error searching accommodations', 500, err.message);
+      return responseHelper.success(res, rows, 'Search results retrieved successfully');
     }
   );
 });

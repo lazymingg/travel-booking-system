@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const responseHelper = require('../utils/responseHelper');
 const router = express.Router();
 
 const db = new sqlite3.Database('./db/db.db');
@@ -10,7 +11,7 @@ router.get('/accommodation/:accommodation_id', (req, res, next) => {
   
   db.all('SELECT * FROM Rooms WHERE accommodation_id = ?', [accommodation_id], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    return responseHelper.success(res, rows, 'Rooms retrieved successfully');
   });
 });
 
@@ -22,15 +23,20 @@ router.get('/:accommodation_id/:room_id', (req, res, next) => {
     [accommodation_id, room_id], (err, row) => {
     if (err) return next(err);
     if (!row) {
-      return res.status(404).json({ error: 'Room not found' });
+      return responseHelper.error(res, 'Room not found', 404);
     }
-    res.json(row);
+    return responseHelper.success(res, row, 'Room retrieved successfully');
   });
 });
 
 // Create new room
 router.post('/', (req, res, next) => {
   const { accommodation_id, room_id, room_type, price_per_night, capacity, description } = req.body;
+  
+  if (!accommodation_id || !room_id || !room_type || !price_per_night || !capacity) {
+    return responseHelper.validationError(res, 'Accommodation ID, room ID, room type, price per night, and capacity are required');
+  }
+  
   const created_at = new Date().toISOString();
 
   db.run(
@@ -39,10 +45,7 @@ router.post('/', (req, res, next) => {
     [accommodation_id, room_id, room_type, price_per_night, capacity, description, created_at],
     function (err) {
       if (err) return next(err);
-      res.status(201).json({ 
-        message: 'Room created successfully',
-        room: { accommodation_id, room_id }
-      });
+      return responseHelper.success(res, { accommodation_id, room_id }, 'Room created successfully', 201);
     }
   );
 });
@@ -60,9 +63,9 @@ router.put('/:accommodation_id/:room_id', (req, res, next) => {
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Room not found' });
+        return responseHelper.error(res, 'Room not found', 404);
       }
-      res.json({ message: 'Room updated successfully' });
+      return responseHelper.success(res, null, 'Room updated successfully');
     }
   );
 });
@@ -75,15 +78,19 @@ router.delete('/:accommodation_id/:room_id', (req, res, next) => {
     [accommodation_id, room_id], function (err) {
     if (err) return next(err);
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'Room not found' });
+      return responseHelper.error(res, 'Room not found', 404);
     }
-    res.json({ message: 'Room deleted successfully' });
+    return responseHelper.success(res, null, 'Room deleted successfully');
   });
 });
 
 // Get available rooms for date range
 router.post('/available', (req, res, next) => {
   const { accommodation_id, check_in_date, check_out_date } = req.body;
+
+  if (!accommodation_id || !check_in_date || !check_out_date) {
+    return responseHelper.validationError(res, 'Accommodation ID, check-in date, and check-out date are required');
+  }
 
   const query = `
     SELECT r.* FROM Rooms r
@@ -103,7 +110,7 @@ router.post('/available', (req, res, next) => {
      check_out_date, check_out_date, check_in_date, check_out_date],
     (err, rows) => {
       if (err) return next(err);
-      res.json(rows);
+      return responseHelper.success(res, rows, 'Available rooms retrieved successfully');
     }
   );
 });
@@ -118,9 +125,9 @@ router.patch('/:accommodation_id/:room_id/toggle-availability', (req, res, next)
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Room not found' });
+        return responseHelper.error(res, 'Room not found', 404);
       }
-      res.json({ message: 'Room availability toggled successfully' });
+      return responseHelper.success(res, null, 'Room availability toggled successfully');
     }
   );
 });

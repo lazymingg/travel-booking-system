@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const responseHelper = require('../utils/responseHelper');
 const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
 
@@ -26,7 +27,7 @@ router.get('/', (req, res, next) => {
 
   db.all(query, params, (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    return responseHelper.success(res, rows, 'Bookings retrieved successfully');
   });
 });
 
@@ -46,9 +47,9 @@ router.get('/:id', (req, res, next) => {
   db.get(query, [id], (err, row) => {
     if (err) return next(err);
     if (!row) {
-      return res.status(404).json({ error: 'Booking not found' });
+      return responseHelper.error(res, 'Booking not found', 404);
     }
-    res.json(row);
+    return responseHelper.success(res, row, 'Booking retrieved successfully');
   });
 });
 
@@ -59,7 +60,7 @@ router.post('/', requireAuth, (req, res, next) => {
   const created_at = new Date().toISOString();
 
   if (!accommodation_id || !room_id || !check_in_date || !check_out_date || !total_price) {
-    return res.status(400).json({ error: 'Missing required booking information' });
+    return responseHelper.validationError(res, 'Missing required booking information');
   }
 
   db.run(
@@ -68,10 +69,7 @@ router.post('/', requireAuth, (req, res, next) => {
     [user_id, accommodation_id, room_id, check_in_date, check_out_date, total_price, created_at],
     function (err) {
       if (err) return next(err);
-      res.status(201).json({ 
-        message: 'Booking created',
-        booking_id: this.lastID 
-      });
+      return responseHelper.success(res, { booking_id: this.lastID }, 'Booking created successfully', 201);
     }
   );
 });
@@ -87,9 +85,9 @@ router.put('/:id', (req, res, next) => {
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Booking not found' });
+        return responseHelper.error(res, 'Booking not found', 404);
       }
-      res.json({ message: 'Booking status updated successfully' });
+      return responseHelper.success(res, null, 'Booking status updated successfully');
     }
   );
 });
@@ -104,9 +102,9 @@ router.patch('/:id/cancel', (req, res, next) => {
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
-        return res.status(404).json({ error: 'Booking not found' });
+        return responseHelper.error(res, 'Booking not found', 404);
       }
-      res.json({ message: 'Booking cancelled successfully' });
+      return responseHelper.success(res, null, 'Booking cancelled successfully');
     }
   );
 });
@@ -125,7 +123,7 @@ router.get('/my-bookings', requireAuth, (req, res, next) => {
 
   db.all(query, [user_id], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    return responseHelper.success(res, rows, 'User bookings retrieved successfully');
   });
 });
 
@@ -143,13 +141,17 @@ router.get('/user/:user_id', (req, res, next) => {
 
   db.all(query, [user_id], (err, rows) => {
     if (err) return next(err);
-    res.json(rows);
+    return responseHelper.success(res, rows, 'User bookings retrieved successfully');
   });
 });
 
 // Check room availability
 router.post('/check-availability', (req, res, next) => {
   const { accommodation_id, room_id, check_in_date, check_out_date } = req.body;
+
+  if (!accommodation_id || !room_id || !check_in_date || !check_out_date) {
+    return responseHelper.validationError(res, 'Accommodation ID, room ID, check-in date, and check-out date are required');
+  }
 
   const query = `
     SELECT COUNT(*) as count FROM Bookings 
@@ -165,10 +167,11 @@ router.post('/check-availability', (req, res, next) => {
     [accommodation_id, room_id, check_in_date, check_in_date, check_out_date, check_out_date, check_in_date, check_out_date],
     (err, result) => {
       if (err) return next(err);
-      res.json({ 
-        available: result.count === 0,
-        message: result.count === 0 ? 'Room is available' : 'Room is not available for the selected dates'
-      });
+      const available = result.count === 0;
+      return responseHelper.success(res, {
+        available,
+        message: available ? 'Room is available' : 'Room is not available for the selected dates'
+      }, 'Availability check completed');
     }
   );
 });

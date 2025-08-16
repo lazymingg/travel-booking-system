@@ -15,8 +15,8 @@ const router = createRouter({
       component: () => import('../views/User_info.vue'),
     },
     {
-      path: '/homePage',
-      name: 'homePage',
+      path: '/',
+      name: 'HomePage',
       component: () => import('../views/HomePage.vue'),
     }
   ],
