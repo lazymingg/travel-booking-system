@@ -22,7 +22,7 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
     <!-- Confirmed Status Buttons -->
     <template v-else-if="status === 'confirmed'">
       <button class="btn btn-danger" @click="$emit('delete')" title="Move to Cancelled">
-        <i class="fas fa-trash"></i> Cancel
+        <i class="fas fa-trash"></i> Delete
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <i class="fas fa-edit"></i> Edit
