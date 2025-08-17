@@ -1,10 +1,10 @@
 <script setup>
 const props = defineProps({ status: String })
 const statusMap = {
-  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', icon: 'fas fa-check-double' },
-  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', icon: 'fas fa-check-circle' },
-  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', icon: 'fas fa-clock' },
-  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', icon: 'fas fa-times-circle' },
+  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', icon: 'fas fa-clock' }, // clock for completed
+  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', icon: 'fas fa-check-circle' }, // tick with circle
+  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', icon: 'fas fa-clock' }, // clock for pending
+  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', icon: 'fas fa-times-circle' }, // x with circle
 }
 const badge = statusMap[props.status] || statusMap.completed
 </script>

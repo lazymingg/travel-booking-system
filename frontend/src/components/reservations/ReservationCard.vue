@@ -7,8 +7,8 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
 <template>
   <div class="reservation-card">
     <div class="card-header">
-      <span class="hotel-name">{{ reservation.hotel }}</span>
-      <div class="status-row">
+      <div class="hotel-status-row">
+        <span class="hotel-name">{{ reservation.hotel }}</span>
         <StatusBadge :status="reservation.status" />
       </div>
     </div>
@@ -43,17 +43,18 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
   position: relative;
 }
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 1rem;
+}
+.hotel-status-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 .hotel-name {
   font-size: 1.125rem;
   font-weight: 600;
   color: #374151;
-  display: flex;
-  align-items: center;
+  flex-grow: 1;
 }
 .card-body {
   margin-bottom: 1rem;
@@ -100,4 +101,4 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
   color: #6B7280;
   font-weight: 500;
 }
-</style>
+</style>y

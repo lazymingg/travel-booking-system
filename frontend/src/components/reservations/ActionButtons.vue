@@ -7,10 +7,10 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
     <!-- Pending Status Buttons -->
     <template v-if="status === 'pending'">
       <button class="btn btn-success" @click="$emit('confirm')" title="Move to Confirmed">
-        <i class="fas fa-check"></i> Confirm
+        <i class="fas fa-check-square"></i> Confirm
       </button>
       <button class="btn btn-danger" @click="$emit('decline')" title="Remove reservation">
-        <i class="fas fa-times"></i> Decline
+        <i class="fas fa-times-rectangle"></i> Decline
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <i class="fas fa-edit"></i> Edit
@@ -19,11 +19,10 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
         <i class="fas fa-phone"></i> Contact Guest
       </button>
     </template>
-    
     <!-- Confirmed Status Buttons -->
     <template v-else-if="status === 'confirmed'">
       <button class="btn btn-danger" @click="$emit('delete')" title="Move to Cancelled">
-        <i class="fas fa-ban"></i> Delete
+        <i class="fas fa-trash"></i> Cancel
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <i class="fas fa-edit"></i> Edit
@@ -32,7 +31,6 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
         <i class="fas fa-phone"></i> Contact Guest
       </button>
     </template>
-    
     <!-- Completed & Cancelled Status Buttons -->
     <template v-else>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
