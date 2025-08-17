@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/',
       name: 'HomePage',
       component: () => import('../views/HomePage.vue'),
+    },
+    {
+      path: '/manage-reservations',
+      name: 'ManageReservations',
+      component: () => import('../views/ManageReservations.vue'),
     }
   ],
 })
