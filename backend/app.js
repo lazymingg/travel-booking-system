@@ -10,6 +10,12 @@ var cookieParser = require('cookie-parser');
 // a middleware logger to log http requests to the console
 var logger = require('morgan');
 
+// CORS middleware
+const cors = require('cors');
+
+// Session middleware
+const session = require('express-session');
+
 // import and enable verbose mode for sqlite to get more detail debug info
 const sqlite3 = require('sqlite3').verbose();
 
@@ -17,11 +23,21 @@ const sqlite3 = require('sqlite3').verbose();
 const dotenv = require('dotenv');
 
 
+const responseHelper = require('./utils/responseHelper');
+
 var app = express();
 dotenv.config();
 
 // declare routes
 const usersRouter = require('./routes/users');
+const paymentsRouter = require('./routes/payments');
+const reviewRouter = require('./routes/Review');
+const accommodationsRouter = require('./routes/Accommodations');
+const accommodationsImagesRouter = require('./routes/Accommodations_images');
+const bookingsRouter = require('./routes/Bookings');
+const roomsRouter = require('./routes/Rooms');
+const ownersRouter = require('./routes/Owners');
+const authRouter = require('./routes/Auth');
 
 const home = require("./routes/index");
 // connect to db
@@ -34,26 +50,48 @@ const db = new sqlite3.Database('./db/db.db', (err) => {
 });
 
 // middleware
+app.use(cors({
+  origin: true, // Allow all origins for now
+  credentials: true // Allow cookies
+}));
+
+// Simple session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'simple-travel-booking-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
 app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 //serve static file in public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/users', usersRouter);
-
+app.use('/payments', paymentsRouter);
+app.use('/reviews', reviewRouter);
+app.use('/accommodations', accommodationsRouter);
+app.use('/accommodations', accommodationsImagesRouter);
+app.use('/bookings', bookingsRouter);
+app.use('/rooms', roomsRouter);
+app.use('/owners', ownersRouter);
+app.use('/auth', authRouter);
 app.use('/', home);
 
 // middleware serve the err
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  // Sử dụng responseHelper để trả về format thống nhất
+  return responseHelper.error(res, 'Internal Server Error', 500, err.message);
 });
 
 module.exports = app
-// // start app
-// app.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
