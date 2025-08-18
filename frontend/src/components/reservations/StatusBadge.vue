@@ -1,16 +1,22 @@
 <script setup>
 const props = defineProps({ status: String })
+// Import your SVGs here
+import pendingSvg from '@/assets/pendingStatus.svg'
+import completedSvg from '@/assets/completedStatus.svg'
+import confirmedSvg from '@/assets/confirmedStatus.svg'
+import cancelledSvg from '@/assets/cancelledStatus.svg'
+
 const statusMap = {
-  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', icon: 'fas fa-clock' }, // clock for completed
-  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', icon: 'fas fa-check-circle' }, // tick with circle
-  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', icon: 'fas fa-clock' }, // clock for pending
-  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', icon: 'fas fa-times-circle' }, // x with circle
+  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', svg: completedSvg },
+  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', svg: confirmedSvg },
+  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', svg: pendingSvg },
+  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', svg: cancelledSvg },
 }
 const badge = statusMap[props.status] || statusMap.completed
 </script>
 <template>
   <span class="status-badge" :style="{ background: badge.bg, color: badge.color }">
-    <i :class="badge.icon" class="status-icon"></i>
+    <img :src="badge.svg" alt="Status" class="svg-icon" />
     {{ badge.text }}
   </span>
 </template>
@@ -26,7 +32,10 @@ const badge = statusMap[props.status] || statusMap.completed
   text-transform: uppercase;
   letter-spacing: 0.025em;
 }
-.status-icon {
-  font-size: 0.875em;
+.svg-icon {
+  width: 1.5em; /* Increased size */
+  height: 1.5em;
+  vertical-align: middle;
+  margin-right: 0.5em;
 }
 </style>

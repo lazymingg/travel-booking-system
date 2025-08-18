@@ -1,43 +1,50 @@
 <script setup>
 const props = defineProps({ status: String })
 const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
+import trashSvg from '@/assets/trash.svg'
+import confirmSvg from '@/assets/confirmButton.svg'
+import declineSvg from '@/assets/declineButton.svg'
+import contactSvg from '@/assets/contactButton.svg'
+import editSvg from '@/assets/editButton.svg'
+
+
 </script>
 <template>
   <div class="card-actions">
     <!-- Pending Status Buttons -->
     <template v-if="status === 'pending'">
       <button class="btn btn-success" @click="$emit('confirm')" title="Move to Confirmed">
-        <i class="fas fa-check-square"></i> Confirm
+        <img :src="confirmSvg" alt="Confirm" class="svg-icon" /> Confirm
       </button>
       <button class="btn btn-danger" @click="$emit('decline')" title="Remove reservation">
-        <i class="fas fa-times-rectangle"></i> Decline
+        <img :src="declineSvg" alt="Decline" class="svg-icon" /> Decline
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
-        <i class="fas fa-edit"></i> Edit
+        <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
       </button>
       <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <i class="fas fa-phone"></i> Contact Guest
+        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
       </button>
     </template>
     <!-- Confirmed Status Buttons -->
     <template v-else-if="status === 'confirmed'">
       <button class="btn btn-danger" @click="$emit('delete')" title="Move to Cancelled">
-        <i class="fas fa-trash"></i> Delete
+        <img :src="trashSvg" alt="Delete" class="svg-icon" /> Delete
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
-        <i class="fas fa-edit"></i> Edit
+        <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
       </button>
       <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <i class="fas fa-phone"></i> Contact Guest
+        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
       </button>
     </template>
     <!-- Completed & Cancelled Status Buttons -->
     <template v-else>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
-        <i class="fas fa-edit"></i> Edit
+        <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
       </button>
       <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <i class="fas fa-phone"></i> Contact Guest
+        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
       </button>
     </template>
   </div>
@@ -62,6 +69,12 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
 }
 .btn:hover {
   transform: translateY(-1px);
+}
+.svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  margin-right: 0.5em;
 }
 .btn-primary {
   background: #1E40AF;

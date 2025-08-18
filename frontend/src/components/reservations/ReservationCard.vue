@@ -17,7 +17,7 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
       <div class="info-row"><span class="info-label">Adults/Children:</span><span class="info-value">{{ reservation.adults }}/{{ reservation.children }}</span></div>
       <div class="info-row"><span class="info-label">Dates:</span><span class="info-value">{{ reservation.checkIn }} → {{ reservation.checkOut }}</span></div>
       <div class="info-row"><span class="info-label">Total:</span><span class="info-value total-amount">${{ reservation.total }}</span></div>
-      <div v-if="reservation.requirements" class="special-req"><i class="fas fa-info-circle"></i>{{ reservation.requirements }}</div>
+      <div v-if="reservation.requirements" class="special-req">{{ reservation.requirements }}</div>
     </div>
     <div class="card-footer">
       <div class="reservation-id">#{{ reservation.id }}</div>
@@ -101,4 +101,4 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
   color: #6B7280;
   font-weight: 500;
 }
-</style>y
+</style>
