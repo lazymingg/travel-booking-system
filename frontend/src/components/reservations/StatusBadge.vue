@@ -1,10 +1,10 @@
 <script setup>
 const props = defineProps({ status: String })
 // Import your SVGs here
-import pendingSvg from '@/assets/pendingStatus.svg'
-import completedSvg from '@/assets/completedStatus.svg'
-import confirmedSvg from '@/assets/confirmedStatus.svg'
-import cancelledSvg from '@/assets/cancelledStatus.svg'
+import pendingSvg from '@/assets/manageReservationIcons/status/pendingStatus.svg'
+import completedSvg from '@/assets/manageReservationIcons/status/completedStatus.svg'
+import confirmedSvg from '@/assets/manageReservationIcons/status/confirmedStatus.svg'
+import cancelledSvg from '@/assets/manageReservationIcons/status/cancelledStatus.svg'
 
 const statusMap = {
   completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', svg: completedSvg },

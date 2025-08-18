@@ -1,11 +1,11 @@
 <script setup>
 const props = defineProps({ status: String })
 const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
-import trashSvg from '@/assets/trash.svg'
-import confirmSvg from '@/assets/confirmButton.svg'
-import declineSvg from '@/assets/declineButton.svg'
-import contactSvg from '@/assets/contactButton.svg'
-import editSvg from '@/assets/editButton.svg'
+import deleteSvg from '@/assets/manageReservationIcons/buttons/deleteButton.svg'
+import confirmSvg from '@/assets/manageReservationIcons/buttons/confirmButton.svg'
+import declineSvg from '@/assets/manageReservationIcons/buttons/declineButton.svg'
+import contactSvg from '@/assets/manageReservationIcons/buttons/contactButton.svg'
+import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
 
 
 </script>
@@ -29,7 +29,7 @@ import editSvg from '@/assets/editButton.svg'
     <!-- Confirmed Status Buttons -->
     <template v-else-if="status === 'confirmed'">
       <button class="btn btn-danger" @click="$emit('delete')" title="Move to Cancelled">
-        <img :src="trashSvg" alt="Delete" class="svg-icon" /> Delete
+        <img :src="deleteSvg" alt="Delete" class="svg-icon" /> Delete
       </button>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit

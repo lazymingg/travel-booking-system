@@ -1,5 +1,9 @@
 <script setup>
 import { ref, watch } from 'vue'
+import calendarSvg from '@/assets//manageReservationIcons/edit_Check_in_out.svg' 
+import peopleSvg from '@/assets//manageReservationIcons/people.svg'
+import moneySvg from '@/assets//manageReservationIcons/money.svg'
+
 
 const props = defineProps({ reservation: Object })
 const emit = defineEmits(['close', 'save'])
@@ -17,7 +21,6 @@ const form = ref({
 
 watch(() => props.reservation, (val) => {
   if (val) {
-    // Fix: Properly assign values to form
     form.value = { ...val }
   }
 }, { immediate: true })
@@ -46,26 +49,40 @@ function save() {
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Check-in</label>
+            <label class="form-label">
+              <img :src="calendarSvg" alt="Check-in" class="svg-label" />
+              Check-in
+            </label>
             <input type="date" v-model="form.checkIn" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">Check-out</label>
+            <label class="form-label">
+              <img :src="calendarSvg" alt="Check-out" class="svg-label" />
+              Check-out
+            </label>
             <input type="date" v-model="form.checkOut" class="form-input" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Adults</label>
+            <label class="form-label">
+              <img :src="peopleSvg" alt="Adults" class="svg-label" />
+              Adults
+            </label>
             <input type="number" min="1" v-model="form.adults" class="form-input" />
           </div>
           <div class="form-group">
-            <label class="form-label">Children</label>
+            <label class="form-label">
+              Children
+            </label>
             <input type="number" min="0" v-model="form.children" class="form-input" />
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Total amount</label>
+          <label class="form-label">
+            <img :src="moneySvg" alt="Total" class="svg-label" />
+            Total amount
+          </label>
           <input type="number" min="0" v-model="form.total" class="form-input" />
         </div>
         <div class="form-group">
@@ -82,6 +99,12 @@ function save() {
 </template>
 
 <style scoped>
+.svg-label {
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: middle;
+  margin-right: 0.5em;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -136,7 +159,8 @@ function save() {
   margin-bottom: 1.25rem;
 }
 .form-label {
-  display: block;
+  display: flex;
+  align-items: center;
   font-size: 1rem;
   font-weight: 600;
   color: #374151;
