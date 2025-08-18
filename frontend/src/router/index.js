@@ -23,6 +23,11 @@ const router = createRouter({
       path: '/manage-reservations',
       name: 'ManageReservations',
       component: () => import('../views/ManageReservations.vue'),
+    },
+    {
+      path: '/manage-accommodation',
+      name: 'ManageAccommodation',
+      component: () => import('../views/ManageAccommodation.vue'),
     }
   ],
 })
