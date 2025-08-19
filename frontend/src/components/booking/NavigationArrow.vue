@@ -1,5 +1,4 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue'
 import previous from '@/assets/bookingIcon/leftArrow.svg'
 import next from '@/assets/bookingIcon/rightArrow.svg'
 

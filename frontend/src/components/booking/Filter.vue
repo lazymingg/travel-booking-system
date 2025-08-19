@@ -1,13 +1,34 @@
+<script setup>
+import { ref, reactive , watch } from 'vue'
+
+const emit = defineEmits(['filter'])
+
+const showChangeSearch = ref(false)
+
+const filterData = reactive({
+  checkInDate: '13/08/2025', 
+  checkInTime: '12:00',
+  checkOutDate: '15/08/2025 - 12:00',
+  checkOutTime: '12:00',
+  guests: '2 person'
+})
+
+const applyFilter = () => {
+  emit('filter', { ...filterData })
+  showChangeSearch.value = false
+}
+</script>
+
 <template>
   <div class="search-container">
     <h2 class="title">Select your option</h2>
     
     <div class="summary-box">
       <div class="summary-item">
-        {{ filterData.checkIn }}
+        {{ filterData.checkInDate }} - {{ filterData.checkInTime }}
       </div>
       <div class="summary-item">
-        {{ filterData.checkOut }}
+        {{ filterData.checkOutDate }} - {{ filterData.checkOutTime }}
       </div>
       <div class="summary-item">
         {{ filterData.guests }}
@@ -26,30 +47,41 @@
         <div>
           <label class="label">Check-in Date</label>
           <input 
-            v-model="filterData.checkIn" 
-            type="text" 
+            v-model="filterData.checkInDate" 
+            type="date" 
+            class="input"
+          />
+          <input 
+            v-model="filterData.checkInTime" 
+            type="time" 
             class="input"
           />
         </div>
         <div>
           <label class="label">Check-out Date</label>
           <input 
-            v-model="filterData.checkOut" 
-            type="text" 
+            v-model="filterData.checkOutDate" 
+            type="date" 
+            class="input"
+          />
+          <input 
+            v-model="filterData.checkOutTime" 
+            type="time" 
             class="input"
           />
         </div>
         <div>
           <label class="label">Guests</label>
-          <select 
-            v-model="filterData.guests" 
+          <div class="input-wrapper">
+            <input
+            v-model="filterData.guests"
+            type="number"
+            min="0"
             class="input"
-          >
-            <option>1 person</option>
-            <option>2 people</option>
-            <option>3 people</option>
-            <option>4 people</option>
-          </select>
+            >
+            </input>
+            <span class="suffix">person</span>
+          </div>
         </div>
       </div>
       <div class="button-group">
@@ -69,24 +101,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, reactive } from 'vue'
-
-const emit = defineEmits(['filter'])
-
-const showChangeSearch = ref(false)
-const filterData = reactive({
-  checkIn: '13/08/2025 - 12:00:00',
-  checkOut: '15/08/2025 - 12:00:00',
-  guests: '2 people'
-})
-
-const applyFilter = () => {
-  emit('filter', { ...filterData })
-  showChangeSearch.value = false
-}
-</script>
 
 <style scoped>
 .search-container {
@@ -184,5 +198,20 @@ const applyFilter = () => {
 
 .btn-secondary:hover {
   background: #9ca3af;
+}
+
+.input-wrapper {
+  position: relative;
+  /* display: inline-block; */
+}
+
+.input-wrapper .suffix {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* không cho click vào suffix */
+  color: #555;
+  font-size: 14px;
 }
 </style>

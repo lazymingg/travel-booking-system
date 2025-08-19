@@ -6,5 +6,7 @@ import RoomtList from '@/components/booking/RoomList.vue'
 <template>
     Selection Page
     <Filter/>
-    <RoomtList/>
+    <div id="room-list">
+        <RoomtList/>
+    </div>
 </template>

@@ -1,3 +1,14 @@
+<script setup>
+import check from '@/assets/bookingIcon/check.svg'
+
+defineProps({
+  currentStep: {
+    type: Number,
+    required: true
+  }
+})
+</script>
+
 <template>
   <div class="progress-wrapper">
     <div class="progress-container">
@@ -5,7 +16,9 @@
         <!-- Step 1 -->
         <div class="step">
           <div class="step-circle" :class="{ active: currentStep >= 1 }">
-            <span v-if="currentStep > 1">✓</span>
+            <span v-if="currentStep > 1">
+              <img :src="check" alt="check" class="check-icon">
+            </span>
             <span v-else>1</span>
           </div>
           <span class="step-label">Selection</span>
@@ -17,7 +30,9 @@
         <!-- Step 2 -->
         <div class="step">
           <div class="step-circle" :class="{ active: currentStep >= 2 }">
-            <span v-if="currentStep > 2">✓</span>
+            <span v-if="currentStep > 2">
+              <img :src="check" alt="check" class="check-icon">
+            </span>
             <span v-else>2</span>
           </div>
           <span class="step-label">Your details</span>
@@ -37,15 +52,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-defineProps({
-  currentStep: {
-    type: Number,
-    required: true
-  }
-})
-</script>
 
 <style scoped>
 .progress-wrapper {
@@ -103,5 +109,12 @@ defineProps({
 
 .step-line.active {
   background-color: #2563eb; /* bg-blue-600 */
+}
+
+.check-icon{
+  max-width: 35px;
+  display: flex;
+  align-items: center;
+  fill: #fff;
 }
 </style>
