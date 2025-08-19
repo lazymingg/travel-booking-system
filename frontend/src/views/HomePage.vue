@@ -4,14 +4,16 @@
 
 <template>
   <div class="main-container">
-  <nav class ='nav-bar'>
+  <!-- <nav class ='nav-bar'>
     <h1 class="logo">Travel Booking System</h1>
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/login">Login</a></li>
       <li><a href="/userProfile">User Profile</a></li>
     </ul>
-  </nav>
+  </nav> -->
+  <HeaderModal/>
+  <SearchModal/>
   <div class="hero-pane">
   </div>
   <div class="search-bar">
@@ -32,8 +34,27 @@
       <p>Destination 3</p>
     </div>
   </div>
-
+  <FooterModal/>
 </template>
+
+<script>
+import HeaderModal from '@/components/HeaderModal.vue';
+import FooterModal from '@/components/FooterModal.vue';
+import SearchModal from '@/components/SearchModal.vue';
+
+export default {
+  name: 'WeGoBooking',
+  components: {
+    HeaderModal,
+    SearchModal,
+    FooterModal
+  },
+  data() {
+    return {
+    }
+  }
+}
+</script>
 
 <style scoped>
 .hero-pane {

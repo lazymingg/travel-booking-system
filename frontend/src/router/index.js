@@ -28,6 +28,11 @@ const router = createRouter({
       path: '/manage-reservations',
       name: 'ManageReservations',
       component: () => import('../views/ManageReservations.vue'),
+    },
+    {
+      path: '/about-us',
+      name: 'AboutUs',
+      component: () => import('../views/AboutUs.vue'),
     }
   ],
 })
