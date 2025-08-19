@@ -1,14 +1,3 @@
-<script setup>
-import check from '@/assets/bookingIcon/check.svg'
-
-defineProps({
-  currentStep: {
-    type: Number,
-    required: true
-  }
-})
-</script>
-
 <template>
   <div class="progress-wrapper">
     <div class="progress-container">
@@ -53,27 +42,40 @@ defineProps({
   </div>
 </template>
 
+<script setup>
+import check from '@/assets/bookingIcon/check.svg'
+
+defineProps({
+  currentStep: {
+    type: Number,
+    required: true
+  }
+})
+</script>
+
 <style scoped>
 .progress-wrapper {
   background-color: #fff;
-  padding: 2rem 0; /* py-8 */
+  padding: 2rem 0;
 }
 
 .progress-container {
-  max-width: 64rem; /* max-w-4xl */
+  max-width: 64rem;
   margin: 0 auto;
 }
 
 .progress-steps {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  position: relative;
 }
 
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .step-circle {
@@ -86,32 +88,36 @@ defineProps({
   font-weight: bold;
   font-size: 1.25rem;
   color: white;
-  background-color: #d1d5db; /* bg-gray-300 */
+  background-color: #d1d5db;
+  position: relative;
+  z-index: 2;
 }
 
 .step-circle.active {
-  background-color: #2563eb; /* bg-blue-600 */
+  background-color: #2563eb;
 }
 
 .step-label {
-  margin-top: 0.75rem; /* mt-3 */
-  font-size: 1.125rem; /* text-lg */
-  font-weight: 500; /* font-medium */
-  color: #374151; /* text-gray-700 */
+  margin-top: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #374151;
 }
 
 .step-line {
-  width: 8rem;  /* w-32 */
-  height: 0.25rem; /* h-1 */
-  margin: 0 1rem; /* mx-4 */
-  background-color: #d1d5db; /* bg-gray-300 */
+  width: 8rem;
+  height: 0.25rem;
+  background-color: #d1d5db;
+  position: relative;
+  top: 2rem;
+  z-index: 1;
 }
 
 .step-line.active {
-  background-color: #2563eb; /* bg-blue-600 */
+  background-color: #2563eb;
 }
 
-.check-icon{
+.check-icon {
   max-width: 35px;
   display: flex;
   align-items: center;

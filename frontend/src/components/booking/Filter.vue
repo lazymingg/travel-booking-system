@@ -1,22 +1,45 @@
 <script setup>
-import { ref, reactive , watch } from 'vue'
+import { ref, reactive , computed } from 'vue'
 
 const emit = defineEmits(['filter'])
 
 const showChangeSearch = ref(false)
 
+// Information in the filter bar
+// The filter bar shows the result from a specific Accommodation Page -> NOT DONE
+// Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  checkInDate: '13/08/2025', 
-  checkInTime: '12:00',
-  checkOutDate: '15/08/2025 - 12:00',
-  checkOutTime: '12:00',
-  guests: '2 person'
+  checkInDate: 'DD/MM/YYYY', 
+  checkInTime: 'HH:MM',
+  checkOutDate: 'DD/MM/YYYY',
+  checkOutTime: 'HH:MM',
+  numberGuest: 0
 })
 
+// Add string person in the Number of Guest of Filter bar
+const guestWithText = computed(() => {
+  return filterData.numberGuest + ' person'
+})
+
+// Temporary data for Filter bar form
+const formFilter = reactive({ ...filterData })
+
+// Click on Change Search
+// Open the form for input new data
+const openForm = () => {
+  // Copy the data from the Filter bar form
+  Object.assign(formFilter, filterData) // Copy Data -> Form
+  showChangeSearch.value = true
+}
+
+// Change the state of filter bar
 const applyFilter = () => {
+  Object.assign(filterData, formFilter) // Copy Form -> Data
   emit('filter', { ...filterData })
   showChangeSearch.value = false
 }
+
+
 </script>
 
 <template>
@@ -31,7 +54,7 @@ const applyFilter = () => {
         {{ filterData.checkOutDate }} - {{ filterData.checkOutTime }}
       </div>
       <div class="summary-item">
-        {{ filterData.guests }}
+        {{ guestWithText }}
       </div>
       <button 
         @click="showChangeSearch = !showChangeSearch"
@@ -47,12 +70,12 @@ const applyFilter = () => {
         <div>
           <label class="label">Check-in Date</label>
           <input 
-            v-model="filterData.checkInDate" 
+            v-model="formFilter.checkInDate" 
             type="date" 
             class="input"
           />
           <input 
-            v-model="filterData.checkInTime" 
+            v-model="formFilter.checkInTime" 
             type="time" 
             class="input"
           />
@@ -60,12 +83,12 @@ const applyFilter = () => {
         <div>
           <label class="label">Check-out Date</label>
           <input 
-            v-model="filterData.checkOutDate" 
+            v-model="formFilter.checkOutDate" 
             type="date" 
             class="input"
           />
           <input 
-            v-model="filterData.checkOutTime" 
+            v-model="formFilter.checkOutTime" 
             type="time" 
             class="input"
           />
@@ -74,7 +97,7 @@ const applyFilter = () => {
           <label class="label">Guests</label>
           <div class="input-wrapper">
             <input
-            v-model="filterData.guests"
+            v-model="formFilter.numberGuest"
             type="number"
             min="0"
             class="input"
