@@ -1,100 +1,157 @@
+<script setup>
+import { ref, computed } from 'vue'
+import AccommodationStats from '../components/accommodations/AccommodationStats.vue'
+import AccommodationCard from '../components/accommodations/AccommodationCard.vue'
+import AddAccommodationModal from '../components/accommodations/AddAccommodationModal.vue'
+import EditAccommodationModal from '../components/accommodations/EditAccommodationModal.vue'
+import DeleteAccommodationModal from '../components/accommodations/DeleteAccommodationModal.vue'
+
+console.log('[v0] ManageAccommodation component loaded')
+
+const accommodations = ref([
+  {
+    id: 'A001',
+    name: 'Khách sạn continental',
+    city: 'TPHCM',
+    rating: 4.6,
+    price: 1000000,
+    image: '/placeholder.svg?height=200&width=300',
+    totalBookings: 15,
+    revenue: 15000000
+  },
+  {
+    id: 'A002',
+    name: 'Resort Paradise',
+    city: 'Đà Nẵng',
+    rating: 4.8,
+    price: 1500000,
+    image: '/placeholder.svg?height=200&width=300',
+    totalBookings: 12,
+    revenue: 18000000
+  },
+  {
+    id: 'A003',
+    name: 'Mountain Lodge',
+    city: 'Sapa',
+    rating: 4.4,
+    price: 800000,
+    image: '/placeholder.svg?height=200&width=300',
+    totalBookings: 24,
+    revenue: 19200000
+  }
+])
+
+const showAddModal = ref(false)
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+const selectedAccommodation = ref(null)
+
+const stats = computed(() => {
+  const result = {
+    totalProperties: accommodations.value.length,
+    totalRevenue: accommodations.value.reduce((sum, acc) => sum + acc.revenue, 0),
+    totalBookings: accommodations.value.reduce((sum, acc) => sum + acc.totalBookings, 0),
+    averageRating: accommodations.value.reduce((sum, acc) => sum + acc.rating, 0) / accommodations.value.length
+  }
+  console.log('[v0] Computed stats:', result)
+  return result
+})
+
+function openAddModal() {
+  showAddModal.value = true
+}
+
+function openEditModal(accommodation) {
+  selectedAccommodation.value = { ...accommodation }
+  showEditModal.value = true
+}
+
+function openDeleteModal(accommodation) {
+  selectedAccommodation.value = { ...accommodation }
+  showDeleteModal.value = true
+}
+
+function handleAdd(newAccommodation) {
+  const id = 'A' + String(accommodations.value.length + 1).padStart(3, '0')
+  accommodations.value.push({ ...newAccommodation, id })
+  showAddModal.value = false
+  console.log('New accommodation added:', newAccommodation)
+}
+
+function handleEdit(updatedAccommodation) {
+  const idx = accommodations.value.findIndex(acc => acc.id === updatedAccommodation.id)
+  if (idx !== -1) {
+    accommodations.value[idx] = { ...updatedAccommodation }
+  }
+  showEditModal.value = false
+  console.log('Accommodation updated:', updatedAccommodation)
+}
+
+function handleDelete(accommodationId) {
+  accommodations.value = accommodations.value.filter(acc => acc.id !== accommodationId)
+  showDeleteModal.value = false
+  console.log('Accommodation deleted:', accommodationId)
+}
+
+function handleView(accommodation) {
+  console.log('Viewing accommodation:', accommodation)
+  // Add your view logic here
+}
+</script>
+
 <template>
   <div class="page-wrapper">
-    <!-- title row -->
+    <!-- Section Title -->
     <div class="section-title-row">
-      <h2 class="section-title"> Manage Properties</h2>
-      <div class="add-properties-btn"> + Add Properties </div>
+      <h2 class="section-title">Manage Properties</h2>
+      <button class="add-properties-btn" @click="openAddModal">
+        + Add Properties
+      </button>
     </div>
-    <!-- status card -->
-    <div class="list-status-cards-container">
 
-      <div class="status-card-container">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home h-8 w-8 text-blue-600"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        <div class="status-card-text-container">
-          <p class="status-card-content-title">
-            Total Properties
-          </p>
-          <p class="status-card-content-ammount">
-            37
-          </p>
-        </div>
-      </div>
+    <!-- Statistics Cards -->
+    <AccommodationStats :stats="stats" />
 
-      <div class="status-card-container">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign h-8 w-8 text-green-600"><line x1="12" x2="12" y1="2" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        <div class="status-card-text-container">
-          <p class="status-card-content-title">
-            Total Revenue
-          </p>
-          <p class="status-card-content-ammount">
-            10.000.000 VND
-          </p>
-        </div>
-      </div>
-
-      <div class="status-card-container">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users h-8 w-8 text-purple-600"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        <div class="status-card-text-container">
-          <p class="status-card-content-title">
-            Total bookings
-          </p>
-          <p class="status-card-content-ammount">
-            51
-          </p>
-        </div>
-      </div>
-
-      <div class="status-card-container">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-8 w-8 text-yellow-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <div class="status-card-text-container">
-          <p class="status-card-content-title">
-            Average ratings
-          </p>
-          <p class="status-card-content-ammount">
-            4.6/5
-          </p>
-        </div>
-      </div>
-
+    <!-- Accommodation List -->
+    <div class="list-accom-cards-container">
+      <AccommodationCard
+        v-for="accommodation in accommodations"
+        :key="accommodation.id"
+        :accommodation="accommodation"
+        @edit="openEditModal"
+        @view="handleView"
+        @delete="openDeleteModal"
+      />
     </div>
+
+    <!-- Modals -->
+    <AddAccommodationModal
+      v-if="showAddModal"
+      @close="showAddModal = false"
+      @save="handleAdd"
+    />
+
+    <EditAccommodationModal
+      v-if="showEditModal"
+      :accommodation="selectedAccommodation"
+      @close="showEditModal = false"
+      @save="handleEdit"
+    />
+
+    <DeleteAccommodationModal
+      v-if="showDeleteModal"
+      :accommodation="selectedAccommodation"
+      @close="showDeleteModal = false"
+      @delete="handleDelete"
+    />
   </div>
 </template>
 
 <style scoped>
-.list-status-cards-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 2rem;
-}
-
-.status-card-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: 1rem;
-  border: 1px solid #e5e5e5;
-  border-radius: 10px;
-  padding: 1rem;
-}
-
-.status-card-text-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.status-card-content-title {
-  font-size: 1.5rem;
-}
-
-.status-card-content-ammount {
-  font-size: 1rem;
-}
-
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem, 1rem;
+  padding: 1.5rem 1rem;
   background: #f9fafb;
   min-height: 100vh;
 }
@@ -106,6 +163,7 @@
   margin-bottom: 2rem;
   background: #fff;
   padding: 1.5rem;
+  border-radius: 1.5rem;
   box-shadow: 0 2px 8px rgba(30,64,175,0.08);
   border: 1px solid #E5E7EB;
 }
@@ -118,7 +176,26 @@
 }
 
 .add-properties-btn {
-  background-color: #e5e5e5;
-  border-radius: 10%;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+}
+
+.add-properties-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59,130,246,0.2);
+}
+
+.list-accom-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 </style>
