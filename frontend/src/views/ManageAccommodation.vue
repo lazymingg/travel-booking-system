@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue'
 import AccommodationStats from '../components/accommodations/AccommodationStats.vue'
 import AccommodationCard from '../components/accommodations/AccommodationCard.vue'
-import AddAccommodationModal from '../components/accommodations/AddAccommodationModal.vue'
 import EditAccommodationModal from '../components/accommodations/EditAccommodationModal.vue'
 import DeleteAccommodationModal from '../components/accommodations/DeleteAccommodationModal.vue'
 
@@ -45,6 +44,7 @@ const showAddModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const selectedAccommodation = ref(null)
+console.log('[v0] ManageAccommodation component loaded')
 
 const stats = computed(() => {
   const result = {
@@ -57,8 +57,10 @@ const stats = computed(() => {
   return result
 })
 
+
 function openAddModal() {
-  showAddModal.value = true
+  //router.push('/upload-accommodation')
+  window.location.href = '/upload-accommodation'
 }
 
 function openEditModal(accommodation) {
@@ -69,13 +71,6 @@ function openEditModal(accommodation) {
 function openDeleteModal(accommodation) {
   selectedAccommodation.value = { ...accommodation }
   showDeleteModal.value = true
-}
-
-function handleAdd(newAccommodation) {
-  const id = 'A' + String(accommodations.value.length + 1).padStart(3, '0')
-  accommodations.value.push({ ...newAccommodation, id })
-  showAddModal.value = false
-  console.log('New accommodation added:', newAccommodation)
 }
 
 function handleEdit(updatedAccommodation) {
@@ -97,6 +92,7 @@ function handleView(accommodation) {
   console.log('Viewing accommodation:', accommodation)
   // Add your view logic here
 }
+
 </script>
 
 <template>
@@ -125,11 +121,6 @@ function handleView(accommodation) {
     </div>
 
     <!-- Modals -->
-    <AddAccommodationModal
-      v-if="showAddModal"
-      @close="showAddModal = false"
-      @save="handleAdd"
-    />
 
     <EditAccommodationModal
       v-if="showEditModal"
@@ -148,6 +139,7 @@ function handleView(accommodation) {
 </template>
 
 <style scoped>
+
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
