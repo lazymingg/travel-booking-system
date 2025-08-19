@@ -40,7 +40,7 @@
 const props = defineProps({
   rooms: {
     type: Array,
-    default: () => [] // đảm bảo luôn có mảng
+    default: () => []
   }
 })
 </script>

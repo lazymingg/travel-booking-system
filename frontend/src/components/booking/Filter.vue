@@ -225,7 +225,6 @@ const applyFilter = () => {
 
 .input-wrapper {
   position: relative;
-  /* display: inline-block; */
 }
 
 .input-wrapper .suffix {
@@ -233,7 +232,7 @@ const applyFilter = () => {
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
-  pointer-events: none; /* không cho click vào suffix */
+  pointer-events: none;
   color: #555;
   font-size: 14px;
 }

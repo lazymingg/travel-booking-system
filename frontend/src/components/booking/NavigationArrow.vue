@@ -66,8 +66,8 @@ const emit = defineEmits(['prev', 'next'])
   padding: 0 16px;
   border-radius: 8px;
   border: 1px solid transparent;
-  background: #e5e7eb; /* xám nhạt */
-  color: #111827;      /* xám rất đậm */
+  background: #e5e7eb;
+  color: #111827;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -75,7 +75,7 @@ const emit = defineEmits(['prev', 'next'])
 }
 
 .btn:hover {
-  background: #d1d5db; /* xám hơn khi hover */
+  background: #d1d5db;
 }
 
 .btn:active {
@@ -84,12 +84,12 @@ const emit = defineEmits(['prev', 'next'])
 
 /* Primary (next) */
 .btn-next {
-  background: #2563eb;    /* xanh dương */
+  background: #2563eb;
   color: #ffffff;
 }
 
 .btn-next:hover {
-  background: #1d4ed8;    /* xanh dương đậm hơn khi hover */
+  background: #1d4ed8;
 }
 
 /* Disabled state */
@@ -99,7 +99,6 @@ const emit = defineEmits(['prev', 'next'])
   transform: none;
 }
 
-/* (Nếu dùng SVG icon thay cho text arrow) */
 .nav-icon {
   width: 20px;
   height: 20px;

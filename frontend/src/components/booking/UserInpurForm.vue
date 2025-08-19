@@ -90,7 +90,7 @@ watch(formData, (newValue) => {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;            /* tương đương space-y-6 */
+  gap: 1.5rem;
 }
 
 /* Nhóm field */
@@ -99,26 +99,26 @@ watch(formData, (newValue) => {
   flex-direction: column;
 }
 
-/* Nhãn */
-.form-label {
-  font-size: 0.95rem;     /* text-sm-ish */
-  font-weight: 600;       /* font-medium */
-  margin-bottom: 0.5rem;  /* mb-2 */
-  color: #111827;         /* xám rất đậm */
-}
-
 /* Dấu * bắt buộc */
 .required {
-  color: #ef4444;         /* đỏ */
+  color: #ef4444;
+}
+
+/* Nhãn */
+.form-label {
+  font-size: 0.85rem; /* nhỏ hơn 0.95rem */
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #111827;
 }
 
 /* Input & Select dùng chung */
 .form-input {
   width: 100%;
-  padding: 0.75rem;       /* p-3 */
-  border: 1px solid #d1d5db; /* border-gray-300 */
-  border-radius: 0.5rem;  /* rounded */
-  font-size: 1rem;
+  padding: 0.5rem; /* nhỏ hơn 0.75rem */
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font-size: 0.9rem; /* nhỏ hơn 1rem */
   color: #111827;
   background: #fff;
   outline: none;
@@ -126,11 +126,9 @@ watch(formData, (newValue) => {
   box-sizing: border-box;
 }
 
-.form-input:focus {
-  border-color: #3b82f6;  /* blue-500 */
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15); /* hiệu ứng focus */
-}
 
-/* Tinh chỉnh cho select (nếu cần) */
-/* .form-input[type="select"] { } */
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
 </style>
