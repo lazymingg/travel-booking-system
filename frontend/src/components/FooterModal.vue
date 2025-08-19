@@ -68,7 +68,7 @@ export default {
 }
 
 .logo_icon {
-  height: 100px;
+  height: 80px;
 }
 
 .social_icon {
