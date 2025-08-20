@@ -16,13 +16,13 @@ class APIHelper {
       });
 
       const data = await response.json();
-
+      // console.log('API Response:', data);
       // Backend response format: { success, message, data, error }
       return {
         success: data.success,
         data: data.data,
         message: data.message,
-        error: data.error,
+        details: data.details || 'no details',
         status: response.status
       };
     } catch (error) {
@@ -30,7 +30,7 @@ class APIHelper {
         success: false,
         data: null,
         message: 'Network error',
-        error: error.message,
+        details: 'Cant connect to server',
         status: 0
       };
     }
