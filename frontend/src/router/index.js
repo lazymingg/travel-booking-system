@@ -43,6 +43,21 @@ const router = createRouter({
       path: '/upload-accommodation',
       name: 'UploadAccommodation',
       component: () => import('../views/UploadAccommodation.vue'),
+    },
+     {
+      path: '/about-us',
+      name: 'AboutUs',
+      component: () => import('../views/AboutUs.vue'),
+    },
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboard',
+      component: () => import('../views/AdminDashboard.vue'),
+    },
+    {
+      path: '/booking',
+      name: 'booking',
+      component: () => import('../views/Booking.vue'),
     }
   ],
 })
