@@ -31,42 +31,71 @@
   <div v-if="showFilter" class="filter-popup">
     <!-- Cột 1: Price / Bed / Rating -->
     <div class="filter-section">
-      <h3>Price per day ($)</h3>
-      <div class="range-group">
-        <input type="number" min="0" max="1000" v-model.number="filters.priceMin"> –
-        <input type="number" min="0" max="1000" v-model.number="filters.priceMax">
+      <div class="attribute">
+        <h3>Price per day ($)</h3>
+        <Slider
+          v-model="filters.priceRange"
+          :min="0"
+          :max="1000"
+          :interval="10"
+          :tooltip="'always'"
+          :lazy="true"
+          :dot-size="16"
+          :height="4"
+          :enable-cross="false"
+          :piecewise="true"
+          :piecewise-label="true"
+        />
       </div>
 
-      <h3>Bed quantity</h3>
-      <div class="range-group">
-        <input type="number" min="1" max="6" v-model.number="filters.bedMin"> –
-        <input type="number" min="1" max="6" v-model.number="filters.bedMax">
+
+      <div class="attribute">
+        <h3>Bed quantity</h3>
+        <Slider
+          v-model="filters.bedRange"
+          :min="1"
+          :max="6"
+          :interval="1"
+          :tooltip="'always'"
+          :lazy="true"
+          :dot-size="16"
+          :height="4"
+          :enable-cross="false"
+          :piecewise="true"
+          :piecewise-label="true"
+        />
       </div>
 
-      <h3>Rating</h3>
-      <div>
-        <label><input type="checkbox" value="0" v-model="filters.selectedRatings"> ≥ 0</label><br>
-        <label><input type="checkbox" value="1" v-model="filters.selectedRatings"> ≥ 1</label><br>
-        <label><input type="checkbox" value="2" v-model="filters.selectedRatings"> ≥ 2</label><br>
-        <label><input type="checkbox" value="3" v-model="filters.selectedRatings"> ≥ 3</label><br>
-        <label><input type="checkbox" value="4" v-model="filters.selectedRatings"> ≥ 4</label><br>
-        <label><input type="checkbox" value="5" v-model="filters.selectedRatings"> = 5</label>
+      <div class="attribute">
+        <h3>Accommodation type</h3>
+        <div v-for="type in accommodationTypes" :key="type">
+          <label><input type="radio" :value="type" v-model="filters.selectedTypes"> {{ type }}</label>
+        </div>
       </div>
     </div>
 
     <!-- Cột 2: Amenities -->
     <div class="filter-section">
-      <h3>Amenities</h3>
-      <div v-for="amenity in amenities" :key="amenity">
-        <label><input type="checkbox" :value="amenity" v-model="filters.selectedAmenities"> {{ amenity }}</label>
+      <div class="attribute">
+        <h3>Amenities</h3>
+        <div v-for="amenity in amenities" :key="amenity">
+          <label><input type="checkbox" :value="amenity" v-model="filters.selectedAmenities"> {{ amenity }}</label>
+        </div>
       </div>
     </div>
 
     <!-- Cột 3: Accommodation Types -->
     <div class="filter-section">
-      <h3>Accommodation type</h3>
-      <div v-for="type in accommodationTypes" :key="type">
-        <label><input type="checkbox" :value="type" v-model="filters.selectedTypes"> {{ type }}</label>
+      <div class="attribute">
+        <h3>Rating</h3>
+        <div>
+          <label><input type="radio" value="0" v-model="filters.selectedRatings"> ≥ 0.0 </label><br>
+          <label><input type="radio" value="1" v-model="filters.selectedRatings"> ≥ 1.0 </label><br>
+          <label><input type="radio" value="2" v-model="filters.selectedRatings"> ≥ 2.0 </label><br>
+          <label><input type="radio" value="3" v-model="filters.selectedRatings"> ≥ 3.0 </label><br>
+          <label><input type="radio" value="4" v-model="filters.selectedRatings"> ≥ 4.0 </label><br>
+          <label><input type="radio" value="5" v-model="filters.selectedRatings"> 5.0 </label>
+        </div>
       </div>
     </div>
   </div>
@@ -75,10 +104,12 @@
 </template>
 
 <script>
-import 'vue-slider-component/theme/default.css'
+import Slider from '@vueform/slider'
+import '@vueform/slider/themes/default.css'
 
 export default {
   name: 'SearchModal',
+  components: { Slider },
   data() {
     return {
       showFilter: false,
@@ -88,13 +119,15 @@ export default {
         checkout: ''
       },
       filters: {
+        priceRange: [0, 1000],
+        bedRange: [1, 6],
         priceMin: 0,
         priceMax: 1000,
         bedMin: 1,
         bedMax: 6,
-        selectedRatings: [],
+        selectedRatings: null,
         selectedAmenities: [],
-        selectedTypes: []
+        selectedTypes: null
       },
       amenities: ['Swimming pool', 'Parking lot', 'Restaurant', 'Gym', 'Sauna', 'Free Wifi', 'Smoking room', 'Spa', 'Golf course'],
       meals: ['Breakfast', 'Lunch', 'Dinner', 'Self sufficiency'],
@@ -112,7 +145,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* Search Section */
 .search_section {
   background-color: #F9FAFB;
@@ -246,24 +279,36 @@ export default {
   margin-right: auto;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cột chia đều */
-  gap: 20px;
+  grid-template-columns: 2fr 1fr 1fr; /* 3 cột chia đều */
+  gap: 100px;
 
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   animation: slideDown 0.3s ease;
 }
 
-.filter-section h3 {
-  margin-bottom: 10px;
+.filter-section .attribute {
+  margin-bottom: 20px;
+}
+
+.filter-section .attribute h3 {
   font-size: 1rem;
   font-weight: bold;
 }
 
-.filter-section label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.95rem;
-  color: #374151;
+.filter-section .slider-target {
+  width: 100%; /* Đảm bảo slider chiếm toàn bộ chiều rộng */
+  margin-top: 40px; /* Khoảng cách trên slider */
+  margin-bottom: 20px; /* Khoảng cách dưới slider */
 }
 
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 </style>
