@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-
+import placeholderImg from '@/assets/Image/Teams/TranCaoVan.jpg'
+import leftButton from '@/assets/HomePage/leftButton.svg' // inactive dot + arrows
+import rightButton from '@/assets/HomePage/rightButton.svg' // inactive dot + arrows
+import dotIcon from '@/assets/HomePage/dotNormal.svg' // active dot
+import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg' // active dot
 
 const props = defineProps({
   regionList: {
