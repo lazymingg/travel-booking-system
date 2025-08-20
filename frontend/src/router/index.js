@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('../views/ManageReservations.vue'),
     },
     {
+      path: '/about-us',
+      name: 'AboutUs',
+      component: () => import('../views/AboutUs.vue'),
+    },
+    {
       path: '/manage-accommodation',
       name: 'ManageAccommodation',
       component: () => import('../views/ManageAccommodation.vue'),
@@ -38,11 +43,6 @@ const router = createRouter({
       path: '/upload-accommodation',
       name: 'UploadAccommodation',
       component: () => import('../views/UploadAccommodation.vue'),
-    },
-    {
-      path: '/user-dashboard',
-      name: 'User Dashboard',
-      component: () => import('../views/Dashboard.vue'),
     }
   ],
 })
