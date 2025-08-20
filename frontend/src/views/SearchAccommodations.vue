@@ -22,7 +22,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="more-results">
         <button class="more-btn">More results</button>
       </div>
@@ -186,21 +186,21 @@ body {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .filter-overlay {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .filter-popup {
     width: calc(100% - 2rem);
     max-width: 400px;
   }
-  
+
   .accommodations-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .footer-content {
     grid-template-columns: repeat(2, 1fr);
   }
