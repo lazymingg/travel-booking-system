@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import('../views/SearchAccommodations.vue'),
     },
     {
-      path: '/',
+      path: '/home-page',
       name: 'HomePage',
       component: () => import('../views/HomePage.vue'),
     },
@@ -33,6 +33,11 @@ const router = createRouter({
       path: '/about-us',
       name: 'AboutUs',
       component: () => import('../views/AboutUs.vue'),
+    },
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboard',
+      component: () => import('../views/AdminDashboard.vue'),
     }
   ],
 })
