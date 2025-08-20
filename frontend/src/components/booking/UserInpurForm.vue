@@ -58,7 +58,6 @@
         required
       >
         <option value="">Select payment method</option>
-        <option value="credit-card">Credit Card</option>
         <option value="debit-card">Debit Card</option>
         <option value="paypal">PayPal</option>
         <option value="bank-transfer">Bank Transfer</option>

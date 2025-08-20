@@ -2,10 +2,8 @@
 import { ref } from 'vue'
 
 // Sample data - you can make these props or reactive data
-const checkInDate = ref('13/08/2025')
-const checkInTime = ref('12:00')
-const checkOutDate = ref('13/08/2025')
-const checkOutTime = ref('12:00')
+const checkIn = ref('13/08/2025')
+const checkOut = ref('13/08/2025')
 const lengthOfStay = ref('3 days')
 const selection = ref('1 rooms for 2 people')
 const description = ref('Two-bedrooms apartment with balcony')
@@ -26,13 +24,11 @@ const totalAmount = ref('$ 220')
       <div class="datetime-section">
         <div class="datetime-field">
           <label class="datetime-label">Check in</label>
-          <input type="text" class="datetime-input" :value="checkInDate" readonly>
-          <input type="text" class="datetime-input" :value="checkInTime" readonly>
+          <input type="text" class="datetime-input" :value="checkIn" readonly>
         </div>
         <div class="datetime-field">
           <label class="datetime-label">Check out</label>
-          <input type="text" class="datetime-input" :value="checkOutDate" readonly>
-          <input type="text" class="datetime-input" :value="checkOutTime" readonly>
+          <input type="text" class="datetime-input" :value="checkOut" readonly>
         </div>
       </div>
 

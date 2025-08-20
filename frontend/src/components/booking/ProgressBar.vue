@@ -1,3 +1,21 @@
+<script setup>
+import { ref } from 'vue'
+import check from '@/assets/bookingIcon/check.svg'
+
+defineProps({
+  currentStep: {
+    type: Number,
+    required: true
+  },
+
+  success: {
+    type: Boolean,
+    default: false
+  }
+})
+
+</script>
+
 <template>
   <div class="progress-wrapper">
     <div class="progress-container">
@@ -33,7 +51,10 @@
         <!-- Step 3 -->
         <div class="step">
           <div class="step-circle" :class="{ active: currentStep >= 3 }">
-            3
+            <span v-if="success">
+              <img :src="check" alt="check" class="check-icon">
+            </span>
+            <span v-else>3</span>
           </div>
           <span class="step-label">Confirmation</span>
         </div>
@@ -41,17 +62,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import check from '@/assets/bookingIcon/check.svg'
-
-defineProps({
-  currentStep: {
-    type: Number,
-    required: true
-  }
-})
-</script>
 
 <style scoped>
 .progress-wrapper {

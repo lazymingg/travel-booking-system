@@ -8,24 +8,40 @@ import ConfirmationPage from '@/components/booking/ConfirmationPage.vue'
 
 const currentStep = ref(1)
 const totalSteps = 3
+const bookingSuccess = ref(false)
 
 function handleNextStep() {
+  console.log('Before Next: ', currentStep.value)
+  
   if (currentStep.value < totalSteps) {
     currentStep.value++
   }
+
+  console.log('After Next: ', currentStep.value)
 }
 
 function handlePrevStep() {
+  console.log('Before Prev: ', currentStep.value)
+
   if (currentStep.value > 1) {
     currentStep.value--
   }
+
+  console.log('After Prev: ', currentStep.value)
+}
+
+const completeBooking = () => {
+  bookingSuccess.value = true
 }
 </script>
 
 <template>
   <div>
     <!-- Progress bar -->
-    <ProgressBar :currentStep="currentStep" />
+    <ProgressBar 
+      :currentStep="currentStep"
+      :success="bookingSuccess" 
+    />
 
     <!-- Nội dung theo step -->
     <div class="step-content">
@@ -36,7 +52,7 @@ function handlePrevStep() {
         <DetailBookingPage/>
       </div>
       <div v-else-if="currentStep === 3">
-        <ConfirmationPage/>
+        <ConfirmationPage @booking-success="completeBooking"/>
       </div>
     </div>
 

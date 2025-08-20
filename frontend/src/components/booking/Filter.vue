@@ -9,10 +9,8 @@ const showChangeSearch = ref(false)
 // The filter bar shows the result from a specific Accommodation Page -> NOT DONE
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  checkInDate: 'DD/MM/YYYY', 
-  checkInTime: 'HH:MM',
-  checkOutDate: 'DD/MM/YYYY',
-  checkOutTime: 'HH:MM',
+  checkIn: 'DD/MM/YYYY', 
+  checkOut: 'DD/MM/YYYY',
   numberGuest: 0
 })
 
@@ -48,10 +46,10 @@ const applyFilter = () => {
     
     <div class="summary-box">
       <div class="summary-item">
-        {{ filterData.checkInDate }} - {{ filterData.checkInTime }}
+        {{ filterData.checkIn}}
       </div>
       <div class="summary-item">
-        {{ filterData.checkOutDate }} - {{ filterData.checkOutTime }}
+        {{ filterData.checkOut }}
       </div>
       <div class="summary-item">
         {{ guestWithText }}
@@ -70,26 +68,16 @@ const applyFilter = () => {
         <div>
           <label class="label">Check-in Date</label>
           <input 
-            v-model="formFilter.checkInDate" 
-            type="date" 
-            class="input"
-          />
-          <input 
-            v-model="formFilter.checkInTime" 
-            type="time" 
+            v-model="formFilter.checkIn" 
+            type="date"
             class="input"
           />
         </div>
         <div>
           <label class="label">Check-out Date</label>
           <input 
-            v-model="formFilter.checkOutDate" 
+            v-model="formFilter.checkOut" 
             type="date" 
-            class="input"
-          />
-          <input 
-            v-model="formFilter.checkOutTime" 
-            type="time" 
             class="input"
           />
         </div>

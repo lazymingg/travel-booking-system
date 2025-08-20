@@ -2,11 +2,13 @@
 import previous from '@/assets/bookingIcon/leftArrow.svg'
 import next from '@/assets/bookingIcon/rightArrow.svg'
 
-const props = defineProps({
+// props
+const { currentStep, totalSteps } = defineProps({
   currentStep: { type: Number, required: true },
-  totalSteps:  { type: Number, required: true }
+  totalSteps: { type: Number, required: true }
 })
 
+// emit
 const emit = defineEmits(['prev', 'next'])
 </script>
 
@@ -14,8 +16,8 @@ const emit = defineEmits(['prev', 'next'])
   <div class="nav-container">
     <!-- Previous arrow -->
     <button
-      class="btn btn-prev"
-      :disabled="props.currentStep === 1"
+      class="btn btn-nav"
+      :disabled="currentStep === 1"
       @click="emit('prev')"
       aria-label="Previous step"
       title="Previous"
@@ -23,12 +25,12 @@ const emit = defineEmits(['prev', 'next'])
       <img :src="previous" alt="Previous Step" class="nav-icon">
     </button>
 
-    <span class="step-indicator">Step {{ props.currentStep }} / {{ props.totalSteps }}</span>
+    <span class="step-indicator">Step {{ currentStep }} / {{ totalSteps }}</span>
 
     <!-- Next arrow -->
     <button
-      class="btn btn-next"
-      :disabled="props.currentStep === props.totalSteps"
+      class="btn btn-nav"
+      :disabled="currentStep === totalSteps"
       @click="emit('next')"
       aria-label="Next step"
       title="Next"
@@ -43,10 +45,10 @@ const emit = defineEmits(['prev', 'next'])
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 30em;
-  margin: 0;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem auto 0 auto;
+  width: fit-content;
 }
 
 /* Step text */
@@ -82,13 +84,13 @@ const emit = defineEmits(['prev', 'next'])
   transform: translateY(1px);
 }
 
-/* Primary (next) */
-.btn-next {
+/* Navigation Button */
+.btn-nav {
   background: #2563eb;
   color: #ffffff;
 }
 
-.btn-next:hover {
+.btn-nav:hover {
   background: #1d4ed8;
 }
 

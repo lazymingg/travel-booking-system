@@ -26,14 +26,12 @@ import BookingDetailForm from './BookingDetailForm.vue';
   box-sizing: border-box;
 }
 
-/* Input form nhỏ hơn (30%) */
 #input-form {
   max-width: 30%;
   padding: 1em;
   box-sizing: border-box;
 }
 
-/* Booking form lớn hơn (70%) */
 #booking-form {
   max-width: 70%;
   padding: 1em;
