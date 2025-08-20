@@ -4,27 +4,27 @@
   <!-- Search section -->
    <SearchModal/>
   <!-- Main content -->
-  <main class="main-content">
-    <div class="content-layout">
-      <div class="accommodations-grid">
-        <div v-for="(accommodation, index) in accommodations" :key="index" class="accommodation-card">
-          <div class="card-image">
-            <div class="placeholder-image">🏔️</div>
+  <main class="main_content">
+    <div class="content_layout">
+      <div class="accommodations_grid">
+        <div v-for="(accommodation, index) in accommodations" :key="index" class="accommodation_card">
+          <div class="card_image">
+            <img class="accommodation_image" :src="accommodation.image" alt="Accommodation image">
           </div>
-          <div class="card-content">
-            <h3 class="accommodation-name">{{ accommodation.name }}</h3>
-            <p class="accommodation-address">{{ accommodation.address }}</p>
+          <div class="card_content">
+            <h3 class="accommodation_name">{{ accommodation.name }}</h3>
+            <p class="accommodation_address">{{ accommodation.address }}</p>
             <div class="rating">
-              <span class="rating-badge">{{ accommodation.rating }}</span>
-              <span class="rating-text">{{ accommodation.reviews }} ratings</span>
+              <span class="rating_badge">{{ accommodation.rating }}</span>
+              <span class="rating_text">{{ accommodation.reviews }} ratings</span>
             </div>
             <div class="price">Price: {{ accommodation.price }}</div>
           </div>
         </div>
       </div>
 
-      <div class="more-results">
-        <button class="more-btn">More results</button>
+      <div class="more_results">
+        <button class="more_button">More results</button>
       </div>
     </div>
   </main>
@@ -37,7 +37,7 @@
 import HeaderModal from '@/components/HeaderModal.vue';
 import FooterModal from '@/components/FooterModal.vue';
 import SearchModal from '@/components/SearchModal.vue';
-
+import heroImg from "@/assets/hero-img-singin.jpg";
 export default {
   name: 'SearchAccommodation',
   components: {
@@ -48,6 +48,7 @@ export default {
   data() {
     return {
       accommodations: Array(16).fill().map((_, i) => ({
+        image: heroImg,
         name: 'Accommodation name',
         address: 'Type address here',
         rating: '4.8',
@@ -80,7 +81,7 @@ body {
 }
 
 /* Main Content */
-.main-content {
+.main_content {
   flex: 1;
   padding: 2rem;
   max-width: 1200px;
@@ -88,18 +89,18 @@ body {
   width: 100%;
 }
 
-.content-layout {
+.content_layout {
   width: 100%;
 }
 
-.accommodations-grid {
+.accommodations_grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.accommodation-card {
+.accommodation_card {
   background-color: white;
   border-radius: 8px;
   overflow: hidden;
@@ -107,11 +108,11 @@ body {
   transition: transform 0.2s ease;
 }
 
-.accommodation-card:hover {
+.accommodation_card:hover {
   transform: translateY(-2px);
 }
 
-.card-image {
+.card_image {
   height: 200px;
   background-color: #4B5563;
   display: flex;
@@ -119,23 +120,31 @@ body {
   justify-content: center;
 }
 
-.placeholder-image {
+.placeholder_image {
   font-size: 3rem;
   color: #9CA3AF;
 }
 
-.card-content {
+.accommodation_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* hoặc contain tùy nhu cầu */
+  border-radius: 0;
+}
+
+.card_content {
   padding: 1rem;
 }
 
-.accommodation-name {
+.accommodation_name {
   color: #2563EB;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
-.accommodation-address {
-  color: #6B7280;
+.accommodation_address {
+  color: #4B5563;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
@@ -147,30 +156,30 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.rating-badge {
+.rating_badge {
   background-color: #FACC15;
-  color: #111827;
+  color: #2563EB;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: bold;
 }
 
-.rating-text {
-  color: #6B7280;
+.rating_text {
+  color: #4B5563;
   font-size: 0.8rem;
 }
 
 .price {
-  color: #2563EB;
+  color: #1D4ED8;
   font-weight: bold;
 }
 
-.more-results {
+.more_results {
   text-align: center;
 }
 
-.more-btn {
+.more_button {
   background-color: white;
   color: #2563EB;
   border: 2px solid #2563EB;
@@ -180,34 +189,25 @@ body {
   font-size: 1rem;
 }
 
+.more_button:hover {
+  background-color: #FACC15;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
-  .search-form {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .filter-overlay {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .filter-popup {
-    width: calc(100% - 2rem);
-    max-width: 400px;
-  }
-
-  .accommodations-grid {
+  .accommodations_grid {
     grid-template-columns: 1fr;
   }
 
-  .footer-content {
+  .footer_content {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .footer-content {
+  .footer_content {
     grid-template-columns: 1fr;
   }
 }

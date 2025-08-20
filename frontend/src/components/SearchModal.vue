@@ -255,10 +255,6 @@ export default {
   transition: transform 0.2s ease; /* thêm hiệu ứng mượt */
 }
 
-.button_icon {
-  transition: transform 0.15s ease-out;
-}
-
 .action_button:hover .button_icon {
   transform: scale(1.2); /* phóng to 20% khi hover */
 }
