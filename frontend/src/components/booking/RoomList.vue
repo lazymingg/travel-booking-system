@@ -52,6 +52,35 @@ const filteredRooms = computed(() => {
     return dateAvailable && numberGuest && isAvailable;
   });
 });
+
+// API
+const fetchUserInfo = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+
+    const result = await api.get('/bookings/available');
+
+    if (result.success) {
+      // Success - data có trong result.data
+      // console.log('User info fetched successfully:', result.data);
+      Object.assign(userInfo, result.data);
+      console.log('Success:', result.message);
+    } else {
+      // Error - message có trong result.error hoặc result.message
+      throw new Error(result.error || result.message || 'Unknown error');
+    }
+
+  } catch (err) {
+    error.value = 'Không thể tải thông tin người dùng: ' + err.message;
+    if (err.message.includes('401') || result.status === 401) {
+      router.push('/booking');
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
 </script>
 
 <template>

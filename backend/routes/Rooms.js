@@ -31,18 +31,18 @@ router.get('/:accommodation_id/:room_id', (req, res, next) => {
 
 // Create new room
 router.post('/', (req, res, next) => {
-  const { accommodation_id, room_id, room_type, price_per_night, capacity, description } = req.body;
+  const { accommodation_id, room_id, room_type, price_per_day, capacity, description } = req.body;
   
-  if (!accommodation_id || !room_id || !room_type || !price_per_night || !capacity) {
-    return responseHelper.validationError(res, 'Accommodation ID, room ID, room type, price per night, and capacity are required');
+  if (!accommodation_id || !room_id || !room_type || !price_per_day || !capacity) {
+    return responseHelper.validationError(res, 'Accommodation ID, room ID, room type, price per day, and capacity are required');
   }
   
   const created_at = new Date().toISOString();
 
   db.run(
-    `INSERT INTO Rooms (accommodation_id, room_id, room_type, price_per_night, capacity, description, created_at)
+    `INSERT INTO Rooms (accommodation_id, room_id, room_type, price_per_day, capacity, description, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [accommodation_id, room_id, room_type, price_per_night, capacity, description, created_at],
+    [accommodation_id, room_id, room_type, price_per_day, capacity, description, created_at],
     function (err) {
       if (err) return next(err);
       return responseHelper.success(res, { accommodation_id, room_id }, 'Room created successfully', 201);
@@ -53,13 +53,13 @@ router.post('/', (req, res, next) => {
 // Update room
 router.put('/:accommodation_id/:room_id', (req, res, next) => {
   const { accommodation_id, room_id } = req.params;
-  const { room_type, price_per_night, capacity, description, is_available } = req.body;
+  const { room_type, price_per_day, capacity, description, is_available } = req.body;
 
   db.run(
-    `UPDATE Rooms SET room_type = ?, price_per_night = ?, capacity = ?, 
+    `UPDATE Rooms SET room_type = ?, price_per_day = ?, capacity = ?, 
      description = ?, is_available = ?
      WHERE accommodation_id = ? AND room_id = ?`,
-    [room_type, price_per_night, capacity, description, is_available, accommodation_id, room_id],
+    [room_type, price_per_day, capacity, description, is_available, accommodation_id, room_id],
     function (err) {
       if (err) return next(err);
       if (this.changes === 0) {
