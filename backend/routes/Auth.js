@@ -18,7 +18,7 @@ router.post('/login', (req, res, next) => {
     if (err) return responseHelper.error(res, 'Error checking user credentials', 500, err.message);
     
     if (!user || user.password_hash !== password) {
-      return responseHelper.error(res, 'Invalid email or password', 401);
+      return responseHelper.error(res, 'Invalid email or password', 401, 'May be email or password is incorrect');
     }
     
     // Store user in session

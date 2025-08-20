@@ -1,5 +1,7 @@
 // Simple authentication middleware
-const db = require('sqlite3').verbose().Database('./db/db.db');
+const sqlite3 = require('sqlite3').verbose();
+
+const db = new sqlite3.Database('./db/db.db');
 const responseHelper = require('../utils/responseHelper');
 
 const requireAuth = (req, res, next) => {
