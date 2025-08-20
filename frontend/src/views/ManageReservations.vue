@@ -84,12 +84,12 @@ function handleSave(updated) {
   if (idx !== -1) {
     const oldStatus = reservations.value[idx].status
     reservations.value[idx] = { ...updated }
-    
+
     // Auto switch to the new status tab if status changed
     if (oldStatus !== updated.status) {
       activeTab.value = updated.status
     }
-    
+
     console.log(`Reservation ${updated.id} updated and moved to ${updated.status} filter`)
   }
   showEditModal.value = false
@@ -145,7 +145,7 @@ function handleContact(reservation) {
       @close="showDeleteModal = false"
       @delete="confirmDelete"
     />
-    
+
     <EditReservationModal
       v-if="showEditModal"
       :reservation="selectedReservation"

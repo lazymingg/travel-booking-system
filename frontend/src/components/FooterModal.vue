@@ -28,13 +28,13 @@
         <a href="#" class="nav_link">About us</a>
       </div>
     </div>
-  </footer> 
+  </footer>
 </template>
 
 <script setup>
 </script>
 
-<style>
+<style scoped>
 /* Footer */
 .footer {
   background-color: #1D4ED8;
