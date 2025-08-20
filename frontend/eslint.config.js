@@ -11,7 +11,7 @@ export default defineConfig([
     name: 'app/files-to-lint',
     files: ['**/*.{js,mjs,jsx,vue}'],
   },
-
+/home/letrungkien/Documents/HCMUS/N2K3 _ Introduction to software engineering
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   {

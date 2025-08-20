@@ -15,9 +15,24 @@ const router = createRouter({
       component: () => import('../views/User_info.vue'),
     },
     {
+      path: '/accommodations',
+      name: 'accommodations',
+      component: () => import('../views/SearchAccommodations.vue'),
+    },
+    {
       path: '/',
       name: 'HomePage',
       component: () => import('../views/HomePage.vue'),
+    },
+    {
+      path: '/manage-reservations',
+      name: 'ManageReservations',
+      component: () => import('../views/ManageReservations.vue'),
+    },
+    {
+      path: '/about-us',
+      name: 'AboutUs',
+      component: () => import('../views/AboutUs.vue'),
     }
   ],
 })
