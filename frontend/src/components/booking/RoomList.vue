@@ -1,3 +1,88 @@
+<script setup>
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router';
+import api from '@/frontend-api-helper'
+
+const router = useRouter()
+
+const roomInfo = reactive({
+  accommodation_id: null,
+  room_id: null,
+  room_type: '',
+  price_per_day: null,
+  capacity: 1,
+  description: '',
+  number_guest: null,
+  is_available: null,
+  available_date_start: '',
+  available_date_end: '',  
+  created_at: ''
+})
+
+const props = defineProps({
+  rooms: {
+    type: Array,
+    default: () => []
+  },
+  checkInDate: {
+    type: String, // 'YYYY-MM-DD'
+    required: true
+  },
+  checkOutDate: {
+    type: String, // 'YYYY-MM-DD'
+    required: true
+  },
+  numberGuest: {
+    type: Number,
+    required: true
+  }
+})
+
+const filteredRooms = computed(() => {
+  return props.rooms.filter(room => {
+    const start = new Date(room.available_date_start);
+    const end = new Date(room.available_date_end);
+    const checkIn = new Date(props.checkInDate);
+    const checkOut = new Date(props.checkOutDate);
+
+    const dateAvailable = checkIn >= start && checkOut <= end;
+    const numberGuest = room.number_guest >= props.numberGuest;
+    const isAvailable = room.is_available === 1;
+
+    return dateAvailable && numberGuest && isAvailable;
+  });
+});
+
+// API
+const fetchUserInfo = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+
+    const result = await api.get('/bookings/available');
+
+    if (result.success) {
+      // Success - data có trong result.data
+      // console.log('User info fetched successfully:', result.data);
+      Object.assign(userInfo, result.data);
+      console.log('Success:', result.message);
+    } else {
+      // Error - message có trong result.error hoặc result.message
+      throw new Error(result.error || result.message || 'Unknown error');
+    }
+
+  } catch (err) {
+    error.value = 'Không thể tải thông tin người dùng: ' + err.message;
+    if (err.message.includes('401') || result.status === 401) {
+      router.push('/booking');
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
+</script>
+
 <template>
   <table class="room-table">
     <thead>
@@ -11,8 +96,8 @@
     </thead>
     <tbody>
       <!-- Nếu có rooms -->
-      <tr v-for="room in rooms" :key="room.id">
-        <td>{{ room.name }}</td>
+      <tr v-for="room in filteredRooms" :key="room.room_id">
+        <td>{{ room.room_type }}</td>
         <td>{{ room.description }}</td>
         <td>
           <ul>
@@ -29,21 +114,12 @@
       </tr>
 
       <!-- Nếu không có rooms -->
-      <tr v-if="!rooms || rooms.length === 0">
+      <tr v-if="!props.rooms || props.rooms.length === 0">
         <td colspan="8" class="empty">No rooms available</td>
       </tr>
     </tbody>
   </table>
 </template>
-
-<script setup>
-const props = defineProps({
-  rooms: {
-    type: Array,
-    default: () => []
-  }
-})
-</script>
 
 <style scoped>
 .room-table {

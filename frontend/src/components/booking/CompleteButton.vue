@@ -11,7 +11,7 @@ const handleClick = () => {
     emit('booking-success')
   } else {
     // Navigate về home
-    window.location.href = '/'
+    window.location.href = '/home-page'
   }
 }
 </script>

@@ -16,10 +16,10 @@
           <input type="date" v-model="searchData.checkout">
         </div>
         <div class="form_actions">
-          <button class="search_button" @click="toggleFilter">
+          <button class="action_button" @click="toggleFilter">
             <img class="button_icon" src="../assets/hamburger_button_icon.svg" alt="Hamburger button icon">
           </button>
-          <button class="search_button">
+          <button class="action_button">
             <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
           </button>
         </div>
@@ -28,82 +28,88 @@
   </section>
 
   <!-- Filter Popup Overlay -->
-  <div v-if="showFilter" class="filter_overlay" @click="closeFilter">
-    <div class="filter_popup" @click.stop>
-      <div class="filter_header">
-        <h3>Advanced Filters</h3>
-        <button class="close_btn" @click="closeFilter">×</button>
+  <div v-if="showFilter" class="filter-popup">
+    <!-- Cột 1: Price / Bed / Rating -->
+    <div class="filter-section">
+      <div class="attribute">
+        <h3>Price per day</h3>
+        <Slider
+          v-model="filters.priceRange"
+          :min="0"
+          :max="1000"
+          :interval="10"
+          :tooltip="'always'"
+          :lazy="true"
+          :dot-size="10"
+          :height="4"
+          :enable-cross="false"
+          :piecewise="true"
+          :piecewise-label="true"
+        />
       </div>
-      <div class="filter_content">
-        <!-- Price Range -->
-        <div class="filter_group">
-          <h4>Price per day</h4>
-          <div class="price_range">
-            <span>0 vnd - 500,000,000 vnd</span>
-            <input type="range" v-model="filters.priceRange" min="0" max="500000000" class="slider">
-          </div>
-        </div>
 
-        <!-- Bed Quantity -->
-        <div class="filter_group">
-          <h4>Bed quantity</h4>
-          <div class="bed_range">
-            <span>1 - 4</span>
-            <input type="range" v-model="filters.bedQuantity" min="1" max="4" class="slider">
-          </div>
-        </div>
 
-        <!-- Rating -->
-        <div class="filter_group">
-          <h4>Rating</h4>
-          <div class="rating_options">
-            <label v-for="rating in [5, 4, 3, 2, 1]" :key="rating" class="radio_option">
-              <input type="radio" :value="rating" v-model="filters.rating" name="rating">
-              <span>{{ rating }}.0</span>
-            </label>
-          </div>
-        </div>
+      <div class="attribute">
+        <h3>Bed quantity</h3>
+        <Slider
+          v-model="filters.bedRange"
+          :min="1"
+          :max="6"
+          :interval="1"
+          :tooltip="'always'"
+          :lazy="true"
+          :dot-size="10"
+          :height="4"
+          :enable-cross="false"
+          :piecewise="true"
+          :piecewise-label="true"
+        />
+      </div>
 
-        <!-- Amenities -->
-        <div class="filter_group">
-          <h4>Amenities</h4>
-          <div class="checkbox_group">
-            <label v-for="amenity in amenities" :key="amenity" class="checkbox_option">
-              <input type="checkbox" :value="amenity" v-model="filters.selectedAmenities">
-              <span>{{ amenity }}</span>
-            </label>
-          </div>
+      <div class="attribute">
+        <h3>Accommodation type</h3>
+        <div v-for="type in accommodationTypes" :key="type">
+          <label><input type="radio" :value="type" v-model="filters.selectedTypes"> {{ type }}</label>
         </div>
+      </div>
+    </div>
 
-        <!-- Meals -->
-        <div class="filter_group">
-          <h4>Meals available</h4>
-          <div class="checkbox_group">
-            <label v-for="meal in meals" :key="meal" class="checkbox_option">
-              <input type="checkbox" :value="meal" v-model="filters.selectedMeals">
-              <span>{{ meal }}</span>
-            </label>
-          </div>
+    <!-- Cột 2: Amenities -->
+    <div class="filter-section">
+      <div class="attribute">
+        <h3>Amenities</h3>
+        <div v-for="amenity in amenities" :key="amenity">
+          <label><input type="checkbox" :value="amenity" v-model="filters.selectedAmenities"> {{ amenity }}</label>
         </div>
+      </div>
+    </div>
 
-        <!-- Accommodation Type -->
-        <div class="filter_group">
-          <h4>Accommodation type</h4>
-          <div class="checkbox_group">
-            <label v-for="type in accommodationTypes" :key="type" class="checkbox_option">
-              <input type="checkbox" :value="type" v-model="filters.selectedTypes">
-              <span>{{ type }}</span>
-            </label>
-          </div>
+    <!-- Cột 3: Accommodation Types -->
+    <div class="filter-section">
+      <div class="attribute">
+        <h3>Rating</h3>
+        <div>
+          <label><input type="radio" value="0" v-model="filters.selectedRatings"> ≥ 0.0 </label><br>
+          <label><input type="radio" value="1" v-model="filters.selectedRatings"> ≥ 1.0 </label><br>
+          <label><input type="radio" value="2" v-model="filters.selectedRatings"> ≥ 2.0 </label><br>
+          <label><input type="radio" value="3" v-model="filters.selectedRatings"> ≥ 3.0 </label><br>
+          <label><input type="radio" value="4" v-model="filters.selectedRatings"> ≥ 4.0 </label><br>
+          <label><input type="radio" value="5" v-model="filters.selectedRatings"> 5.0 </label>
         </div>
       </div>
     </div>
   </div>
+
+
 </template>
 
 <script>
+import Slider from '@vueform/slider'
+import '@vueform/slider/themes/default.css'
+
 export default {
   name: 'SearchModal',
+  components: { Slider },
   data() {
     return {
       showFilter: false,
@@ -113,12 +119,15 @@ export default {
         checkout: ''
       },
       filters: {
-        priceRange: 250000000,
-        bedQuantity: 2,
-        rating: 5,
-        selectedAmenities: ['Free Wifi', 'Smoking room'],
-        selectedMeals: [],
-        selectedTypes: []
+        priceRange: [0, 1000],
+        bedRange: [1, 6],
+        priceMin: 0,
+        priceMax: 1000,
+        bedMin: 1,
+        bedMax: 6,
+        selectedRatings: null,
+        selectedAmenities: [],
+        selectedTypes: null
       },
       amenities: ['Swimming pool', 'Parking lot', 'Restaurant', 'Gym', 'Sauna', 'Free Wifi', 'Smoking room', 'Spa', 'Golf course'],
       meals: ['Breakfast', 'Lunch', 'Dinner', 'Self sufficiency'],
@@ -136,7 +145,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* Search Section */
 .search_section {
   background-color: #F9FAFB;
@@ -152,7 +161,6 @@ export default {
 .search_container {
   max-width: 1200px;
   margin: 0 auto;
-
   display: flex;
   justify-content: center; /* căn ngang */
   align-items: center;     /* căn dọc */
@@ -160,14 +168,15 @@ export default {
 
 .search_form {
   display: grid;
+  width: 83.33vw;
   grid-template-columns: 2fr 1fr 1fr auto;
   gap: 5px;
+  margin: 0 auto;      /* căn giữa */
   align-items: end;
 }
 
 .form_group {
   height: 60px;
-
   padding: 0.2rem 0.75rem;
   display: flex;
   flex-direction: column; 
@@ -187,11 +196,12 @@ export default {
   outline:none;
   border-radius: 4px;
   font-size: 1rem;
+  font-family: sans-serif;
 }
 
 .form_group input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #2563EB; /* hiệu ứng viền sáng xanh khi focus */
+  box-shadow: 0 0 0 1px #2563EB; /* hiệu ứng viền sáng xanh khi focus */
 }
 
 .form_actions {
@@ -211,7 +221,7 @@ export default {
   justify-content: center;
 }
 
-.search_button {
+.action_button {
   background-color: #2563EB;
   border: none;
   cursor: pointer;
@@ -223,7 +233,13 @@ export default {
 
   width: 60px;   /* chiều ngang nút */
   height: 60px;  /* chiều cao nút */
-  padding: 15px;    /* bỏ padding */
+  padding: 20px;    /* bỏ padding */
+}
+
+.action_button:hover {
+  background-color: #FACC15;
+  animation-delay: 3ms;
+  box-shadow: 0 0 0 2px #2563EB; /* hiệu ứng viền sáng xanh khi focus */
 }
 
 .button_icon {
@@ -232,83 +248,70 @@ export default {
   object-fit: contain; /* đảm bảo không méo icon */
 }
 
-/* Filter Popup Overlay */
-.filter_overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+.button_icon {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding-top: 17vh; /* Position below header */
-  padding-left: 2rem;
+  object-fit: contain; /* đảm bảo không méo icon */
+  transition: transform 0.2s ease; /* thêm hiệu ứng mượt */
 }
 
-.filter_popup {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 400px;
-  max-height: 70vh;
-  overflow-y: auto;
-  animation: slideIn 0.3s ease;
+.action_button:hover .button_icon {
+  transform: scale(1.2); /* phóng to 20% khi hover */
+}
+  
+/* Filter popup */
+.filter-popup {
+  background: #F9FAFB;
+  border: 2px solid #2563EB;
+  border-radius: 5px;
+  margin-top: 0;  /* sát dưới search_form */
+  padding: 20px;
+
+  width: 83.33vw; /* bằng search_form */
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; /* 3 cột chia đều */
+  gap: 100px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  animation: slideDown 0.3s ease;
 }
 
-@keyframes slideIn {
+.filter-section .attribute {
+  margin-bottom: 20px;
+}
+
+.filter-section .attribute h3 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.slider-target {
+  width: 100%; /* Đảm bảo slider chiếm toàn bộ chiều rộng */
+  margin-top: 40px; /* Khoảng cách trên slider */
+  margin-bottom: 20px; /* Khoảng cách dưới slider */
+}
+
+:deep(.slider-tooltip) {
+  font-size: 0.75rem;
+}
+
+:deep(.slider-base) {
+  height: 0.3rem;
+}
+
+
+@keyframes slideDown {
   from {
-    opacity: 0;
     transform: translateY(-20px);
+    opacity: 0;
   }
   to {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
   }
-}
-
-.filter_header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.filter_header h3 {
-  margin: 0;
-  color: #111827;
-  font-size: 1.1rem;
-}
-
-.close_btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #6B7280;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close_btn:hover {
-  color: #111827;
-}
-
-.filter_popup .filter_content {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.filter_popup .filter_group {
-  margin-bottom: 0;
 }
 </style>

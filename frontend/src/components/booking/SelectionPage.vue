@@ -1,12 +1,12 @@
 <script setup>
 import Filter from '@/components/booking/Filter.vue'
-import RoomtList from '@/components/booking/RoomList.vue'
+import RoomList from '@/components/booking/RoomList.vue'
 </script>
 
 <template>
     <Filter/>
     <div id="room-list">
-        <RoomtList/>
+        <RoomList/>
     </div>
 </template>
 

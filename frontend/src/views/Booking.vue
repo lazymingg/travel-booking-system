@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+
 import ProgressBar from '@/components/booking/ProgressBar.vue'
 import NavigationArrow from '@/components/booking/NavigationArrow.vue'
 import SelectionPage from '@/components/booking/SelectionPage.vue'
@@ -32,7 +33,9 @@ const completeBooking = () => {
 <template>
   <div class="container">
     <!-- Header -->
-    <HeaderModal/>
+    <div class="header">
+      <HeaderModal/>
+    </div>
 
     <!-- Progress bar -->
     <ProgressBar 

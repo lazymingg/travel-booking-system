@@ -1,5 +1,5 @@
 INSERT INTO Users (full_name, email, password_hash, phone_number, address, role) 
-VALUES 
+VALUES
     ('Nguyễn Văn An', 'an.nguyen@example.com', 'password123', '0901234567', '123 Đường Láng, Hà Nội', 'customer'),
     ('Trần Thị Bình', 'binh.tran@example.com', 'password123', '0912345678', '456 Nguyễn Huệ, TP.HCM', 'customer'),
     ('Lê Minh Châu', 'chau.le@example.com', 'password123', '0923456789', '789 Lê Lợi, Đà Nẵng', 'customer'),

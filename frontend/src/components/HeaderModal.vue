@@ -5,7 +5,7 @@
         <img class="logo_icon" src="../assets/logo.svg" alt="Wego's logo">
       </router-link>
       <div class="header_right">
-        <a href="#" class="nav_link">About us</a>
+        <router-link to="about-us" class="nav_link">About us</router-link>
 
         <!-- Chưa đăng nhập -->
         <template v-if="!isLoggedIn">
@@ -35,7 +35,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 .header {
   width: 100%;
@@ -74,7 +74,7 @@ export default {
 .nav_link:hover {
   color: #FACC15;
   text-decoration:underline;
-  font-size: 1.02rem;
+  transform: scale(1.02);
 }
 
 .user_profile {

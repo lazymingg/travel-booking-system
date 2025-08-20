@@ -1,12 +1,12 @@
 <script setup>
-import UserInpurForm from '@/components/booking/UserInpurForm.vue';
+import UserInputForm from '@/components/booking/UserInputForm.vue';
 import BookingDetailForm from './BookingDetailForm.vue';
 </script>
 
 <template>
     <div id="container">
         <div id="input-form">
-            <UserInpurForm/>
+            <UserInputForm/>
         </div>
         <div id="booking-form">
             <BookingDetailForm/>

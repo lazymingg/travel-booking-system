@@ -7,14 +7,14 @@ const { requireAuth } = require('../middleware/auth');
 const db = new sqlite3.Database('./db/db.db');
 
 //get all users
-// router.get('/', (req, res, next) => {
-//   db.all('SELECT * FROM Users', [], (err, rows) => {
-//     if (err) {
-//       return next(err);
-//     }
-//     responseHelper.success(res, rows);
-//   });
-// });
+router.get('/', (req, res, next) => {
+  db.all('SELECT * FROM Users', [], (err, rows) => {
+    if (err) {
+      return next(err);
+    }
+    responseHelper.success(res, rows);
+  });
+});
 
 // Get current user info
 router.get('/', requireAuth, (req, res, next) => {
@@ -35,23 +35,23 @@ router.get('/', requireAuth, (req, res, next) => {
 });
 
 // Post create user
-// router.post('/', (req, res, next) => {
-//   const { full_name, email, password_hash, phone_number, address, role } = req.body;
-//   const created_at = new Date().toISOString();
-//   const updated_at = created_at;
+router.post('/', (req, res, next) => {
+  const { full_name, email, password_hash, phone_number, address, role } = req.body;
+  const created_at = new Date().toISOString();
+  const updated_at = created_at;
   
-//   db.run(
-//     `INSERT INTO Users (full_name, email, password_hash, phone_number, address, role, created_at, updated_at)
-//      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-//     [full_name, email, password_hash, phone_number, address, role || 'customer', created_at, updated_at],
-//     function (err) {
-//       if (err) {
-//         return next(err);
-//       }
-//       responseHelper.success(res, { user_id: this.lastID });
-//     }
-//   );
-// });
+  db.run(
+    `INSERT INTO Users (full_name, email, password_hash, phone_number, address, role, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [full_name, email, password_hash, phone_number, address, role || 'customer', created_at, updated_at],
+    function (err) {
+      if (err) {
+        return next(err);
+      }
+      responseHelper.success(res, { user_id: this.lastID });
+    }
+  );
+});
 
 // put update user
 router.put('/:id', (req, res, next) => {
