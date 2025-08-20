@@ -11,7 +11,6 @@ export default defineConfig([
     name: 'app/files-to-lint',
     files: ['**/*.{js,mjs,jsx,vue}'],
   },
-/home/letrungkien/Documents/HCMUS/N2K3 _ Introduction to software engineering
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   {
@@ -24,12 +23,12 @@ export default defineConfig([
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
-  
+
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],

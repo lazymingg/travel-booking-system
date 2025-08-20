@@ -1,5 +1,9 @@
 <script setup>
 // const axious = require('axios');
+import HeaderModal from '@/components/HeaderModal.vue';
+import FooterModal from '@/components/FooterModal.vue';
+import SearchModal from '@/components/SearchModal.vue';
+
 </script>
 
 <template>
@@ -14,47 +18,19 @@
   </nav> -->
   <HeaderModal/>
   <SearchModal/>
-  <div class="hero-pane">
+    <div class="hero-pane">
+    </div>
   </div>
-  <div class="search-bar">
-    <h2>Search for your next adventure</h2>
-    <form>
-      <input type="text" placeholder="Enter destination" />
-      <input type="date" placeholder="Select booking date - booking return day" />
-      <input type="number" placeholder="Number of guests" />
-      <button type="submit">Search</button>
-    </form>
-  </div>
-  </div>
-  <div>
+  <!-- <div>
     <h2>Featured Destinations</h2>
     <div class="featured-destinations">
       <p>Destination 1</p>
       <p>Destination 2</p>
       <p>Destination 3</p>
     </div>
-  </div>
+  </div> -->
   <FooterModal/>
 </template>
-
-<script>
-import HeaderModal from '@/components/HeaderModal.vue';
-import FooterModal from '@/components/FooterModal.vue';
-import SearchModal from '@/components/SearchModal.vue';
-
-export default {
-  name: 'WeGoBooking',
-  components: {
-    HeaderModal,
-    SearchModal,
-    FooterModal
-  },
-  data() {
-    return {
-    }
-  }
-}
-</script>
 
 <style scoped>
 .hero-pane {
