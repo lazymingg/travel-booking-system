@@ -78,7 +78,10 @@ const seedDatabase = () => {
       price_per_night: 100.00,
       capacity: 2,
       description: 'Spacious room with city view',
-      is_available: 1
+      number_guests: 2,
+      is_available: 1,
+      available_date_start: '2025-08-01',
+      available_date_end: '2025-08-31'
     },
     {
       accommodation_id: 1,
@@ -87,7 +90,10 @@ const seedDatabase = () => {
       price_per_night: 200.00,
       capacity: 4,
       description: 'Luxury suite with balcony',
-      is_available: 1
+      number_guests: 3,
+      is_available: 1,
+      available_date_start: '2025-08-15',
+      available_date_end: '2025-08-31'
     },
     {
       accommodation_id: 2,
@@ -96,7 +102,10 @@ const seedDatabase = () => {
       price_per_night: 80.00,
       capacity: 2,
       description: 'Entire apartment with kitchen',
-      is_available: 1
+      number_guests: 4,
+      is_available: 1,
+      available_date_start: '2025-09-01',
+      available_date_end: '2025-10-30'
     }
   ];
 
@@ -135,12 +144,12 @@ const seedDatabase = () => {
 
   // Insert rooms
   const roomStmt = db.prepare(`
-    INSERT INTO Rooms (accommodation_id, room_id, room_type, price_per_night, capacity, description, is_available, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    INSERT INTO Rooms (accommodation_id, room_id, room_type, price_per_night, capacity, description, number_guest, is_available, available_date_start, available_date_end, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
   `);
 
   rooms.forEach(room => {
-    roomStmt.run([room.accommodation_id, room.room_id, room.room_type, room.price_per_night, room.capacity, room.description, room.is_available]);
+    roomStmt.run([room.accommodation_id, room.room_id, room.room_type, room.price_per_night, room.capacity, room.description, room.number_guests, room.is_available, room.available_date_start, room.available_date_end]);
   });
   roomStmt.finalize();
 
