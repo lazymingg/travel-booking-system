@@ -38,6 +38,7 @@ export default {
 <style>
 
 .header {
+  width: 100%;
   background-color: #1D4ED8;
   height: 80px;
   display: flex;
@@ -55,7 +56,7 @@ export default {
 }
 
 .logo_icon {
-  height: 100px;
+  height: 80px;
 }
 
 .header_right {

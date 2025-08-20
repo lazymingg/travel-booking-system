@@ -1,12 +1,14 @@
 <script setup>
-defineOptions({ name: 'UserLoginView' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
 import api from '@/frontend-api-helper.js'
+import { useError } from '@/composables/useError.js'
 
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const { handleApiError } = useError()
 
 const handleLogin = async () => {
   try {
@@ -17,14 +19,14 @@ const handleLogin = async () => {
 
     if (result.success) {
       console.log('Login thành công:', result.message);
-      // userInfo.value = result.data;
       router.push('/userProfile');
     } else {
-      throw new Error(result.message || 'Đăng nhập thất bại');
+      console.error('Login thất bại:', result.message);
+      handleApiError(result);
     }
   } catch (error) {
-    console.error('Login error:', error.message);
-    alert('Lỗi đăng nhập: ' + error.message);
+    console.error('Login error:', error);
+    handleApiError(error);
   }
 };
 </script>

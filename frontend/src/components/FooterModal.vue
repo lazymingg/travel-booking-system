@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <!-- <footer class="footer">
     <div class="footer_content">
       <div class="footer_section">
       <router-link to="/" class="logo">
@@ -28,17 +28,10 @@
         <a href="#" class="nav_link">About us</a>
       </div>
     </div>
-  </footer>
+  </footer> -->
 </template>
 
-<script>
-export default {
-  name: 'FooterModal',
-  data() {
-    return {
-    }
-  }
-}
+<script setup>
 </script>
 
 <style>
@@ -68,7 +61,7 @@ export default {
 }
 
 .logo_icon {
-  height: 100px;
+  height: 80px;
 }
 
 .social_icon {
