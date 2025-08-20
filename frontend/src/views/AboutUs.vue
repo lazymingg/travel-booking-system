@@ -1,4 +1,107 @@
+<script setup>
+import HeaderModal from '@/components/HeaderModal.vue';
+import FooterModal from '@/components/FooterModal.vue';
+
+const team = [
+  {
+    name: 'Trần Cao Vân',
+    role: 'Full-Stack Developer',
+    roleBg: 'var(--accent-green)',
+    roleText: '#fff',
+    desc: 'Develops user interfaces and optimizes experiences across all devices.',
+    avatar: 'src/assets/Image/Teams/TranCaoVan.jpg',
+  },
+  {
+    name: 'Nguyễn Hữu Anh Trí',
+    role: 'Front-end Developer',
+    roleBg: 'var(--accent-purple)',
+    roleText: '#fff',
+    desc: 'Designs and builds server systems, ensuring data security.',
+    avatar: 'src/assets/Image/Teams/NguyenHuuAnhTri.jpg',
+  },
+  {
+    name: 'Lê Thanh Phong',
+    role: 'UI/UX Designer',
+    roleBg: 'var(--accent-orange)',
+    roleText: '#fff',
+    desc: 'Creates intuitive, friendly, and easy-to-use interfaces.',
+    avatar: 'src/assets/Image/Teams/LeThanhPhong.jpg',
+  },
+  {
+    name: 'Nguyễn Văn Minh',
+    role: 'Back-end Developer',
+    roleBg: 'var(--accent-teal)',
+    roleText: '#fff',
+    desc: 'Builds marketing strategies and connects customers with our products.',
+    avatar: 'src/assets/Image/Teams/NguyenVanMinh.jpg',
+  },
+  {
+    name: 'Lê Trung Kiên',
+    role: 'Project Manager',
+    roleBg: 'var(--primary)',
+    roleText: '#fff',
+    desc: 'Manages progress, coordinates team members, and ensures project quality.',
+    avatar: 'src/assets/Image/Teams/LeTrungKien.jpg',
+  }
+]
+
+const values = [
+  {
+    icon: '🌟',
+    title: 'Quality',
+    desc: 'Committed to the best service, carefully vetting every partner.',
+    bg: 'var(--accent-purple)'
+  },
+  {
+    icon: '🤝',
+    title: 'Trust',
+    desc: 'Transparent information and secure customer data.',
+    bg: 'var(--accent-teal)'
+  },
+  {
+    icon: '🚀',
+    title: 'Innovation',
+    desc: 'Continuously updating technology and optimizing user experience.',
+    bg: 'var(--accent-orange)'
+  },
+  {
+    icon: '💚',
+    title: 'Dedication',
+    desc: 'Supportive team, always listening to customers.',
+    bg: 'var(--accent-green)'
+  }
+]
+
+const stats = {
+  hotels: 5000,
+  users: 120,
+  partners: 50
+}
+
+const testimonials = [
+  {
+    name: 'Linh Nguyen',
+    role: 'Customer',
+    feedback: 'Booking was super fast, great prices, and very enthusiastic support!',
+    image: 'src/assets/Image/Teams/TranCaoVan.jpg',
+  },
+  {
+    name: 'Minh Tran',
+    role: 'Partner Business',
+    feedback: 'Easy room management, reaching new customers every day.',
+    image: 'src/assets/Image/Teams/TranCaoVan.jpg',
+  },
+  {
+    name: 'Ha Pham',
+    role: 'Customer',
+    feedback: 'Friendly interface, lots of hotel choices that fit my needs. Great experience!',
+    image: 'src/assets/Image/Teams/TranCaoVan.jpg',
+  }
+]
+</script>
+
 <template>
+  <HeaderModal />
     <div class="about-root">
       <!-- About Intro -->
       <section class="about-intro">
@@ -115,107 +218,10 @@
         </div>
       </section>
     </div>
+  <FooterModal />
   </template>
   
-  <script setup>
-  const team = [
-    {
-      name: 'Trần Cao Vân',
-      role: 'Full-Stack Developer',
-      roleBg: 'var(--accent-green)',
-      roleText: '#fff',
-      desc: 'Develops user interfaces and optimizes experiences across all devices.',
-      avatar: 'src/assets/Image/Teams/TranCaoVan.jpg',
-    },
-    {
-      name: 'Nguyễn Hữu Anh Trí',
-      role: 'Front-end Developer',
-      roleBg: 'var(--accent-purple)',
-      roleText: '#fff',
-      desc: 'Designs and builds server systems, ensuring data security.',
-      avatar: 'src/assets/Image/Teams/NguyenHuuAnhTri.jpg',
-    },
-    {
-      name: 'Lê Thanh Phong',
-      role: 'UI/UX Designer',
-      roleBg: 'var(--accent-orange)',
-      roleText: '#fff',
-      desc: 'Creates intuitive, friendly, and easy-to-use interfaces.',
-      avatar: 'src/assets/Image/Teams/LeThanhPhong.jpg',
-    },
-    {
-      name: 'Nguyễn Văn Minh',
-      role: 'Back-end Developer',
-      roleBg: 'var(--accent-teal)',
-      roleText: '#fff',
-      desc: 'Builds marketing strategies and connects customers with our products.',
-      avatar: 'src/assets/Image/Teams/NguyenVanMinh.jpg',
-    },
-    {
-      name: 'Lê Trung Kiên',
-      role: 'Project Manager',
-      roleBg: 'var(--primary)',
-      roleText: '#fff',
-      desc: 'Manages progress, coordinates team members, and ensures project quality.',
-      avatar: 'src/assets/Image/Teams/LeTrungKien.jpg',
-    }
-  ]
-  
-  const values = [
-    {
-      icon: '🌟',
-      title: 'Quality',
-      desc: 'Committed to the best service, carefully vetting every partner.',
-      bg: 'var(--accent-purple)'
-    },
-    {
-      icon: '🤝',
-      title: 'Trust',
-      desc: 'Transparent information and secure customer data.',
-      bg: 'var(--accent-teal)'
-    },
-    {
-      icon: '🚀',
-      title: 'Innovation',
-      desc: 'Continuously updating technology and optimizing user experience.',
-      bg: 'var(--accent-orange)'
-    },
-    {
-      icon: '💚',
-      title: 'Dedication',
-      desc: 'Supportive team, always listening to customers.',
-      bg: 'var(--accent-green)'
-    }
-  ]
-  
-  const stats = {
-    hotels: 5000,
-    users: 120,
-    partners: 50
-  }
-  
-  const testimonials = [
-    {
-      name: 'Linh Nguyen',
-      role: 'Customer',
-      feedback: 'Booking was super fast, great prices, and very enthusiastic support!',
-      image: 'src/assets/Image/Teams/TranCaoVan.jpg',
-    },
-    {
-      name: 'Minh Tran',
-      role: 'Partner Business',
-      feedback: 'Easy room management, reaching new customers every day.',
-      image: 'src/assets/Image/Teams/TranCaoVan.jpg',
-    },
-    {
-      name: 'Ha Pham',
-      role: 'Customer',
-      feedback: 'Friendly interface, lots of hotel choices that fit my needs. Great experience!',
-      image: 'src/assets/Image/Teams/TranCaoVan.jpg',
-    }
-  ]
-  </script>
-  
+
   <style>
   :root {
     --primary: #2563EB;

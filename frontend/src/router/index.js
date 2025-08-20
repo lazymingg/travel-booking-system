@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import('../views/SearchAccommodations.vue'),
     },
     {
-      path: '/',
+      path: '/home-page',
       name: 'HomePage',
       component: () => import('../views/HomePage.vue'),
     },
@@ -35,10 +35,30 @@ const router = createRouter({
       component: () => import('../views/AboutUs.vue'),
     },
     {
+      path: '/manage-accommodation',
+      name: 'ManageAccommodation',
+      component: () => import('../views/ManageAccommodation.vue'),
+    },
+    {
+      path: '/upload-accommodation',
+      name: 'UploadAccommodation',
+      component: () => import('../views/UploadAccommodation.vue'),
+    },
+     {
+      path: '/about-us',
+      name: 'AboutUs',
+      component: () => import('../views/AboutUs.vue'),
+    },
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboard',
+      component: () => import('../views/AdminDashboard.vue'),
+    },
+    {
       path: '/booking',
       name: 'booking',
       component: () => import('../views/Booking.vue'),
-    },
+    }
   ],
 })
 

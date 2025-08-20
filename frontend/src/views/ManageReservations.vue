@@ -1,4 +1,9 @@
 <script setup>
+// const axious = require('axios');
+import HeaderModal from '@/components/HeaderModal.vue';
+import FooterModal from '@/components/FooterModal.vue';
+
+
 import { ref, computed } from 'vue'
 import ReservationFilter from '../components/reservations/ReservationFilter.vue'
 import ReservationCard from '../components/reservations/ReservationCard.vue'
@@ -79,12 +84,12 @@ function handleSave(updated) {
   if (idx !== -1) {
     const oldStatus = reservations.value[idx].status
     reservations.value[idx] = { ...updated }
-    
+
     // Auto switch to the new status tab if status changed
     if (oldStatus !== updated.status) {
       activeTab.value = updated.status
     }
-    
+
     console.log(`Reservation ${updated.id} updated and moved to ${updated.status} filter`)
   }
   showEditModal.value = false
@@ -97,6 +102,8 @@ function handleContact(reservation) {
 </script>
 
 <template>
+    <HeaderModal/>
+    
   <div class="page-wrapper">
     <!-- Section Title -->
     <div class="section-title-row">
@@ -138,7 +145,7 @@ function handleContact(reservation) {
       @close="showDeleteModal = false"
       @delete="confirmDelete"
     />
-    
+
     <EditReservationModal
       v-if="showEditModal"
       :reservation="selectedReservation"
@@ -146,9 +153,21 @@ function handleContact(reservation) {
       @save="handleSave"
     />
   </div>
+  
+  <FooterModal/>
 </template>
 
 <style scoped>
+.layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f9fafb, #eef2ff);
+}
+.main-content {
+  flex: 1;
+  padding-bottom: 2rem;
+}
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
