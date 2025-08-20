@@ -1,8 +1,23 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
+import api from '@/frontend-api-helper'
 
 const router = useRouter()
+
+const roomInfo = reactive({
+  accommodation_id: null,
+  room_id: null,
+  room_type: '',
+  price_per_day: null,
+  capacity: 1,
+  description: '',
+  number_guest: null,
+  is_available: null,
+  available_date_start: '',
+  available_date_end: '',  
+  created_at: ''
+})
 
 const props = defineProps({
   rooms: {

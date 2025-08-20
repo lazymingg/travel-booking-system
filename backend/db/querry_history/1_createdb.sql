@@ -41,7 +41,7 @@ CREATE TABLE Rooms (
     accommodation_id INTEGER NOT NULL,
     room_id INTEGER NOT NULL,
     room_type TEXT NOT NULL,
-    price_per_night REAL NOT NULL CHECK(price_per_night > 0),
+    price_per_day REAL NOT NULL CHECK(price_per_day > 0),
     capacity INTEGER NOT NULL CHECK(capacity > 0),
     description TEXT,
     number_guest INTEGER NOT NULL CHECK(number_guest > 0),
