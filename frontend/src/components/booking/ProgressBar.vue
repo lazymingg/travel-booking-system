@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import check from '@/assets/bookingIcon/check.svg'
 
 defineProps({
