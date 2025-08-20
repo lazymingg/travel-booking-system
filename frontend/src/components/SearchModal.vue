@@ -32,7 +32,7 @@
     <!-- Cột 1: Price / Bed / Rating -->
     <div class="filter-section">
       <div class="attribute">
-        <h3>Price per day ($)</h3>
+        <h3>Price per day</h3>
         <Slider
           v-model="filters.priceRange"
           :min="0"
@@ -40,7 +40,7 @@
           :interval="10"
           :tooltip="'always'"
           :lazy="true"
-          :dot-size="16"
+          :dot-size="10"
           :height="4"
           :enable-cross="false"
           :piecewise="true"
@@ -58,7 +58,7 @@
           :interval="1"
           :tooltip="'always'"
           :lazy="true"
-          :dot-size="16"
+          :dot-size="10"
           :height="4"
           :enable-cross="false"
           :piecewise="true"
@@ -262,8 +262,6 @@ export default {
 .action_button:hover .button_icon {
   transform: scale(1.2); /* phóng to 20% khi hover */
 }
-
-
   
 /* Filter popup */
 .filter-popup {
@@ -295,11 +293,20 @@ export default {
   font-weight: bold;
 }
 
-.filter-section .slider-target {
+.slider-target {
   width: 100%; /* Đảm bảo slider chiếm toàn bộ chiều rộng */
   margin-top: 40px; /* Khoảng cách trên slider */
   margin-bottom: 20px; /* Khoảng cách dưới slider */
 }
+
+:deep(.slider-tooltip) {
+  font-size: 0.75rem;
+}
+
+:deep(.slider-base) {
+  height: 0.3rem;
+}
+
 
 @keyframes slideDown {
   from {
