@@ -1,5 +1,5 @@
 <template>
-  <!-- <footer class="footer">
+  <footer class="footer">
     <div class="footer_content">
       <div class="footer_section">
       <router-link to="/" class="logo">
@@ -28,7 +28,7 @@
         <a href="#" class="nav_link">About us</a>
       </div>
     </div>
-  </footer> -->
+  </footer> 
 </template>
 
 <script setup>

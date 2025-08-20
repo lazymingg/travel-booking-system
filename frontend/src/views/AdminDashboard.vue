@@ -1,4 +1,60 @@
+ 
+  <script setup>
+  import HeaderModal from '@/components/HeaderModal.vue';
+  import FooterModal from '@/components/FooterModal.vue';
+  import { ref, computed } from 'vue'
+  const tab = ref('users')
+  
+  const users = [
+    { id: 1, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Alice', email: 'alice@mail.com', role: 'admin', status: 'active' },
+    { id: 2, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Bob', email: 'bob@mail.com', role: 'user', status: 'inactive' },
+    { id: 3, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Charlie', email: 'charlie@mail.com', role: 'manager', status: 'active' },
+    { id: 4, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'David', email: 'david@mail.com', role: 'user', status: 'active' },
+  ]
+  
+  const accommodations = [
+    { id: 1, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Sunrise Hotel', address: '123 Beach Ave', price: 120, status: 'approved' },
+    { id: 2, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Mountain Resort', address: '456 Hill St', price: 180, status: 'pending' },
+    { id: 3, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'City Hostel', address: '789 Main Rd', price: 60, status: 'approved' },
+    { id: 4, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Lakeview Inn', address: '321 Lake Rd', price: 90, status: 'approved' },
+  ]
+  
+  const bookings = [
+    { id: 'B001', guest: 'Alice', property: 'Sunrise Hotel', dates: '2024-06-01 ~ 2024-06-05', status: 'confirmed', total: 480 },
+    { id: 'B002', guest: 'Bob', property: 'Mountain Resort', dates: '2024-06-10 ~ 2024-06-12', status: 'pending', total: 360 },
+    { id: 'B003', guest: 'Charlie', property: 'City Hostel', dates: '2024-06-15 ~ 2024-06-16', status: 'completed', total: 60 },
+    { id: 'B004', guest: 'David', property: 'Lakeview Inn', dates: '2024-06-20 ~ 2024-06-22', status: 'confirmed', total: 180 },
+    { id: 'B005', guest: 'Bob', property: 'Sunrise Hotel', dates: '2024-06-25 ~ 2024-06-27', status: 'completed', total: 240 },
+  ]
+  
+  const statList = computed(() => [
+    {
+      label: 'Total Users',
+      value: users.filter(u => u.role !== 'admin').length,
+      icon: 'src/assets/adminDashboardIcons/userIcon.svg'
+    },
+    {
+      label: 'Properties',
+      value: accommodations.filter(a => a.status === 'approved').length,
+      icon: 'src/assets/adminDashboardIcons/accommodationIcon.svg'
+    },
+    {
+      label: 'Bookings',
+      value: bookings.filter(b => b.status === 'completed' || b.status === 'confirmed').length,
+      icon: 'src/assets/adminDashboardIcons/bookingIcon.svg'
+    },
+    {
+      label: 'Revenue',
+      value: '$' + bookings
+        .filter(b => b.status === 'completed' || b.status === 'confirmed')
+        .reduce((sum, b) => sum + b.total, 0)
+        .toLocaleString(),
+        icon: 'src/assets/adminDashboardIcons/revenueIcon.svg'
+    }
+  ])
+  </script>
 <template>
+    <HeaderModal/>
     <div class="admin-dashboard">
       <!-- Header Stats -->
       <div class="stats-grid">
@@ -116,60 +172,9 @@
         </div>
       </div>
     </div>
+    <FooterModal/>
   </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue'
-  const tab = ref('users')
-  
-  const users = [
-    { id: 1, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Alice', email: 'alice@mail.com', role: 'admin', status: 'active' },
-    { id: 2, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Bob', email: 'bob@mail.com', role: 'user', status: 'inactive' },
-    { id: 3, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Charlie', email: 'charlie@mail.com', role: 'manager', status: 'active' },
-    { id: 4, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'David', email: 'david@mail.com', role: 'user', status: 'active' },
-  ]
-  
-  const accommodations = [
-    { id: 1, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Sunrise Hotel', address: '123 Beach Ave', price: 120, status: 'approved' },
-    { id: 2, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Mountain Resort', address: '456 Hill St', price: 180, status: 'pending' },
-    { id: 3, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'City Hostel', address: '789 Main Rd', price: 60, status: 'approved' },
-    { id: 4, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Lakeview Inn', address: '321 Lake Rd', price: 90, status: 'approved' },
-  ]
-  
-  const bookings = [
-    { id: 'B001', guest: 'Alice', property: 'Sunrise Hotel', dates: '2024-06-01 ~ 2024-06-05', status: 'confirmed', total: 480 },
-    { id: 'B002', guest: 'Bob', property: 'Mountain Resort', dates: '2024-06-10 ~ 2024-06-12', status: 'pending', total: 360 },
-    { id: 'B003', guest: 'Charlie', property: 'City Hostel', dates: '2024-06-15 ~ 2024-06-16', status: 'completed', total: 60 },
-    { id: 'B004', guest: 'David', property: 'Lakeview Inn', dates: '2024-06-20 ~ 2024-06-22', status: 'confirmed', total: 180 },
-    { id: 'B005', guest: 'Bob', property: 'Sunrise Hotel', dates: '2024-06-25 ~ 2024-06-27', status: 'completed', total: 240 },
-  ]
-  
-  const statList = computed(() => [
-    {
-      label: 'Total Users',
-      value: users.filter(u => u.role !== 'admin').length,
-      icon: 'src/assets/adminDashboardIcons/userIcon.svg'
-    },
-    {
-      label: 'Properties',
-      value: accommodations.filter(a => a.status === 'approved').length,
-      icon: 'src/assets/adminDashboardIcons/accommodationIcon.svg'
-    },
-    {
-      label: 'Bookings',
-      value: bookings.filter(b => b.status === 'completed' || b.status === 'confirmed').length,
-      icon: 'src/assets/adminDashboardIcons/bookingIcon.svg'
-    },
-    {
-      label: 'Revenue',
-      value: '$' + bookings
-        .filter(b => b.status === 'completed' || b.status === 'confirmed')
-        .reduce((sum, b) => sum + b.total, 0)
-        .toLocaleString(),
-        icon: 'src/assets/adminDashboardIcons/revenueIcon.svg'
-    }
-  ])
-  </script>
+ 
   
   <style>
   :root {
