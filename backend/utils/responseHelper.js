@@ -5,28 +5,16 @@ const responseHelper = {
       success: true,
       message,
       data,
-      error: null
+      details: null
     });
   },
 
-  error: (res, message = 'Internal Server Error', statusCode = 500, error = null) => {
+  error: (res, message = 'Internal Server Error', statusCode = 500, details = null) => {
     return res.status(statusCode).json({
       success: false,
       message,
       data: null,
-      error
-    });
-  },
-
-  validationError: (res, message = 'Validation Error', errors = []) => {
-    return res.status(400).json({
-      success: false,
-      message,
-      data: null,
-      error: {
-        type: 'validation',
-        details: errors
-      }
+      details
     });
   }
 };
