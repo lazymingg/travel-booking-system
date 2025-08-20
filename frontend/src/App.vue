@@ -1,9 +1,21 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import ErrorModal from '@/components/ErrorModal.vue'
+import { useError } from '@/composables/useError.js'
+
+const { showError, errorMessage, errorDetails, clearError } = useError()
 </script>
 
 <template>
   <RouterView />
+
+  <!-- Global Error Modal -->
+  <ErrorModal
+    :show="showError"
+    :message="errorMessage"
+    :details="errorDetails"
+    @close="clearError"
+  />
 </template>
 
 <style scoped>

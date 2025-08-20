@@ -1,12 +1,13 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const responseHelper = require('../utils/responseHelper');
+const { requireAdmin, requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 const db = new sqlite3.Database('./db/db.db');
 
 // Get all owners
-router.get('/', (req, res, next) => {
+router.get('/',  (req, res, next) => {
   const { status } = req.query;
   let query = `SELECT o.*, u.full_name, u.email, u.phone_number 
                FROM Owners o 
@@ -62,8 +63,9 @@ router.get('/user/:user_id', (req, res, next) => {
 });
 
 // Create new owner (register as host)
-router.post('/', (req, res, next) => {
-  const { user_id, bank_account, id_card, business_license } = req.body;
+router.post('/', requireAuth, (req, res, next) => {
+  const { bank_account, id_card, business_license } = req.body;
+  const user_id = req.session.user.user_id; // Get user_id from session
   const created_at = new Date().toISOString();
 
   // Check if user already registered as owner

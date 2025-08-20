@@ -1,38 +1,35 @@
 <script setup>
 // const axious = require('axios');
+import HeaderModal from '@/components/HeaderModal.vue';
+import FooterModal from '@/components/FooterModal.vue';
+import SearchModal from '@/components/SearchModal.vue';
+
 </script>
 
 <template>
   <div class="main-container">
-  <nav class ='nav-bar'>
+  <!-- <nav class ='nav-bar'>
     <h1 class="logo">Travel Booking System</h1>
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/login">Login</a></li>
       <li><a href="/userProfile">User Profile</a></li>
     </ul>
-  </nav>
-  <div class="hero-pane">
+  </nav> -->
+  <HeaderModal/>
+  <SearchModal/>
+    <div class="hero-pane">
+    </div>
   </div>
-  <div class="search-bar">
-    <h2>Search for your next adventure</h2>
-    <form>
-      <input type="text" placeholder="Enter destination" />
-      <input type="date" placeholder="Select booking date - booking return day" />
-      <input type="number" placeholder="Number of guests" />
-      <button type="submit">Search</button>
-    </form>
-  </div>
-  </div>
-  <div>
+  <!-- <div>
     <h2>Featured Destinations</h2>
     <div class="featured-destinations">
       <p>Destination 1</p>
       <p>Destination 2</p>
       <p>Destination 3</p>
     </div>
-  </div>
-
+  </div> -->
+  <FooterModal/>
 </template>
 
 <style scoped>
