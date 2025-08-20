@@ -39,7 +39,7 @@ import FooterModal from '@/components/FooterModal.vue';
 import SearchModal from '@/components/SearchModal.vue';
 
 export default {
-  name: 'WeGoBooking',
+  name: 'SearchAccommodation',
   components: {
     HeaderModal,
     SearchModal,

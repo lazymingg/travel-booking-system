@@ -74,7 +74,7 @@ export default {
 .nav_link:hover {
   color: #FACC15;
   text-decoration:underline;
-  font-size: 1.02rem;
+  transform: scale(1.02);
 }
 
 .user_profile {
