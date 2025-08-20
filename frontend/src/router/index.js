@@ -28,6 +28,16 @@ const router = createRouter({
       path: '/manage-accommodation',
       name: 'ManageAccommodation',
       component: () => import('../views/ManageAccommodation.vue'),
+    },
+    {
+      path: '/upload-accommodation',
+      name: 'UploadAccommodation',
+      component: () => import('../views/UploadAccommodation.vue'),
+    },
+    {
+      path: '/user-dashboard',
+      name: 'User Dashboard',
+      component: () => import('../views/Dashboard.vue'),
     }
   ],
 })
