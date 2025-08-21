@@ -5,30 +5,62 @@ import SearchModal from '@/components/SearchModal.vue'
 import SingleCarousel from '@/components/HomePage/SingleCarosel.vue'
 import MultipleCarousel from '@/components/HomePage/MultipleCarousel.vue'
 
-// Data for SingleCarousel
+// Helper to get province image path
+function getProvinceImage(name) {
+  return new URL(`../assets/Image/HomePage/province/${name}.jpg`, import.meta.url).href
+}
+
+// Helper to get accommodation image path
+function getAccommodationImage(name) {
+  return new URL(`../assets/Image/HomePage/accommodation/${name}.jpg`, import.meta.url).href
+}
+
+function getPopularPlacesImage(name) {
+  return new URL(`../assets/Image/HomePage/popularPlaces/${name}.jpg`, import.meta.url).href
+}
+
+
+// Data for SingleCarousel (map to {name, image})
 const accommodations = [
-  "Hotel", "Resort", "Homestay", "Villa", "Apartment", "Hostel", "Guesthouse", "Motel", "Camping", "Bungalow",
-  "Farmstay", "Eco-lodge", "Luxury Hotel", "Boutique Hotel", "Beach Resort", "Mountain Lodge", "Capsule Hotel",
-  "Treehouse", "Floating House", "Glamping"
-]
+  "Hotel", "Resort", "Homestay", "Villa", "Apartment", "Hostel", "Guesthouse", "Motel", "Bungalow"
+].map((name, i) => ({
+  id: i + 1,
+  name,
+  image: getAccommodationImage(name)
+}))
 
 const popularPlaces = [
-  "Ha Long Bay", "Phong Nha Cave", "Sapa", "Da Nang Beach", "Nha Trang", "Mekong Delta", "Hoi An Ancient Town", "Hue Imperial City",
-  "Fansipan", "Da Lat", "Phu Quoc Island", "My Son Sanctuary", "Con Dao", "Tam Coc", "Ba Na Hills", "Cat Ba Island",
-  "Mui Ne", "Pleiku", "Buon Ma Thuot", "Tay Ninh Holy See"
-]
+  "Ha Long Bay", "Phong Nha Cave", "Sapa", "Da Nang Beach", "Mekong Delta", "Hoi An Ancient Town", "Hue Imperial City",
+  "Fansipan", "Da Lat", "Phu Quoc Island"
+].map((name, i) => ({
+  id: i + 1,
+  name,
+  image: getPopularPlacesImage(name)
+}))
 
-// Data for MultipleCarousel
+// Data for MultipleCarousel (map to {name, image})
 const northernRegion = [
   "Ha Noi", "Quang Ninh", "Cao Bang", "Lang Son", "Lai Chau", "Dien Bien", "Son La", "Tuyen Quang", "Lao Cai",
   "Thai Nguyen", "Phu Tho", "Bac Ninh", "Hung Yen", "Hai Phong", "Ninh Binh", "Thanh Hoa"
-]
+].map((name, i) => ({
+  id: i + 1,
+  name,
+  image: getProvinceImage(name)
+}))
 const middleRegion = [
   "Hue", "Nghe An", "Ha Tinh", "Quang Tri", "Da Nang", "Quang Ngai", "Gia Lai", "Khanh Hoa", "Lam Dong", "Dak Lak"
-]
+].map((name, i) => ({
+  id: i + 1,
+  name,
+  image: getProvinceImage(name)
+}))
 const southernRegion = [
   "Ho Chi Minh City", "Dong Nai", "Tay Ninh", "Can Tho", "Vinh Long", "Dong Thap", "Ca Mau", "An Giang"
-]
+].map((name, i) => ({
+  id: i + 1,
+  name,
+  image: getProvinceImage(name)
+}))
 </script>
 
 <template>
@@ -38,7 +70,7 @@ const southernRegion = [
 
     <!-- Hero Banner -->
     <section class="hero-banner">
-      <img class="hero-bg" src="@/assets/Image/Teams/TranCaoVan.jpg" alt="banner" />
+      <img class="hero-bg" src="@/assets/Image/HomePage/background.jpg" alt="banner" />
       <div class="hero-overlay">
         <h1 class="hero-title">Welcome to WeGo</h1>
       </div>
