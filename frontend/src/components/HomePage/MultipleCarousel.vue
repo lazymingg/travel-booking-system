@@ -11,23 +11,9 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  title: {
-    type: String,
-    required: true
-  },
-  desc: {
-    type: String,
-    required: true
-  }
+  title: String,
+  desc: String
 })
-
-const regionCards = computed(() =>
-  props.regionList.map((name, i) => ({
-    id: i + 1,
-    name,
-    image: placeholderImg
-  }))
-)
 
 const perSlide = ref(6)
 function updatePerSlide() {
@@ -41,16 +27,16 @@ onMounted(() => {
 onUnmounted(() => window.removeEventListener('resize', updatePerSlide))
 
 const current = ref(0)
-const totalSlides = computed(() => Math.ceil(regionCards.value.length / perSlide.value))
+const totalSlides = computed(() => Math.ceil(props.regionList.length / perSlide.value))
 const slideItems = computed(() => {
   const start = current.value * perSlide.value
-  return regionCards.value.slice(start, start + perSlide.value)
+  return props.regionList.slice(start, start + perSlide.value)
 })
 function prev() { if (current.value > 0) current.value-- }
 function next() { if (current.value < totalSlides.value - 1) current.value++ }
 function go(idx) { current.value = idx }
 
-const maxDots = computed(() => Math.ceil(regionCards.value.length / perSlide.value))
+const maxDots = computed(() => Math.ceil(props.regionList.length / perSlide.value))
 const DOT_SLOT = 28
 const dotStart = ref(0)
 const clampDotStart = () => {
@@ -228,7 +214,7 @@ const visibleDots = computed(() => {
   max-width: 320px;
   background: #F9FAFB;
   border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 24px rgba(37,99,235,0.18); /* Increased shadow */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -239,7 +225,7 @@ const visibleDots = computed(() => {
 }
 .carousel-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 12px 36px rgba(37,99,235,0.28); /* Stronger shadow on hover */
 }
 .card-img {
   width: 100%;

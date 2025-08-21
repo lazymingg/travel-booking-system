@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import placeholderImg from '@/assets/Image/Teams/TranCaoVan.jpg'
-import leftButton from '@/assets/HomePage/leftButton.svg' // inactive dot + arrows
-import rightButton from '@/assets/HomePage/rightButton.svg' // inactive dot + arrows
-import dotIcon from '@/assets/HomePage/dotNormal.svg' // active dot
-import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg' // active dot
+import leftButton from '@/assets/HomePage/leftButton.svg'
+import rightButton from '@/assets/HomePage/rightButton.svg'
+import dotIcon from '@/assets/HomePage/dotNormal.svg'
+import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg'
 
 const props = defineProps({
   accommodationList: Array,
@@ -13,12 +12,12 @@ const props = defineProps({
   reverse: Boolean
 })
 
-// Always map to card objects for consistent rendering
+// Use passed image for each accommodation (already processed in HomePage)
 const cards = computed(() =>
   props.accommodationList.map((item, i) =>
     typeof item === 'object'
       ? item
-      : { id: i + 1, name: item, image: placeholderImg }
+      : { id: i + 1, name: item, image: '' }
   )
 )
 
@@ -113,6 +112,7 @@ const visibleDots = computed(() => {
     </div>
   </section>
 </template>
+
 <style scoped>
 :root {
   --blue: #2563EB;
