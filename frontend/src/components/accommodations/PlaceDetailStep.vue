@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -11,6 +11,28 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const data = ref(props.modelValue)
+const previewSrc = ref(null)
+
+function revokePreview() {
+  if (previewSrc.value) {
+    URL.revokeObjectURL(previewSrc.value)
+    previewSrc.value = null
+  }
+}
+
+watch(() => data.value.thumbnailImage, (val) => {
+  revokePreview()
+  if (val instanceof File) {
+    previewSrc.value = URL.createObjectURL(val)
+  } else if (typeof val === 'string' && val) {
+    // If parent passes a string URL
+    previewSrc.value = val
+  }
+})
+
+onUnmounted(() => {
+  revokePreview()
+})
 
 function updateData() {
   emit('update:modelValue', data.value)
@@ -91,10 +113,15 @@ function handleImageUpload(event) {
             id="thumbnail-upload"
           />
           <label for="thumbnail-upload" class="upload-placeholder">
-            <div class="upload-icon">
-              <div class="circle"></div>
-              <div class="triangle"></div>
-            </div>
+            <template v-if="previewSrc">
+              <img :src="previewSrc" alt="Thumbnail preview" class="preview-img" />
+            </template>
+            <template v-else>
+              <div class="upload-icon">
+                <div class="circle"></div>
+                <div class="triangle"></div>
+              </div>
+            </template>
           </label>
         </div>
       </div>
@@ -180,6 +207,13 @@ function handleImageUpload(event) {
 .upload-placeholder:hover {
   border-color: #3b82f6;
   background: #eff6ff;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
 }
 
 .upload-icon {
