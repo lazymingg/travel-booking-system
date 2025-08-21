@@ -54,7 +54,8 @@ router.post('/:accommodationId/rooms', requireOwner, (req, res, next) => {
 router.get('/:accommodationId/available', (req, res, next) => {
   console.log(req.query)
 
-  const { accommodation_id } = req.params;
+  // param name in route is :accommodationId
+  const { accommodationId } = req.params;
   const { check_in_date, check_out_date, number_guest } = req.query;
   
   if (!check_in_date || !check_out_date || !number_guest) {
@@ -82,9 +83,9 @@ router.get('/:accommodationId/available', (req, res, next) => {
 
   db.all(query, 
     [
-      accommodation_id,
+      accommodationId,
       number_guest,
-      accommodation_id,
+      accommodationId,
       check_in_date, check_out_date
     ],
     (err, rows) => {

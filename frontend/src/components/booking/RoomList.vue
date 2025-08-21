@@ -35,7 +35,9 @@ const fetchRooms = async () => {
 
     console.log(params)
 
-    const result = await api.get('/accommodations/${accommodationId}/available', params );
+    // build query string
+    const qs = new URLSearchParams(params).toString();
+    const result = await api.get(`/accommodations/${accommodationId}/available?${qs}`);
     console.log('Filter props:', props.filter)
     console.log('API result.data:', result.data)
 
