@@ -84,7 +84,7 @@ const applyFilter = () => {
           <label class="label">Guests</label>
           <div class="input-wrapper">
             <input
-            v-model="formFilter.number_guest"
+            v-model="formFilter.capacity"
             type="number"
             min="0"
             class="input"
