@@ -84,32 +84,48 @@ router.delete('/:accommodation_id/:room_id', (req, res, next) => {
   });
 });
 
-// Get available rooms for date range
-router.post('/available', (req, res, next) => {
-  const { accommodation_id, check_in_date, check_out_date } = req.body;
+// Available in date range
+// Meet the constraint about number of guests
+router.get('/available', (req, res, next) => {
+  console.log(req.query)
+  const { accommodation_id, check_in_date, check_out_date, number_guest } = req.query;
 
-  if (!accommodation_id || !check_in_date || !check_out_date) {
-    return responseHelper.validationError(res, 'Accommodation ID, check-in date, and check-out date are required');
+  if (!accommodation_id || !check_in_date || !check_out_date || !number_guest) {
+    const e = new Error('Accommodation ID, check-in date, check-out date and capacity are required');
+      e.status = 400;
+      throw e;
   }
 
   const query = `
     SELECT r.* FROM Rooms r
-    WHERE r.accommodation_id = ? AND r.is_available = 1
-    AND r.room_id NOT IN (
-      SELECT DISTINCT b.room_id FROM Bookings b
-      WHERE b.accommodation_id = ? AND b.status != 'cancelled'
-      AND (
-        (b.check_in_date <= ? AND b.check_out_date > ?) OR
-        (b.check_in_date < ? AND b.check_out_date >= ?) OR
-        (b.check_in_date >= ? AND b.check_out_date <= ?)
-      )
-    )`;
+    WHERE 
+      r.accommodation_id = ? AND r.is_available = 1
+      
+      -- Check capacity
+      AND r.number_guest >= ?
+      
+      -- Except booked rooms
+      AND r.room_id NOT IN (
+        SELECT DISTINCT b.room_id FROM Bookings b
+        WHERE b.accommodation_id = ?
+          AND b.status != 'cancelled'
+          AND b.check_in_date <= ?
+          AND b.check_out_date >= ?
+      )`;
 
   db.all(query, 
-    [accommodation_id, accommodation_id, check_in_date, check_in_date, 
-     check_out_date, check_out_date, check_in_date, check_out_date],
+    [
+      accommodation_id,
+      number_guest,
+      accommodation_id,
+      check_in_date, check_out_date
+    ],
     (err, rows) => {
-      if (err) return next(err);
+      if (err) {
+        console.error("SQL: ", err.message)
+        return next(err)
+      }
+
       return responseHelper.success(res, rows, 'Available rooms retrieved successfully');
     }
   );

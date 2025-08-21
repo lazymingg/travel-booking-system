@@ -69,6 +69,15 @@ router.get('/me', (req, res) => {
   }
 });
 
+// check if user is owner
+router.get('/is-owner', (req, res) => {
+  if (req.session.user && req.session.user.role === 'owner') {
+    return responseHelper.success(res, { isOwner: true }, 'User is an owner');
+  } else {
+    return responseHelper.success(res, { isOwner: false }, 'User is not an owner');
+  }
+});
+
 // Logout
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {

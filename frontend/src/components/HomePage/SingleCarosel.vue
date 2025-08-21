@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import placeholderImg from '@/assets/Image/Teams/TranCaoVan.jpg'
-import leftButton from '@/assets/HomePage/leftButton.svg' // inactive dot + arrows
-import rightButton from '@/assets/HomePage/rightButton.svg' // inactive dot + arrows
-import dotIcon from '@/assets/HomePage/dotNormal.svg' // active dot
-import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg' // active dot
+import leftButton from '@/assets/HomePage/leftButton.svg'
+import rightButton from '@/assets/HomePage/rightButton.svg'
+import dotIcon from '@/assets/HomePage/dotNormal.svg'
+import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg'
 
 const props = defineProps({
   accommodationList: Array,
@@ -13,12 +12,12 @@ const props = defineProps({
   reverse: Boolean
 })
 
-// Always map to card objects for consistent rendering
+// Use passed image for each accommodation (already processed in HomePage)
 const cards = computed(() =>
   props.accommodationList.map((item, i) =>
     typeof item === 'object'
       ? item
-      : { id: i + 1, name: item, image: placeholderImg }
+      : { id: i + 1, name: item, image: '' }
   )
 )
 
@@ -84,7 +83,7 @@ const visibleDots = computed(() => {
       </div>
       <div class="accommodations-right">
         <div class="carousel-wrapper">
-          <button class="carousel-btn left" :disabled="current === 0" @click="prev">
+          <button type="button" class="carousel-btn left" :disabled="current === 0" @click="prev">
             <img :src="leftButton" alt="prev" class="arrow-icon"/>
           </button>
           <div class="carousel-track">
@@ -93,7 +92,7 @@ const visibleDots = computed(() => {
               <div class="card-name">{{ acc.name }}</div>
             </div>
           </div>
-          <button class="carousel-btn right" :disabled="current >= totalSlides - 1" @click="next">
+          <button type="button" class="carousel-btn right" :disabled="current >= totalSlides - 1" @click="next">
             <img :src="rightButton" alt="next" class="arrow-icon"/>
           </button>
         </div>
@@ -113,6 +112,7 @@ const visibleDots = computed(() => {
     </div>
   </section>
 </template>
+
 <style scoped>
 :root {
   --blue: #2563EB;
@@ -193,6 +193,7 @@ const visibleDots = computed(() => {
   padding: 1.2rem;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  min-height: 260px;
 }
 .carousel-card:hover {
   transform: scale(1.05);
@@ -200,7 +201,7 @@ const visibleDots = computed(() => {
 }
 .card-img {
   width: 100%;
-  max-height: 300px;
+  height: 300px;
   object-fit: cover;
   border-radius: 0.8rem;
   margin-bottom: 0.8rem;
@@ -251,8 +252,8 @@ const visibleDots = computed(() => {
   will-change: transform;
 }
 .dot-icon {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   cursor: pointer;
   transition: transform 0.2s;
 }

@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onUnmounted, onMounted } from 'vue'
+import api from '@/frontend-api-helper.js'
 
 const props = defineProps({
   modelValue: {
@@ -11,6 +12,28 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const data = ref(props.modelValue)
+const previewSrc = ref(null)
+
+function revokePreview() {
+  if (previewSrc.value) {
+    URL.revokeObjectURL(previewSrc.value)
+    previewSrc.value = null
+  }
+}
+
+watch(() => data.value.thumbnailImage, (val) => {
+  revokePreview()
+  if (val instanceof File) {
+    previewSrc.value = URL.createObjectURL(val)
+  } else if (typeof val === 'string' && val) {
+    // If parent passes a string URL
+    previewSrc.value = val
+  }
+})
+
+onUnmounted(() => {
+  revokePreview()
+})
 
 function updateData() {
   emit('update:modelValue', data.value)
@@ -23,6 +46,46 @@ function handleImageUpload(event) {
     updateData()
   }
 }
+
+const amenitiesList = ref([])
+const loading = ref(true)
+
+const accommodationTypes = [
+  'Hotel',
+  'Hostel', 
+  'Resort',
+  'Homestay'
+]
+
+const fetchAmenities = async () => {
+  try {
+    const result = await api.get('/amenities')
+    if (result.success) {
+      amenitiesList.value = result.data 
+      console.log(amenitiesList.value)
+    } else {
+      console.error('Failed to fetch amenities:', result.message)
+      amenitiesList.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching amenities:', error)
+    amenitiesList.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchAmenities()
+})
+
+if (!data.value.amenities) {
+  data.value.amenities = []
+}
+if (!data.value.accommodationType) {
+  data.value.accommodationType = ''
+}
+
 </script>
 
 <template>
@@ -40,13 +103,23 @@ function handleImageUpload(event) {
         </div>
 
         <div class="form-group">
-          <label>Type of accommodation</label>
-          <input
-            v-model="data.type"
-            type="text"
-            placeholder="EX: Hotels, Villas, Homestay,..."
-            @input="updateData"
-          />
+          <label>Accommodation type</label>
+          <div class="radio-group">
+            <div 
+              v-for="type in accommodationTypes" 
+              :key="type"
+              class="radio-item"
+            >
+              <input 
+                :id="type"
+                v-model="data.accommodationType"
+                type="radio" 
+                :value="type"
+                @change="updateData"
+              />
+              <label :for="type" class="radio-label">{{ type }}</label>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -67,6 +140,26 @@ function handleImageUpload(event) {
             placeholder="123 street 456, ward KLAS,..."
             @input="updateData"
           />
+        </div>
+
+        <div class="form-group">
+          <label>Amenities</label>
+          <div class="checkbox-group">
+            <div 
+              v-for="amenity in amenitiesList" 
+              :key= "amenity.amenity_id|| amenity.name"
+              class="checkbox-item"
+            >
+              <input 
+                :id="`amenity-${amenity.amenity_id || amenity.id || amenity.name}`"
+                v-model="data.amenities"
+                type="checkbox" 
+                :value="amenity.name"
+                @change="updateData"
+              />
+              <label :for="`amenity-${amenity.name}`" class="checkbox-label">{{ amenity.name }}</label>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -91,10 +184,15 @@ function handleImageUpload(event) {
             id="thumbnail-upload"
           />
           <label for="thumbnail-upload" class="upload-placeholder">
-            <div class="upload-icon">
-              <div class="circle"></div>
-              <div class="triangle"></div>
-            </div>
+            <template v-if="previewSrc">
+              <img :src="previewSrc" alt="Thumbnail preview" class="preview-img" />
+            </template>
+            <template v-else>
+              <div class="upload-icon">
+                <div class="circle"></div>
+                <div class="triangle"></div>
+              </div>
+            </template>
           </label>
         </div>
       </div>
@@ -182,6 +280,13 @@ function handleImageUpload(event) {
   background: #eff6ff;
 }
 
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
 .upload-icon {
   position: relative;
   width: 60px;
@@ -209,10 +314,59 @@ function handleImageUpload(event) {
   left: 10px;
 }
 
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radio-item input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+
+.radio-label {
+  font-weight: normal;
+  color: #374151;
+  cursor: pointer;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.checkbox-label {
+  font-weight: normal;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 }
+
 </style>

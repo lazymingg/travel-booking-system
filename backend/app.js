@@ -34,8 +34,12 @@ const paymentsRouter = require('./routes/payments');
 const reviewRouter = require('./routes/Review');
 const accommodationsRouter = require('./routes/Accommodations');
 const accommodationsImagesRouter = require('./routes/Accommodations_images');
+const amenitiesRouter = require('./routes/Amenities');
+const accommodationsAmenitiesRouter = require('./routes/Accommodations_amenities');
+const accommodationsRoomsImagesRouter = require('./routes/Accommodations_rooms_images');
 const bookingsRouter = require('./routes/Bookings');
-const roomsRouter = require('./routes/Rooms');
+const accommodationRoomsRouter = require('./routes/Accommodations_rooms');
+const accommodationsBookingsRouter = require('./routes/Accommodations_bookings');
 const ownersRouter = require('./routes/Owners');
 const authRouter = require('./routes/Auth');
 
@@ -74,17 +78,25 @@ app.use(cookieParser());
 
 //serve static file in public directory
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images/Accommodations', express.static(path.join(__dirname, 'db/images/Accommodations')));
+app.use('/images/Rooms', express.static(path.join(__dirname, 'db/images/Rooms')));
 
 // Routes
 app.use('/users', usersRouter);
 app.use('/payments', paymentsRouter);
 app.use('/reviews', reviewRouter);
+
 app.use('/accommodations', accommodationsRouter);
 app.use('/accommodations', accommodationsImagesRouter);
+app.use('/accommodations', accommodationsRoomsImagesRouter);
+app.use('/accommodations', accommodationRoomsRouter);;
+app.use('/accommodations', accommodationsAmenitiesRouter);
+app.use('/accommodations', accommodationsBookingsRouter);
+
 app.use('/bookings', bookingsRouter);
-app.use('/rooms', roomsRouter);
 app.use('/owners', ownersRouter);
 app.use('/auth', authRouter);
+app.use('/amenities', amenitiesRouter);
 app.use('/', home);
 
 // middleware serve the err

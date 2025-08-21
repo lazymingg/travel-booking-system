@@ -1,42 +1,45 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '../frontend-api-helper.js'
 import StepIndicator from '../components/accommodations/StepIndicator.vue'
 import PlaceDetailStep from '../components/accommodations/PlaceDetailStep.vue'
 import RoomDetailStep from '../components/accommodations/RoomDetailStep.vue'
 import PriceSettingStep from '../components/accommodations/PriceSettingStep.vue'
 import ConfirmationStep from '../components/accommodations/ConfirmationStep.vue'
 
+const router = useRouter()
 const currentStep = ref(1)
 const totalSteps = 4
+const isSubmitting = ref(false)
+const error = ref('')
 
-// Form data for all steps
+  // Form data for all steps
 const accommodationData = ref({
   // Place details
   name: '',
-  type: '',
-  city: '',
   address: '',
+  city: '',
+  country: 'Vietnam',
+  type: 'Hotel',
   otherDetails: '',
   thumbnailImage: null,
-
-  // Room details
+  
+  // Rooms details
   rooms: [
     {
       id: 1,
-      name: 'Room 1',
-      humanCapacity: '',
-      numberOfBeds: '',
+      humanCapacity: 2,
+      numberOfBeds: 1,
       roomConditions: '',
       restroomConditions: '',
       otherConditions: '',
+      pricePerDay: 100000,
       detailImage: null
     }
   ],
-
+  
   // Price settings
-  checkInMethod: 'preservation',
-
-  // Terms acceptance
   acceptTerms: false
 })
 
@@ -58,10 +61,10 @@ function validateStep1() {
 
 function validateStep2() {
   return accommodationData.value.rooms.every(room =>
-    room.humanCapacity.trim() !== '' &&
-    room.numberOfBeds.trim() !== '' &&
-    room.roomConditions.trim() !== '' &&
-    room.restroomConditions.trim() !== ''
+    String(room.humanCapacity ?? '').trim() !== '' &&
+    String(room.numberOfBeds ?? '').trim() !== '' &&
+    String(room.roomConditions ?? '').trim() !== '' &&
+    String(room.restroomConditions ?? '').trim() !== ''
   )
 }
 
@@ -111,15 +114,138 @@ function handleSubmit() {
     return
   }
 
-  console.log('Submitting accommodation data:', accommodationData.value)
-  // Navigate back to manage accommodation page
-  navigateToManage()
+  submitAccommodation()
+}
+
+async function submitAccommodation() {
+  try {
+    isSubmitting.value = true
+    error.value = ''
+    
+    // 1. Create accommodation
+    const accommodationPayload = {
+      name: accommodationData.value.name,
+      address: accommodationData.value.address,
+      city: accommodationData.value.city,
+      country: accommodationData.value.country || 'Vietnam',
+      description: accommodationData.value.otherDetails || '',
+      accommodation_type: accommodationData.value.type.toLowerCase() || 'hotel'
+    }
+    
+    console.log('Creating accommodation with data:', accommodationPayload)
+    
+    const result = await api.post('/accommodations', accommodationPayload)
+    
+    if (!result.success) {
+      throw new Error(result.message || 'Failed to create accommodation')
+    }
+    
+    const accommodationId = result.data.accommodation_id
+    console.log('Accommodation created with ID:', accommodationId)
+    
+    // 2. Create rooms for this accommodation
+    const roomCreationPromises = accommodationData.value.rooms.map(async (room) => {
+      const roomPayload = {
+        number_guest: parseInt(room.humanCapacity) || 1,
+        price_per_day: parseFloat(room.pricePerDay) || 100000,
+        number_bed: parseInt(room.numberOfBeds) || 1,
+        description: `${room.roomConditions || ''} ${room.restroomConditions || ''} ${room.otherConditions || ''}`.trim() || 'Standard room'
+      }
+      
+      console.log(`Creating room for accommodation ${accommodationId} with data:`, roomPayload)
+      
+  const roomResult = await api.post(`/accommodations/${accommodationId}/rooms`, roomPayload)
+      
+      if (!roomResult.success) {
+        throw new Error(`Failed to create room: ${roomResult.message}`)
+      }
+      
+      return {
+        roomId: roomResult.data.room_id,
+        detailImage: room.detailImage,
+        localId: room.id // include local id so we can match when uploading images
+      }
+    })
+    
+    const roomResults = await Promise.all(roomCreationPromises)
+    console.log('All rooms created:', roomResults)
+    
+    // 3. Upload thumbnail for accommodation if provided
+    if (accommodationData.value.thumbnailImage) {
+      await uploadAccommodationImage(accommodationId, accommodationData.value.thumbnailImage)
+    }
+    
+    // 4. Upload room images if provided
+    for (const roomData of roomResults) {
+      if (roomData.detailImage) {
+        // find the original room by its local id
+        const room = accommodationData.value.rooms.find(r => r.id === roomData.localId)
+        if (room && room.detailImage) {
+          await uploadRoomImage(accommodationId, roomData.roomId, room.detailImage)
+        }
+      }
+    }
+    
+    alert('Accommodation and rooms created successfully!')
+    navigateToManage()
+    
+  } catch (err) {
+    console.error('Error creating accommodation:', err)
+    error.value = err.message || 'Failed to create accommodation. Please try again.'
+    alert(error.value)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+async function uploadAccommodationImage(accommodationId, image) {
+  try {
+    const formData = new FormData()
+    formData.append('images', image)
+    
+    const response = await fetch(`${api.baseURL}/accommodations/${accommodationId}/images`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (!result.success) {
+      console.error('Failed to upload accommodation image:', result.message)
+    } else {
+      console.log('Accommodation image uploaded successfully')
+    }
+  } catch (error) {
+    console.error('Error uploading accommodation image:', error)
+  }
+}
+
+async function uploadRoomImage(accommodationId, roomId, image) {
+  try {
+    const formData = new FormData()
+    formData.append('images', image)
+    
+    const response = await fetch(`${api.baseURL}/accommodations/${accommodationId}/rooms/${roomId}/images`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (!result.success) {
+      console.error('Failed to upload room image:', result.message)
+    } else {
+      console.log('Room image uploaded successfully')
+    }
+  } catch (error) {
+    console.error('Error uploading room image:', error)
+  }
 }
 
 function navigateToManage() {
-  // In a real Vue app, you would use this.$router.push('/manage-accommodation')
-  // For now, we'll use window.history or emit an event
-  window.history.back()
+  router.push('/manage-accommodation')
 }
 
 function addRoom() {

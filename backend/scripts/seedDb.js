@@ -73,87 +73,179 @@ const seedDatabase = () => {
   const rooms = [
     {
       accommodation_id: 1,
-      room_id: 101,
-      room_type: 'Deluxe Room',
-      price_per_day: 100.00,
-      capacity: 2,
-      description: 'Spacious room with city view',
-      number_guests: 2,
-      is_available: 1,
-      available_date_start: '2025-08-01',
-      available_date_end: '2025-08-31'
+  number_guest: 2,
+  price_per_day: 100.00,
+  number_bed: 1,
+  description: 'Spacious room with city view',
+  is_available: 1
     },
     {
       accommodation_id: 1,
-      room_id: 102,
-      room_type: 'Suite',
-      price_per_day: 200.00,
-      capacity: 4,
-      description: 'Luxury suite with balcony',
-      number_guests: 3,
-      is_available: 1,
-      available_date_start: '2025-08-15',
-      available_date_end: '2025-08-31'
+  number_guest: 3,
+  price_per_day: 200.00,
+  number_bed: 2,
+  description: 'Luxury suite with balcony',
+  is_available: 1
     },
     {
       accommodation_id: 2,
-      room_id: 1,
-      room_type: 'Entire Apartment',
-      price_per_day: 80.00,
-      capacity: 2,
-      description: 'Entire apartment with kitchen',
-      number_guests: 4,
-      is_available: 1,
-      available_date_start: '2025-09-01',
-      available_date_end: '2025-10-30'
+  number_guest: 4,
+  price_per_day: 80.00,
+  number_bed: 2,
+  description: 'Entire apartment with kitchen',
+  is_available: 1
     }
   ];
 
-  // Insert users
-  const userStmt = db.prepare(`
-    INSERT INTO Users (full_name, email, password_hash, phone_number, address, role, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+  const amenities = [
+    { amenity_id: 1, name: 'Swimming pool' },
+    { amenity_id: 2, name: 'Restaurant' },
+    { amenity_id: 3, name: 'Sauna' },
+    { amenity_id: 4, name: 'Smoking room' },
+    { amenity_id: 5, name: 'Golf course' },
+    { amenity_id: 6, name: 'Parking lot' },
+    { amenity_id: 7, name: 'Gym' },
+    { amenity_id: 8, name: 'Free Wifi' },
+    { amenity_id: 9, name: 'Spa' }
+  ];
+
+  // Insert users idempotently
+  const userInsert = db.prepare(`
+    INSERT OR IGNORE INTO Users (full_name, email, password_hash, phone_number, address, role)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
-  users.forEach(user => {
-    userStmt.run([user.full_name, user.email, user.password_hash, user.phone_number, user.address, user.role]);
+  users.forEach(u => {
+    userInsert.run([u.full_name, u.email, u.password_hash, u.phone_number, u.address, u.role], function(err) {
+      if (err) console.error('Error inserting user', u.email, err.message);
+    });
   });
-  userStmt.finalize();
 
-  // Insert owners
-  const ownerStmt = db.prepare(`
-    INSERT INTO Owners (user_id, host_status, bank_account, id_card, business_license, created_at)
-    VALUES (?, ?, ?, ?, ?, datetime('now'))
-  `);
+  userInsert.finalize((err) => {
+    if (err) console.error('Error finalizing user insert:', err.message);
 
-  owners.forEach(owner => {
-    ownerStmt.run([owner.user_id, owner.host_status, owner.bank_account, owner.id_card, owner.business_license]);
+    // Fetch user_id for owner (by email)
+    db.get('SELECT user_id FROM Users WHERE email = ?', ['owner@hotel.com'], (err, row) => {
+      if (err) {
+        console.error('Error fetching owner user id:', err.message);
+        db.close();
+        return;
+      }
+
+      const ownerUserId = row ? row.user_id : null;
+      if (!ownerUserId) {
+        console.error('Owner user not found, aborting seed for owners/accommodations');
+        db.close();
+        return;
+      }
+
+      // Insert owner row if not exists
+      db.run(`INSERT OR IGNORE INTO Owners (user_id, host_status, bank_account, id_card, business_license) VALUES (?, ?, ?, ?, ?)`,
+        [ownerUserId, 'approved', '1234567890', 'ID123456789', 'BL123456789'], function(err) {
+        if (err) {
+          console.error('Error inserting owner:', err.message);
+          db.close();
+          return;
+        }
+
+        // Get owner_id from Owners
+        db.get('SELECT owner_id FROM Owners WHERE user_id = ?', [ownerUserId], (err, ownerRow) => {
+          if (err || !ownerRow) {
+            console.error('Error fetching owner_id:', err ? err.message : 'not found');
+            db.close();
+            return;
+          }
+
+          const ownerId = ownerRow.owner_id;
+
+          // Insert accommodations linked to this owner_id
+          const accStmt = db.prepare(`
+            INSERT OR IGNORE INTO Accommodations (owner_id, name, address, city, country, description, accommodation_type, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+
+          accommodations.forEach(acc => {
+            accStmt.run([ownerId, acc.name, acc.address, acc.city, acc.country, acc.description, acc.accommodation_type, acc.status], function(err) {
+              if (err) console.error('Error inserting accommodation:', err.message);
+            });
+          });
+
+          accStmt.finalize((err) => {
+            if (err) console.error('Error finalizing accommodations:', err.message);
+
+            // Fetch accommodation ids by name so we can link rooms
+            const accNames = accommodations.map(a => a.name);
+            const accIds = {};
+            let fetched = 0;
+            accNames.forEach(name => {
+              db.get('SELECT accommodation_id FROM Accommodations WHERE name = ?', [name], (err, accRow) => {
+                fetched++;
+                if (accRow) accIds[name] = accRow.accommodation_id;
+
+                if (fetched === accNames.length) {
+                  // Now insert rooms using fetched accIds
+                  const roomStmt = db.prepare(`
+                    INSERT INTO Rooms (accommodation_id, number_guest, price_per_day, number_bed, description, is_available)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                  `);
+
+                  rooms.forEach(room => {
+                    const accId = accIds[accommodations[0].name];
+                    // try to find matching accommodation id by index if provided
+                    // If room.accommodation_id is 1/2 referencing original sample, map to correct accIds by position
+                    let targetAccId = null;
+                    if (room.accommodation_id === 1) targetAccId = accIds[accommodations[0].name];
+                    else if (room.accommodation_id === 2) targetAccId = accIds[accommodations[1].name];
+                    else targetAccId = accIds[accommodations[0].name];
+
+                    roomStmt.run([targetAccId, room.number_guest, room.price_per_day, room.number_bed, room.description, room.is_available], function(err) {
+                      if (err) console.error('Error inserting room:', err.message);
+                      else console.log('Inserted room id=', this.lastID, 'for accommodation_id=', targetAccId);
+                    });
+                  });
+
+                  roomStmt.finalize(() => {
+                    console.log('Seeding complete');
+                    // close will be handled below after main flow
+                  });
+                }
+              });
+            });
+          });
+        });
+      });
+    });
   });
-  ownerStmt.finalize();
 
-  // Insert accommodations
-  const accommodationStmt = db.prepare(`
-    INSERT INTO Accommodations (owner_id, name, address, city, country, description, accommodation_type, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-  `);
-
-  accommodations.forEach(acc => {
-    accommodationStmt.run([acc.owner_id, acc.name, acc.address, acc.city, acc.country, acc.description, acc.accommodation_type, acc.status]);
-  });
-  accommodationStmt.finalize();
-
-  // Insert rooms
+  // Insert rooms (matching current Rooms schema)
   const roomStmt = db.prepare(`
-    INSERT INTO Rooms (accommodation_id, room_id, room_type, price_per_day, capacity, description, number_guest, is_available, available_date_start, available_date_end, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    INSERT INTO Rooms (accommodation_id, number_guest, price_per_day, number_bed, description, is_available)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   rooms.forEach(room => {
-    roomStmt.run([room.accommodation_id, room.room_id, room.room_type, room.price_per_day, room.capacity, room.description, room.number_guests, room.is_available, room.available_date_start, room.available_date_end]);
+    roomStmt.run([room.accommodation_id, room.number_guest, room.price_per_day, room.number_bed, room.description, room.is_available], function(err) {
+      if (err) console.error('Error inserting room:', err.message);
+      else console.log('Inserted room id=', this.lastID, 'for accommodation_id=', room.accommodation_id);
+    });
   });
   roomStmt.finalize();
 
   console.log('Sample data inserted successfully');
+
+
+  const amenityStmt = db.prepare(`
+                        INSERT OR IGNORE INTO Amenities (amenity_id, name)
+                        VALUES (?, ?)
+                      `);
+
+  amenities.forEach(a => {
+    amenityStmt.run([a.amenity_id, a.name], function(err) {
+      if (err) console.error('Error inserting amenity:', err.message);
+      else console.log('Inserted amenity:', a.name);
+    });
+  });
+  amenityStmt.finalize();
 
   db.close((err) => {
     if (err) {
