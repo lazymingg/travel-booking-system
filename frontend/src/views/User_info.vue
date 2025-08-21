@@ -104,6 +104,7 @@ import api from '@/frontend-api-helper.js'
 const router = useRouter()
 
 // State
+
 const userInfo = reactive({
   user_id: null,
   full_name: '',
@@ -114,6 +115,8 @@ const userInfo = reactive({
   created_at: '',
   updated_at: ''
 })
+
+
 
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
@@ -147,20 +150,18 @@ const fetchUserInfo = async () => {
     error.value = null;
 
     const result = await api.get('/users/');
-
+    console.log('Fetch user info result:', result);
     if (result.success) {
-      // Success - data có trong result.data
-      // console.log('User info fetched successfully:', result.data);
       Object.assign(userInfo, result.data);
-      console.log('Success:', result.message);
     } else {
-      // Error - message có trong result.error hoặc result.message
       throw new Error(result.error || result.message || 'Unknown error');
     }
 
   } catch (err) {
-    error.value = 'Không thể tải thông tin người dùng: ' + err.message;
-    if (err.message.includes('401') || result.status === 401) {
+    error.value = 'Không thể tải thông tin người dùng: ' + (err.message || 'Unknown error');
+    const msg = (err.message || '').toLowerCase();
+    
+    if (msg.includes('401') || msg.includes('please login') || msg.includes('unauthorized')) {
       router.push('/login');
     }
   } finally {

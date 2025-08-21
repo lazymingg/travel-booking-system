@@ -3,8 +3,40 @@ const sqlite3 = require('sqlite3').verbose();
 const responseHelper = require('../utils/responseHelper');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 const router = express.Router();
-const multer = require('../middleware/multer')
+
+// Cấu hình Multer cho Accommodation images
+const accommodationsDir = path.join(__dirname, '..', 'db', 'images', 'Accommodations');
+
+// Ensure destination directory exists
+if (!fs.existsSync(accommodationsDir)) {
+  fs.mkdirSync(accommodationsDir, { recursive: true });
+}
+
+const accommodationStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, accommodationsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const safeOriginal = path.basename(file.originalname).replace(/[^a-zA-Z0-9_.-]/g, '_');
+    cb(null, `${file.fieldname}-${uniqueSuffix}-${safeOriginal}`);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (/^image\/(png|jpe?g|gif|webp|bmp)$/i.test(file.mimetype)) {
+    return cb(null, true);
+  }
+  return cb(new Error('Only image files are allowed'));
+};
+
+const accommodationUpload = multer({ 
+  storage: accommodationStorage, 
+  fileFilter, 
+  limits: { fileSize: 5 * 1024 * 1024 } 
+});
 
 const db = new sqlite3.Database('./db/db.db');
 
@@ -15,8 +47,9 @@ router.get('/:accommodation_id/images', (req, res, next) => {
         return responseHelper.success(res, rows, 'Images retrieved successfully');
     });
 });
-// Insert new accommodation image
-router.post('/:accommodation_id/images', multer.array('images',10), (req, res, next) => {
+
+//insert new accommodation image
+router.post('/:accommodation_id/images', accommodationUpload.array('images',10), (req, res, next) => {
     const { accommodation_id } = req.params;
     const images = req.files.map(file => ({
         accommodation_id: accommodation_id,
@@ -25,6 +58,7 @@ router.post('/:accommodation_id/images', multer.array('images',10), (req, res, n
     if (images.length === 0) {
         return responseHelper.error(res, 'No images provided', 400);
     }
+
     db.serialize(() => {
         const stmt = db.prepare('INSERT INTO Accommodation_Images (accommodation_id, image_url) VALUES (?, ?)');
         images.forEach(image => {
@@ -37,7 +71,7 @@ router.post('/:accommodation_id/images', multer.array('images',10), (req, res, n
     }); 
 });
 
-// Delete a specific image
+//delete a specific image
 router.delete('/:accommodation_id/images/:image_id', (req, res, next) => {
     const { accommodation_id, image_id } = req.params;
     
@@ -75,7 +109,7 @@ router.delete('/:accommodation_id/images/:image_id', (req, res, next) => {
     });
 });
 
-// Delete all accommodation images in a specific accommodation and all images
+//delete all accommodation images in a specific accommodation and all images
 router.delete('/:accommodation_id/images', (req, res, next) => {
     const { accommodation_id } = req.params;
     

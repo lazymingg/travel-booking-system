@@ -7,19 +7,18 @@ const { requireAuth } = require('../middleware/auth');
 const db = new sqlite3.Database('./db/db.db');
 
 //get all users
-router.get('/', (req, res, next) => {
-  db.all('SELECT * FROM Users', [], (err, rows) => {
-    if (err) {
-      return next(err);
-    }
-    responseHelper.success(res, rows);
-  });
-});
+// router.get('/', (req, res, next) => {
+//   db.all('SELECT * FROM Users', [], (err, rows) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     responseHelper.success(res, rows);
+//   });
+// });
 
-// Get current user info
+//get current user info
 router.get('/', requireAuth, (req, res, next) => {
   const id = req.session.user.user_id;
-
   db.get(
     'SELECT user_id, full_name, email, role, created_at, updated_at, phone_number, address FROM Users WHERE user_id = ?',
     [id],

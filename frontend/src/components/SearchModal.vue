@@ -19,9 +19,11 @@
           <button class="action_button" @click="toggleFilter">
             <img class="button_icon" src="../assets/hamburger_button_icon.svg" alt="Hamburger button icon">
           </button>
-          <button class="action_button">
-            <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
-          </button>
+          <RouterLink to="/accommodations">
+            <button class="action_button">
+              <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
+            </button>
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -156,6 +158,7 @@ export default {
   display: flex;
   justify-content: center; /* căn ngang */
   align-items: center;     /* căn dọc */
+  margin-bottom: 10px;
 }
 
 .search_container {
@@ -265,6 +268,7 @@ export default {
   border: 2px solid #2563EB;
   border-radius: 5px;
   margin-top: 0;  /* sát dưới search_form */
+  margin-bottom: 10px;
   padding: 20px;
 
   width: 83.33vw; /* bằng search_form */
