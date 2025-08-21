@@ -34,6 +34,8 @@ const paymentsRouter = require('./routes/payments');
 const reviewRouter = require('./routes/Review');
 const accommodationsRouter = require('./routes/Accommodations');
 const accommodationsImagesRouter = require('./routes/Accommodations_images');
+const amenitiesRouter = require('./routes/Amenities');
+const accommodationsRoomsAmenitiesRouter = require('./routes/Accommodations_rooms_amenities');
 const accommodationsRoomsImagesRouter = require('./routes/Accommodations_rooms_images');
 const bookingsRouter = require('./routes/Bookings');
 const roomsRouter = require('./routes/Accommodations_rooms');
@@ -86,9 +88,11 @@ app.use('/accommodations', accommodationsRouter);
 app.use('/accommodations', accommodationsImagesRouter);
 app.use('/accommodations', accommodationsRoomsImagesRouter);
 app.use('/accommodations', roomsRouter);;
+app.use('/accommodations', accommodationsRoomsAmenitiesRouter);
 app.use('/bookings', bookingsRouter);
 app.use('/owners', ownersRouter);
 app.use('/auth', authRouter);
+app.use('/amenities', amenitiesRouter);
 app.use('/', home);
 
 // middleware serve the err
