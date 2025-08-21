@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -11,6 +11,43 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'add-room', 'remove-room'])
 
 const data = ref(props.modelValue)
+const previews = ref({})
+
+function revokePreview(key) {
+  if (previews.value[key]) {
+    try { URL.revokeObjectURL(previews.value[key]) } catch(e) {}
+    delete previews.value[key]
+  }
+}
+
+watch(() => data.value.rooms.map(r => r.detailImage), (images) => {
+  // Recompute previews for rooms
+  // Clear previews for removed images
+  const existingKeys = Object.keys(previews.value)
+  existingKeys.forEach(k => {
+    const id = parseInt(k)
+    const room = data.value.rooms.find(r => r.id === id)
+    if (!room || room.detailImage == null) revokePreview(k)
+  })
+
+  data.value.rooms.forEach(room => {
+    const key = String(room.id)
+    if (room.detailImage instanceof File) {
+      // create or replace
+      if (previews.value[key]) {
+        // already exists
+      } else {
+        previews.value[key] = URL.createObjectURL(room.detailImage)
+      }
+    } else if (typeof room.detailImage === 'string' && room.detailImage) {
+      previews.value[key] = room.detailImage
+    }
+  })
+})
+
+onUnmounted(() => {
+  Object.keys(previews.value).forEach(k => revokePreview(k))
+})
 
 function updateData() {
   emit('update:modelValue', data.value)
@@ -116,10 +153,15 @@ function removeRoom(roomId) {
               :id="`room-upload-${room.id}`"
             />
             <label :for="`room-upload-${room.id}`" class="upload-placeholder">
-              <div class="upload-icon">
-                <div class="circle"></div>
-                <div class="triangle"></div>
-              </div>
+              <template v-if="previews[room.id]">
+                <img :src="previews[room.id]" alt="Room preview" class="preview-img" />
+              </template>
+              <template v-else>
+                <div class="upload-icon">
+                  <div class="circle"></div>
+                  <div class="triangle"></div>
+                </div>
+              </template>
             </label>
           </div>
         </div>
@@ -252,6 +294,17 @@ function removeRoom(roomId) {
 .upload-placeholder:hover {
   border-color: #3b82f6;
   background: #eff6ff;
+}
+
+.upload-placeholder {
+  overflow: hidden; /* ensure contained images don't overflow */
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .upload-icon {

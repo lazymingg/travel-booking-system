@@ -39,17 +39,17 @@ CREATE TABLE Accommodations (
 
 CREATE TABLE Rooms (
     accommodation_id INTEGER NOT NULL,
-    room_id INTEGER NOT NULL,
-    room_type TEXT NOT NULL,
-    price_per_day REAL NOT NULL CHECK(price_per_day > 0),
-    capacity INTEGER NOT NULL CHECK(capacity > 0),
-    description TEXT,
+    room_id INTEGER PRIMARY KEY AUTOINCREMENT,
     number_guest INTEGER NOT NULL CHECK(number_guest > 0),
+    price_per_day REAL NOT NULL CHECK(price_per_day > 0),
+    -- room_type TEXT NOT NULL,
+    number_bed INTEGER NOT NULL CHECK(number_bed > 0),
+    description TEXT,
     is_available INTEGER DEFAULT 1 CHECK(is_available IN (0, 1)),
-    available_date_start TEXT NOT NULL,
-    available_date_end TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now')),
-    PRIMARY KEY (accommodation_id, room_id),
+    -- available_date_start TEXT NOT NULL,
+    -- available_date_end TEXT NOT NULL,
+    -- created_at TEXT DEFAULT (datetime('now')),
+    -- PRIMARY KEY (accommodation_id, room_id),
     FOREIGN KEY (accommodation_id) REFERENCES Accommodations(accommodation_id) ON DELETE CASCADE
 );
 
@@ -98,11 +98,13 @@ CREATE TABLE Amenities (
     description TEXT
 );
 
-CREATE TABLE Accommodation_Amenities (
-    accommodation_id INTEGER,
-    amenity_id INTEGER,
-    PRIMARY KEY (accommodation_id, amenity_id),
+CREATE TABLE rooms_amenities (
+    accommodation_id INTEGER NOT NULL,
+    room_id INTEGER NOT NULL,
+    amenity_id INTEGER NOT NULL,
+    PRIMARY KEY (accommodation_id, room_id, amenity_id),
     FOREIGN KEY (accommodation_id) REFERENCES Accommodations(accommodation_id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES Rooms(room_id) ON DELETE CASCADE,
     FOREIGN KEY (amenity_id) REFERENCES Amenities(amenity_id) ON DELETE CASCADE
 );
 
