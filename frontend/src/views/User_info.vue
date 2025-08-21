@@ -104,6 +104,7 @@ import api from '@/frontend-api-helper.js'
 const router = useRouter()
 
 // State
+
 const userInfo = reactive({
   user_id: null,
   full_name: '',
@@ -114,6 +115,8 @@ const userInfo = reactive({
   created_at: '',
   updated_at: ''
 })
+
+
 
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
