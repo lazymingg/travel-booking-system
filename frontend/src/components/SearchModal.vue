@@ -19,9 +19,11 @@
           <button class="action_button" @click="toggleFilter">
             <img class="button_icon" src="../assets/hamburger_button_icon.svg" alt="Hamburger button icon">
           </button>
-          <button class="action_button">
-            <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
-          </button>
+          <RouterLink to="/accommodations">
+            <button class="action_button">
+              <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
+            </button>
+          </RouterLink>
         </div>
       </div>
     </div>

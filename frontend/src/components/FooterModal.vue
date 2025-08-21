@@ -25,7 +25,7 @@
         <p>227 Street Nguyen Van, Ward Cau Ong Lanh, Ho Chi Minh City, Vietnam</p>
       </div>
       <div class="footer_section">
-        <a href="#" class="nav_link">About us</a>
+        <router-link to="about-us" class="nav_link">About us</router-link>
       </div>
     </div>
   </footer>
