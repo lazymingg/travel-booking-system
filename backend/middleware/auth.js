@@ -6,43 +6,40 @@ const responseHelper = require('../utils/responseHelper');
 
 const requireAuth = (req, res, next) => {
   if (!req.session.user) {
-    return res.status(401).json({ 
-      error: 'Please login first' 
-    });
+    return responseHelper.error(res, 'Please login first', 401);
   }
-  next();
+  return next();
 };
 
 // Check if user is admin
 const requireAdmin = (req, res, next) => {
   if (!req.session.user) {
-    return res.status(401).json({ error: 'Please login first' });
+    return responseHelper.error(res, 'Please login first', 401);
   }
   
   if (req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
+    return responseHelper.error(res, 'Admin access required', 403);
   }
   
-  next();
+  return next();
 };
 
-const requireOwner = (req, res, next) =>
-{
+const requireOwner = (req, res, next) => {
   if (!req.session.user) {
-    return res.status(401).json({ error: 'Please login first' });
+    return responseHelper.error(res, 'Please login first', 401);
   }
   
   db.all('SELECT * FROM Owners WHERE user_id = ?', [req.session.user.user_id], (err, rows) => {
     if (err) {
-      return res.status(500).json({ error: 'Database error', details: err.message });
+      return responseHelper.error(res, 'Database error', 500, err.message);
     }
     if (rows.length === 0) {
-      return res.status(403).json({ error: 'Owner access required' });
+      return responseHelper.error(res, 'Owner access required', 403);
     }
     req.session.user.owner_id = rows[0].owner_id;
-  next();
-  })
-}
+    return next();
+  });
+};
 
 module.exports = {
   requireAuth,

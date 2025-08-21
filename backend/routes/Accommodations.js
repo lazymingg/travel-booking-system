@@ -116,8 +116,8 @@ router.get('/search/:term', (req, res, next) => {
 
   db.all(
     `SELECT * FROM Accommodations 
-     WHERE name LIKE ? OR address LIKE ? OR city LIKE ? OR description LIKE ?
-     AND status = 'approved'`,
+  WHERE (name LIKE ? OR address LIKE ? OR city LIKE ? OR description LIKE ?)
+  AND status = 'approved'`,
     [searchTerm, searchTerm, searchTerm, searchTerm],
     (err, rows) => {
       if (err) return responseHelper.error(res, 'Error searching accommodations', 500, err.message);

@@ -74,6 +74,7 @@ app.use(cookieParser());
 
 //serve static file in public directory
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images/Accommodations', express.static(path.join(__dirname, 'db/images/Accommodations')));
 
 // Routes
 app.use('/users', usersRouter);
