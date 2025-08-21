@@ -1,90 +1,89 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue'
 import api from '@/frontend-api-helper'
 
-const router = useRouter()
-
-const roomInfo = reactive({
-  accommodation_id: null,
-  room_id: null,
-  room_type: '',
-  price_per_day: null,
-  capacity: 1,
-  description: '',
-  number_guest: null,
-  is_available: null,
-  available_date_start: '',
-  available_date_end: '',  
-  created_at: ''
-})
+const loading = ref(false);
+const error = ref(null);
+const rooms = ref([])
 
 const props = defineProps({
-  rooms: {
-    type: Array,
-    default: () => []
-  },
-  checkInDate: {
-    type: String, // 'YYYY-MM-DD'
-    required: true
-  },
-  checkOutDate: {
-    type: String, // 'YYYY-MM-DD'
-    required: true
-  },
-  numberGuest: {
-    type: Number,
+  filter: {
+    type: Object,
     required: true
   }
 })
 
-const filteredRooms = computed(() => {
-  return props.rooms.filter(room => {
-    const start = new Date(room.available_date_start);
-    const end = new Date(room.available_date_end);
-    const checkIn = new Date(props.checkInDate);
-    const checkOut = new Date(props.checkOutDate);
-
-    const dateAvailable = checkIn >= start && checkOut <= end;
-    const numberGuest = room.number_guest >= props.numberGuest;
-    const isAvailable = room.is_available === 1;
-
-    return dateAvailable && numberGuest && isAvailable;
-  });
-});
-
 // API
-const fetchUserInfo = async () => {
+const fetchRooms = async () => {
   try {
     loading.value = true;
     error.value = null;
 
-    const result = await api.get('/bookings/available');
+    const accommodationId = props.filter.accommodation_id
+
+    // const params = {
+    //   check_in_date: props.filter.check_in_date,
+    //   check_out_date: props.filter.check_out_date,
+    //   number_guest: props.filter.number_guest
+    // }
+
+    const params = {
+      check_in_date: '2025-08-20',
+      check_out_date: '2025-08-24',
+      number_guest: 2
+    }
+
+    console.log(params)
+
+    const result = await api.get('/accommodations/${accommodationId}/available', params );
+    console.log('Filter props:', props.filter)
+    console.log('API result.data:', result.data)
 
     if (result.success) {
-      // Success - data có trong result.data
-      // console.log('User info fetched successfully:', result.data);
-      Object.assign(userInfo, result.data);
+      // const roomsWithAmenities = await Promise.all(
+      //   result.data.map(async (room) => {
+      //     const amenities = await fetchAmenities(room.accommodation_id);
+      //     return { ...room, amenities, selectedAmount: 0};
+      //   })
+      // );
+
+      // rooms.value = roomsWithAmenities;
       console.log('Success:', result.message);
-    } else {
-      // Error - message có trong result.error hoặc result.message
+    } 
+    
+    else {
       throw new Error(result.error || result.message || 'Unknown error');
     }
 
   } catch (err) {
-    error.value = 'Không thể tải thông tin người dùng: ' + err.message;
-    if (err.message.includes('401') || result.status === 401) {
-      router.push('/booking');
-    }
+    error.value = 'Failed to load rooms: ' + err.message;
   } finally {
     loading.value = false;
   }
 };
 
+// const fetchAmenities = async (accommodationID) => {
+//   try {
+//     const res = await api.get(`/amenities`);
+//     return res.success ? res.data : [];
+//   } catch (err) {
+//     error.value = 'Failed to load amenities: ' + err.message;
+//     return [];
+//   }
+// };
+
+watch(
+  () => props.filter,
+  () => fetchRooms(),
+  { deep: true, immediate: true }
+)
 </script>
 
 <template>
-  <table class="room-table">
+  <div>
+    <div v-if="loading"> Loading rooms ...</div>
+    <div v-else-if="error" class="error"> {{ error }} </div>
+    <table class="room-table">
     <thead>
       <tr>
         <th>Room Type</th>
@@ -96,29 +95,49 @@ const fetchUserInfo = async () => {
     </thead>
     <tbody>
       <!-- Nếu có rooms -->
-      <tr v-for="room in filteredRooms" :key="room.room_id">
-        <td>{{ room.room_type }}</td>
-        <td>{{ room.description }}</td>
+      <tr v-for="room in rooms" :key="room.room_id">
+        <!-- Room type -->
         <td>
-          <ul>
-            <li v-for="(amenity, index) in room.amenities" :key="index">{{ amenity }}</li>
-          </ul>
+          <div> {{ room.room_type }} </div>
+          <small> {{ room.description }} </small>
         </td>
-        <td>{{ room.originalPrice }}</td>
-        <td>{{ room.discountedPrice }}</td>
-        <td>{{ room.discount }}</td>
-        <td>{{ room.availability }}</td>
+
+        <!-- Booking Policy -->jj n                                              
+        <td>
+          <div>
+            Booking Policy
+          </div>
+        </td>
+
+        <!-- Price -->
+         <td>
+          <div> {{ room.price_per_day }} </div>
+         </td>
+
+         <!-- Amount -->
+         <td>
+          <input 
+            type="number" 
+            min="0"
+            v-model.number="room.selectedAmount"
+          >
+          <select v-model.number="room.selectedAmount">
+            <option v-for="n in 5" :key="n-1" :value="n-1">{{ n-1 }}</option>
+          </select>
+         </td>
+
         <td>
           <button @click="$emit('reserve', room)">Reserve</button>
         </td>
       </tr>
 
       <!-- Nếu không có rooms -->
-      <tr v-if="!props.rooms || props.rooms.length === 0">
+      <tr v-if="rooms.length === 0">
         <td colspan="8" class="empty">No rooms available</td>
       </tr>
     </tbody>
   </table>
+  </div>
 </template>
 
 <style scoped>
@@ -142,5 +161,9 @@ const fetchUserInfo = async () => {
   text-align: center;
   font-style: italic;
   color: gray;
+}
+
+.error {
+  color: red;
 }
 </style>

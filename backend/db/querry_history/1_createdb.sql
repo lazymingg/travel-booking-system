@@ -46,10 +46,10 @@ CREATE TABLE Rooms (
     number_bed INTEGER NOT NULL CHECK(number_bed > 0),
     description TEXT,
     is_available INTEGER DEFAULT 1 CHECK(is_available IN (0, 1)),
-    -- available_date_start TEXT NOT NULL,
-    -- available_date_end TEXT NOT NULL,
-    -- created_at TEXT DEFAULT (datetime('now')),
-    -- PRIMARY KEY (accommodation_id, room_id),
+    -- available_date_start TEXT,
+    -- available_date_end TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (accommodation_id, room_id),
     FOREIGN KEY (accommodation_id) REFERENCES Accommodations(accommodation_id) ON DELETE CASCADE
 );
 

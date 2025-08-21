@@ -6,17 +6,17 @@ const emit = defineEmits(['filter'])
 const showChangeSearch = ref(false)
 
 // Information in the filter bar
-// The filter bar shows the result from a specific Accommodation Page -> NOT DONE
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  checkIn: 'DD/MM/YYYY', 
-  checkOut: 'DD/MM/YYYY',
-  numberGuest: 0
+  accommodation_id: 1,
+  check_in_date: 'YYYY-MM-DD',
+  check_out_date: 'YYYY-MM-DD',
+  number_guest: 0
 })
 
 // Add string person in the Number of Guest of Filter bar
 const guestWithText = computed(() => {
-  return filterData.numberGuest + ' person'
+  return filterData.number_guest + ' person'
 })
 
 // Temporary data for Filter bar form
@@ -30,14 +30,13 @@ const openForm = () => {
   showChangeSearch.value = true
 }
 
+// Click on Apply Filter
 // Change the state of filter bar
 const applyFilter = () => {
   Object.assign(filterData, formFilter) // Copy Form -> Data
   emit('filter', { ...filterData })
   showChangeSearch.value = false
 }
-
-
 </script>
 
 <template>
@@ -46,16 +45,16 @@ const applyFilter = () => {
     
     <div class="summary-box">
       <div class="summary-item">
-        {{ filterData.checkIn}}
+        {{ filterData.check_in_date}}
       </div>
       <div class="summary-item">
-        {{ filterData.checkOut }}
+        {{ filterData.check_out_date }}
       </div>
       <div class="summary-item">
         {{ guestWithText }}
       </div>
       <button 
-        @click="showChangeSearch = !showChangeSearch"
+        @click="openForm"
         class="btn btn-primary"
       >
         Change search
@@ -68,7 +67,7 @@ const applyFilter = () => {
         <div>
           <label class="label">Check-in Date</label>
           <input 
-            v-model="formFilter.checkIn" 
+            v-model="formFilter.check_in_date" 
             type="date"
             class="input"
           />
@@ -76,7 +75,7 @@ const applyFilter = () => {
         <div>
           <label class="label">Check-out Date</label>
           <input 
-            v-model="formFilter.checkOut" 
+            v-model="formFilter.check_out_date" 
             type="date" 
             class="input"
           />
@@ -85,7 +84,7 @@ const applyFilter = () => {
           <label class="label">Guests</label>
           <div class="input-wrapper">
             <input
-            v-model="formFilter.numberGuest"
+            v-model="formFilter.number_guest"
             type="number"
             min="0"
             class="input"
@@ -103,7 +102,7 @@ const applyFilter = () => {
           Apply Filter
         </button>
         <button 
-          @click="showChangeSearch = false"
+          @click="applyFilter"
           class="btn btn-secondary"
         >
           Cancel
