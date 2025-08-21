@@ -33,38 +33,34 @@
   <FooterModal/>
 </template>
 
-<script>
-import HeaderModal from '@/components/HeaderModal.vue';
-import FooterModal from '@/components/FooterModal.vue';
-import SearchModal from '@/components/SearchModal.vue';
-import heroImg from "@/assets/hero-img-singin.jpg";
-export default {
-  name: 'SearchAccommodation',
-  components: {
-    HeaderModal,
-    SearchModal,
-    FooterModal
-  },
-  data() {
-    return {
-      accommodations: Array(16).fill().map((_, i) => ({
-        image: heroImg,
-        name: 'Accommodation name',
-        address: 'Type address here',
-        rating: '4.8',
-        reviews: '123,000',
-        price: 'xxx,000 vnd / hour'
-      }))
-    }
-  },
-  methods: {
-    toggleFilter() {
-      this.showFilter = !this.showFilter;
-    },
-    closeFilter() {
-      this.showFilter = false;
-    }
-  }
+<script setup>
+import { ref } from 'vue'
+import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
+import SearchModal from '@/components/SearchModal.vue'
+import heroImg from "@/assets/hero-img-singin.jpg"
+
+// accommodations (reactive state)
+const accommodations = ref(
+  Array(16).fill().map((_, i) => ({
+    image: heroImg,
+    name: 'Accommodation name',
+    address: 'Type address here',
+    rating: '4.8',
+    reviews: '123,000',
+    price: 'xxx,000 vnd / hour'
+  }))
+)
+
+// filter popup state
+const showFilter = ref(false)
+
+const toggleFilter = () => {
+  showFilter.value = !showFilter.value
+}
+
+const closeFilter = () => {
+  showFilter.value = false
 }
 </script>
 
