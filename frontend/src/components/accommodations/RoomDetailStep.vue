@@ -296,6 +296,17 @@ function removeRoom(roomId) {
   background: #eff6ff;
 }
 
+.upload-placeholder {
+  overflow: hidden; /* ensure contained images don't overflow */
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .upload-icon {
   position: relative;
   width: 60px;
