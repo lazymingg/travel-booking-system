@@ -158,6 +158,7 @@ export default {
   display: flex;
   justify-content: center; /* căn ngang */
   align-items: center;     /* căn dọc */
+  margin-bottom: 10px;
 }
 
 .search_container {
@@ -267,6 +268,7 @@ export default {
   border: 2px solid #2563EB;
   border-radius: 5px;
   margin-top: 0;  /* sát dưới search_form */
+  margin-bottom: 10px;
   padding: 20px;
 
   width: 83.33vw; /* bằng search_form */
