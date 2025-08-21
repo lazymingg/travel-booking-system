@@ -5,38 +5,36 @@
       <div class="search_form">
         <div class="form_group">
           <label>Destination</label>
-          <input type="text" v-model="searchData.destination" placeholder="Ho Chi Minh City">
+          <input type="text" v-model="search_data.destination" placeholder="Ho Chi Minh City">
         </div>
         <div class="form_group">
           <label>Check-in date</label>
-          <input type="date" v-model="searchData.checkin">
+          <input type="date" v-model="search_data.checkin">
         </div>
         <div class="form_group">
           <label>Check-out date</label>
-          <input type="date" v-model="searchData.checkout">
+          <input type="date" v-model="search_data.checkout">
         </div>
         <div class="form_actions">
-          <button class="action_button" @click="toggleFilter">
+          <button class="action_button" @click="toggle_filter">
             <img class="button_icon" src="../assets/hamburger_button_icon.svg" alt="Hamburger button icon">
           </button>
-          <RouterLink to="/accommodations">
-            <button class="action_button">
-              <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
-            </button>
-          </RouterLink>
+          <button class="action_button" @click.prevent="apply_filters">
+            <img class="button_icon" src="../assets/search_icon.svg" alt="Search icon">
+          </button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Filter Popup Overlay -->
-  <div v-if="showFilter" class="filter-popup">
+  <div v-if="show_filter" class="filter-popup">
     <!-- Cột 1: Price / Bed / Rating -->
     <div class="filter-section">
       <div class="attribute">
         <h3>Price per day</h3>
         <Slider
-          v-model="filters.priceRange"
+          v-model="filters.price_range"
           :min="0"
           :max="1000"
           :interval="10"
@@ -54,7 +52,7 @@
       <div class="attribute">
         <h3>Bed quantity</h3>
         <Slider
-          v-model="filters.bedRange"
+          v-model="filters.bed_range"
           :min="1"
           :max="6"
           :interval="1"
@@ -70,7 +68,7 @@
 
       <div class="attribute">
         <h3>Accommodation type</h3>
-        <div v-for="type in accommodationTypes" :key="type">
+        <div v-for="type in accommodation_types" :key="type">
           <label><input type="radio" :value="type" v-model="filters.selectedTypes"> {{ type }}</label>
         </div>
       </div>
@@ -112,36 +110,54 @@ import '@vueform/slider/themes/default.css'
 export default {
   name: 'SearchModal',
   components: { Slider },
+  emits: ['apply-filters'],
   data() {
     return {
-      showFilter: false,
-      searchData: {
+      show_filter: false,
+      search_data: {
         destination: 'Ho Chi Minh City',
         checkin: '',
         checkout: ''
       },
       filters: {
-        priceRange: [0, 1000],
-        bedRange: [1, 6],
-        priceMin: 0,
-        priceMax: 1000,
-        bedMin: 1,
-        bedMax: 6,
-        selectedRatings: null,
-        selectedAmenities: [],
-        selectedTypes: null
+        price_range: [0, 1000],
+        bed_range: [1, 6],
+        price_min: 0,
+        price_max: 1000,
+        bed_min: 1,
+        bed_max: 6,
+        selected_ratings: null,
+        selected_amenities: [],
+        selected_types: null
       },
       amenities: ['Swimming pool', 'Parking lot', 'Restaurant', 'Gym', 'Sauna', 'Free Wifi', 'Smoking room', 'Spa', 'Golf course'],
       meals: ['Breakfast', 'Lunch', 'Dinner', 'Self sufficiency'],
-      accommodationTypes: ['Hotel', 'Hostel', 'Resort', 'Homestay']
+      accommodation_types: ['Hotel', 'Hostel', 'Resort', 'Homestay']
     }
   },
   methods: {
-    toggleFilter() {
-      this.showFilter = !this.showFilter;
+    toggle_filter() {
+      this.show_filter = !this.show_filter;
     },
-    closeFilter() {
-      this.showFilter = false;
+
+    get_selected_filters() {
+      return {
+        destination: this.search_data.destination,
+        checkin: this.search_data.checkin,
+        checkout: this.search_data.checkout,
+        price_range: this.filters.price_range,
+        bed_range: this.filters.bed_range,
+        accommodation_type: this.filters.selected_types,
+        amenities: this.filters.selected_amenities,
+        rating: this.filters.selected_ratings
+      };
+    },
+
+    apply_filters() {
+      const selected_filters = this.get_selected_filters()
+      console.log('Selected Filters:', selected_filters);
+      this.$emit('apply-filters', selected_filters)   // 👈 gửi filters ra ngoài
+      this.$router.push('/accommodations');
     }
   }
 }
@@ -186,6 +202,7 @@ export default {
   border: 1px #1D4ED8 solid;
   border-radius: 5px;
   background-color: #FFFFFF;
+  overflow: hidden;
 }
 
 .form_group label {
@@ -261,7 +278,7 @@ export default {
 .action_button:hover .button_icon {
   transform: scale(1.2); /* phóng to 20% khi hover */
 }
-  
+
 /* Filter popup */
 .filter-popup {
   background: #F9FAFB;

@@ -1,70 +1,90 @@
 <template>
   <header-modal/>
   <search-modal/>
-    <!-- Image Gallery -->
-    <section class="gallery-section">
-      <div class="container">
-        <div class="gallery">
-          <div class="main-image">
-            <img :src="accommodation.mainImage" :alt="accommodation.name">
-          </div>
-          <div class="thumbnail-grid">
-            <div 
-              v-for="(image, index) in accommodation.thumbnails" 
-              :key="index"
-              class="thumbnail"
-              :class="{ 'more-images': index === 3 }"
+
+  <!-- Image Gallery -->
+  <section class="gallery_section">
+    <div class="container">
+      <div class="gallery">
+        <!-- Ảnh to bên trái -->
+        <div class="main_image" @click="openImagePopup(accommodation.images, 0)">
+          <img :src="accommodation.images[0]" :alt="accommodation.name" />
+        </div>
+
+        <!-- 2 ảnh nhỏ bên phải -->
+        <div class="side_images">
+          <div
+            v-for="(image, index) in accommodation.images.slice(1, 3)"
+            :key="index"
+            class="thumbnail"
+            @click="openImagePopup(accommodation.images, index + 1)"
+          >
+            <img :src="image" :alt="`${accommodation.name} image ${index + 2}`" />
+
+            <!-- Overlay ở ảnh thứ 3 trở đi -->
+            <div
+              v-if="index === 1 && accommodation.images.length > 3"
+              class="more_overlay"
             >
-              <img :src="image" :alt="`${accommodation.name} image ${index + 1}`">
-              <div v-if="index === 3" class="more-overlay">
-                <span>{{ accommodation.totalImages - 4 }}+</span>
-              </div>
+              +{{ accommodation.images.length - 3 }}
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <!-- Popup Gallery -->
+  <div v-if="showPopup" class="popup_overlay" @click.self="closePopup">
+    <button class="close_btn" @click="closePopup">✕</button>
+    <div class="popup_content">
+      <img :src="accommodation.images[currentIndex]" alt="Popup Image" />
+
+      <!-- Điều hướng -->
+      <button class="nav_btn prev" @click.stop="prevImage">‹</button>
+      <button class="nav_btn next" @click.stop="nextImage">›</button>
+    </div>
+  </div>
+
 
     <!-- Accommodation Info -->
-    <section class="info-section">
+    <section class="info_section">
       <div class="container">
-        <h1 class="accommodation-name">{{ accommodation.name }}</h1>
+        <h1 class="accommodation_name">{{ accommodation.name }}</h1>
         
         <!-- About Us -->
-        <div class="info-card">
-          <h3 class="info-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
+        <div class="info_card">
+          <h3 class="info_title">
+            <img :src="info_icon" height="15rem"/>
             About us
           </h3>
-          <p class="info-description">{{ accommodation.description }}</p>
+          <p class="info_description">{{ accommodation.description }}</p>
         </div>
 
         <!-- Address -->
-        <div class="info-card">
-          <h3 class="info-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
+        <div class="info_card">
+          <h3 class="info_title">
+            <img :src="address_icon" height="15rem"/>
             Address
           </h3>
           <p class="address">{{ accommodation.address }}</p>
         </div>
 
         <!-- Facilities -->
-        <div class="info-card">
-          <h3 class="info-title">Facilities</h3>
-          <div class="facilities-grid">
+        <div class="info_card">
+          <h3 class="info_title">Facilities</h3>
+          <div class="facilities_grid">
             <div 
               v-for="facility in accommodation.facilities" 
               :key="facility.name"
-              class="facility-item"
+              class="facility_item"
             >
-              <span class="facility-icon" v-html="facility.icon"></span>
-              <span class="facility-name">{{ facility.name }}</span>
+              <img
+                class="facility_icon"
+                :src="getFacilityIcon(facility.icon_name)" 
+                :alt="facility.name" 
+              />
+              <span class="facility_name">{{ facility.name }}</span>
             </div>
           </div>
         </div>
@@ -72,36 +92,74 @@
     </section>
 
     <!-- Rooms Section -->
-    <section class="rooms-section">
+    <section class="rooms_section">
       <div class="container">
-        <h2 class="section-title">Rooms</h2>
-        <div class="rooms-list">
+        <h2 class="section_title">Rooms</h2>
+        <div class="rooms_list">
           <div 
             v-for="(room, index) in accommodation.rooms" 
             :key="index"
-            class="room-card"
+            class="room_card"
           >
-            <h3 class="room-title">Room {{ index + 1 }}</h3>
-            <div class="room-content">
-              <div class="room-image">
-                <img :src="room.image" :alt="`Room ${index + 1}`">
-                <span class="image-count">{{ room.imageCount }}+</span>
+            <h3 class="room_title">Room {{ index + 1 }}</h3>
+            <div class="room_content">
+              
+              <!-- Room Images -->
+              <div class="room_image">
+                <div class="room_image_grid">
+                  <div
+                    v-for="(img, img_index) in room.images.slice(0, 4)"
+                    :key="img_index"
+                    class="room_image_item"
+                    @click="openImagePopup(room.images, img_index)"
+                  >
+                    <img :src="img" :alt="`Room ${index + 1} - image ${img_index + 1}`" />
+                    
+                    <!-- Overlay ở ảnh thứ 3 -->
+                    <div 
+                      v-if="img_index === 3 && room.images.length > 3" 
+                      class="room_image_overlay"
+                    >
+                      {{ room.images.length - 2 }}+
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="room-details">
+
+              <!-- Popup Fullscreen Slideshow -->
+              <div v-if="showImagePopup" class="popup_fullscreen">
+                <button class="popup_close" @click="closeImagePopup">✖</button>
+
+                <!-- Ảnh đang xem -->
+                <img 
+                  :src="selectedRoomImages[currentImageIndex]" 
+                  :alt="`Room image ${currentImageIndex+1}`" 
+                  class="popup_img_large"
+                />
+
+                <!-- Điều hướng -->
+                <button v-if="currentImageIndex > 0" class="nav_btn left" @click="prevImage">‹</button>
+                <button v-if="currentImageIndex < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
+
+                <!-- Số ảnh -->
+                <div class="image_counter">
+                  {{ currentImageIndex + 1 }} / {{ selectedRoomImages.length }}
+                </div>
+              </div>
+
+              <div class="room_detail">
                 <h4>Room Details</h4>
-                <ul class="room-features">
-                  <li v-for="detail in room.details" :key="detail">{{ detail }}</li>
-                </ul>
+                <p> {{ room.detail }}</p>
               </div>
-              <div class="room-guests">
-                <h4>Guests number</h4>
+              <div class="room_guests">
+                <h4>Capacity</h4>
                 <p>{{ room.maxGuests }}</p>
               </div>
-              <div class="room-price">
+              <div class="room_price">
                 <h4>Price</h4>
                 <p class="price">{{ formatPrice(room.price) }}</p>
-                <p class="price-unit">per hour</p>
-                <button class="book-btn">Book now</button>
+                <p class="price_unit">per day</p>
+                <button class="book_btn">Book now</button>
               </div>
             </div>
           </div>
@@ -110,38 +168,43 @@
     </section>
 
     <!-- Ratings Section -->
-    <section class="ratings-section">
+    <section class="ratings_section">
       <div class="container">
-        <h2 class="section-title">Ratings</h2>
-        <div class="ratings-list">
+        <h2 class="section_title">Ratings</h2>
+        <div class="ratings_list">
           <div 
             v-for="(rating, index) in accommodation.ratings" 
             :key="index"
-            class="rating-card"
+            class="rating_card"
           >
-            <div class="rating-header">
-              <span class="user-icon">#</span>
+            <div class="rating_header">
               <span class="username">{{ rating.username }}</span>
-              <div class="rating-stars">
-                <span class="rating-score">{{ rating.score }}</span>
-                <div class="stars">
-                  <span v-for="i in 5" :key="i" class="star" :class="{ filled: i <= rating.score }">★</span>
+                <span class="rating_score">{{ rating.score }}</span>
+            </div>
+            <p class="rating_comment">{{ rating.comment }}</p>
+
+            <!-- Rating Images -->
+            <div class="rating_images">
+              <div class="rating_images_row">
+                <div
+                  v-for="(img, imgIndex) in rating.images.slice(0, 5)"
+                  :key="imgIndex"
+                  class="rating_image_item"
+                  @click="openImagePopup(rating.images, imgIndex)"
+                >
+                  <img :src="img" :alt="`Rating image ${imgIndex + 1}`" />
+
+                  <!-- Overlay ở ảnh thứ 5 -->
+                  <div
+                    v-if="imgIndex === 4 && rating.images.length > 5"
+                    class="rating_image_overlay"
+                  >
+                    +{{ rating.images.length - 4 }}
+                  </div>
                 </div>
               </div>
             </div>
-            <p class="rating-comment">{{ rating.comment }}</p>
-            <div class="rating-images">
-              <img 
-                v-for="(image, imgIndex) in rating.images" 
-                :key="imgIndex"
-                :src="image" 
-                :alt="`Rating image ${imgIndex + 1}`"
-                class="rating-image"
-              >
-              <div v-if="rating.totalImages > rating.images.length" class="more-rating-images">
-                {{ rating.totalImages - rating.images.length }}+
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
@@ -153,13 +216,21 @@
 import HeaderModal from '@/components/HeaderModal.vue';
 import FooterModal from '@/components/FooterModal.vue';
 import SearchModal from '@/components/SearchModal.vue';
+import hero_img from "@/assets/hero-img-singin.jpg";
+import info_icon from "@/assets/icon/info_icon.svg";
+import address_icon from "@/assets/icon/address_icon.svg";
+
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const accommodationId = route.params.id
 
 // Props để nhận tên accommodation từ trang list
 const props = defineProps({
   accommodationId: {
     type: String,
-    default: 'default-accommodation'
+    default: 'default_accommodation'
   }
 })
 
@@ -170,49 +241,99 @@ const searchData = ref({
   checkOut: ''
 })
 
+const modules = import.meta.glob("@/assets/AmenityIcons/*.svg", { eager: true });
+
+const amenities_icons = Object.entries(modules).map(([path, module]) => {
+  return {
+    name: path.split("/").pop().replace(".svg", ""),
+    src: module.default
+  };
+});
+
+const getFacilityIcon = (iconName) => {
+  const found = amenities_icons.find(icon => icon.name === iconName)
+  return found ? found.src : ""
+}
+
+const showImagePopup = ref(false)
+const selectedRoomImages = ref([])
+const currentImageIndex = ref(0)
+
+const openImagePopup = (images, startIndex = 0) => {
+  selectedRoomImages.value = images
+  currentImageIndex.value = startIndex
+  showImagePopup.value = true
+}
+
+const closeImagePopup = () => {
+  showImagePopup.value = false
+  selectedRoomImages.value = []
+  currentImageIndex.value = 0
+}
+
+const nextImage = () => {
+  if (currentImageIndex.value < selectedRoomImages.value.length - 1) {
+    currentImageIndex.value++
+  }
+}
+
+const prevImage = () => {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--
+  }
+}
+
+
 const accommodation = ref({
+  id: "ac1",
   name: "Accommodation's name",
   description: "Provide a brief description for this accommodation",
   address: "XX, Street XX, Ward XX, Province XX, City XX, Vietnam",
-  mainImage: "/placeholder.svg?height=400&width=600",
-  thumbnails: [
-    "/placeholder.svg?height=200&width=200",
-    "/placeholder.svg?height=200&width=200", 
-    "/placeholder.svg?height=200&width=200",
-    "/placeholder.svg?height=200&width=200"
+  images: [
+    hero_img,
+    hero_img, 
+    hero_img
   ],
-  totalImages: 15,
   facilities: [
-    { name: "Free wifi", icon: "📶" },
-    { name: "Restaurant", icon: "🍽️" },
-    { name: "Gym", icon: "💪" },
-    { name: "Swimming pool", icon: "🏊" },
-    { name: "Smoking room", icon: "🚬" },
-    { name: "Sauna", icon: "🧖" },
-    { name: "Parking lot", icon: "🚗" },
-    { name: "Spa", icon: "💆" }
+    { name: "Free wifi", icon_name: "wifi_icon" },
+    { name: "Restaurant", icon_name: "dish_icon" },
+    { name: "Gym", icon_name: "gym_icon" },
+    { name: "Swimming pool", icon_name: "pool_icon" },
+    { name: "Smoking room", icon_name: "smoking_icon" },
+    { name: "Sauna", icon_name: "sauna_icon" },
+    { name: "Parking lot", icon_name: "parking_icon" },
+    { name: "Spa", icon_name: "spa_icon" }
   ],
   rooms: [
     {
-      image: "/placeholder.svg?height=100&width=100",
-      imageCount: 10,
-      details: ["Detail 1", "Detail 2", "Detail 3", "Detail 4"],
+      images: [
+        hero_img,
+        hero_img, 
+        hero_img,
+        hero_img
+      ],
+      detail: "Provide your roomn detail here",
       maxGuests: 3,
-      price: 100000
+      price: 2000
     },
     {
-      image: "/placeholder.svg?height=100&width=100",
-      imageCount: 10,
-      details: ["Detail 1", "Detail 2", "Detail 3", "Detail 4"],
+      images: [
+        hero_img,
+        hero_img, 
+        hero_img,
+        hero_img
+      ],
+      detail: "Provide your roomn detail here",
       maxGuests: 3,
-      price: 100000
+      price: 30
     },
     {
-      image: "/placeholder.svg?height=100&width=100",
-      imageCount: 10,
-      details: ["Detail 1", "Detail 2", "Detail 3", "Detail 4"],
+      images: [
+
+      ],
+      detail: "Provide your roomn detail here",
       maxGuests: 3,
-      price: 100000
+      price: 25
     }
   ],
   ratings: [
@@ -221,51 +342,50 @@ const accommodation = ref({
       score: 4.5,
       comment: "Provide your comments here",
       images: [
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80"
+  
       ],
-      totalImages: 10
     },
     {
       username: "User name",
       score: 4.5,
       comment: "Provide your comments here",
       images: [
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80"
+        hero_img,
+        hero_img, 
+        hero_img,
+        hero_img
       ],
-      totalImages: 10
     },
     {
       username: "User name",
       score: 4.8,
       comment: "Provide your comments here",
       images: [
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80",
-        "/placeholder.svg?height=80&width=80"
+        hero_img,
+        hero_img, 
+        hero_img,
+        hero_img,
+        hero_img,
+        hero_img
       ],
-      totalImages: 10
     }
   ]
 })
 
+
+
 // Methods
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'VND'
+    currency: 'USD'
   }).format(price)
 }
 
 onMounted(() => {
   // Load accommodation data based on accommodationId
   console.log('Loading accommodation:', props.accommodationId)
+  console.log(accommodation.value)
 })
 </script>
 
@@ -276,120 +396,37 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
+/* Gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* ảnh to : 2, cột nhỏ : 1 */
+  gap: 16px;
+  height: 400px;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
 }
 
-/* Header */
-.header {
-  background-color: #2563EB;
-  color: white;
-  padding: 16px 0;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-text {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.about-btn {
-  background: none;
-  border: 1px solid white;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.about-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Search Section */
-.search-section {
-  background-color: #F9FAFB;
-  padding: 24px 0;
-}
-
-.search-form {
-  display: flex;
-  gap: 16px;
-  align-items: end;
-  flex-wrap: wrap;
-}
-
-.search-field {
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-field label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 14px;
-  color: #374151;
-}
-
-.search-field input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #E5E5E5;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.search-btn {
-  background-color: #2563EB;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.search-btn:hover {
-  background-color: #1D4ED8;
-}
-
-/* Gallery */
-.gallery-section {
-  padding: 32px 0;
-}
-
-.gallery {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
-  height: 400px;
-}
-
-.main-image {
+.main_image {
   border-radius: 8px;
   overflow: hidden;
+  max-height: 400px;
 }
 
-.main-image img {
+.main_image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.thumbnail-grid {
+.side_images {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 8px;
+  max-height: 400px;
 }
 
 .thumbnail {
@@ -404,42 +441,43 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.more-overlay {
+.more_overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 18px;
+  font-size: 2rem;
   font-weight: bold;
 }
 
+
 /* Info Section */
-.info-section {
+.info_section {
   padding: 32px 0;
 }
 
-.accommodation-name {
+.accommodation_name {
+  font-weight: bold;
   font-size: 32px;
   color: #2563EB;
   margin-bottom: 32px;
   text-align: center;
 }
 
-.info-card {
+.info_card {
   background: white;
   border: 1px solid #E5E5E5;
   border-radius: 8px;
   padding: 24px;
   margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.info-title {
+.info_title {
+  font-weight: bold;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -448,41 +486,42 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.info-description, .address {
+.info_description, .address {
   color: #4B5563;
   line-height: 1.6;
 }
 
-.facilities-grid {
+.facilities_grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
 }
 
-.facility-item {
+.facility_item {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #374151;
 }
 
-.facility-icon {
-  font-size: 18px;
+.facility_icon {
+  height: 1.5em;
 }
 
 /* Rooms Section */
-.rooms-section {
+.rooms_section {
   padding: 32px 0;
   background-color: #F9FAFB;
 }
 
-.section-title {
+.section_title {
+  font-weight: bold;
   font-size: 24px;
   color: #2563EB;
   margin-bottom: 24px;
 }
 
-.room-card {
+.room_card {
   background: white;
   border: 1px solid #E5E5E5;
   border-radius: 8px;
@@ -490,59 +529,159 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.room-title {
+.room_title {
+  font-weight: bold;
   font-size: 20px;
   color: #111827;
   margin-bottom: 16px;
 }
 
-.room-content {
+.room_content {
   display: grid;
-  grid-template-columns: 100px 1fr auto auto;
-  gap: 24px;
+  grid-template-columns: 150px 5fr 0.8fr 1.5fr;
+  gap: 10px;
   align-items: start;
 }
 
-.room-image {
-  position: relative;
+/* Grid ảnh nhỏ trong room card */
+.room_image_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  width: 150px;
 }
 
-.room-image img {
-  width: 100px;
+.room_image_item {
+  position: relative;
+  overflow: hidden;
+  line-height: 0; /* loại bỏ khoảng trống inline */
+}
+
+.room_image_item img {
+  width: 100%;
   height: 80px;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.image-count {
+/* Overlay ở ảnh thứ 3 */
+.room_image_overlay {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.7);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
-  padding: 2px 6px;
+  font-size: 16px;
+  font-weight: bold;
   border-radius: 4px;
-  font-size: 12px;
+  cursor: pointer;
 }
 
-.room-details h4,
-.room-guests h4,
-.room-price h4 {
+/* Popup Fullscreen */
+.popup_fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+}
+
+/* Ảnh lớn */
+.popup_img_large {
+  max-width: 90%;
+  max-height: 80%;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Nút đóng */
+.popup_close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+/* Nút điều hướng */
+.nav_btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border: none;
+  font-size: 36px;
+  color: white;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 50%;
+  z-index: 1100;
+}
+
+.nav_btn.left {
+  left: 20px;
+}
+
+.nav_btn.right {
+  right: 20px;
+}
+
+/* Bộ đếm */
+.image_counter {
+  position: absolute;
+  bottom: 20px;
+  color: white;
+  font-size: 16px;
+}
+
+.room_detail h4,
+.room_guests h4,
+.room_price h4 {
+  font-weight: bold;
   font-size: 16px;
   color: #111827;
   margin-bottom: 8px;
 }
 
-.room-features {
+.room_guests p {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.room_detail,
+.room_guests,
+.room_price {
+  height: 100%;
+  border: #E5E5E5, solid, 1px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.room_features {
   list-style: none;
   color: #4B5563;
 }
 
-.room-features li {
+.room_features li {
   margin-bottom: 4px;
 }
 
-.room-guests p {
+.room_guests p {
   color: #4B5563;
   text-align: center;
 }
@@ -550,16 +689,16 @@ onMounted(() => {
 .price {
   font-size: 18px;
   font-weight: bold;
-  color: #111827;
+  color: #16A34A;
 }
 
-.price-unit {
+.price_unit {
   color: #4B5563;
   font-size: 14px;
   margin-bottom: 12px;
 }
 
-.book-btn {
+.book_btn {
   background-color: #2563EB;
   color: white;
   border: none;
@@ -569,16 +708,16 @@ onMounted(() => {
   font-weight: 500;
 }
 
-.book-btn:hover {
+.book_btn:hover {
   background-color: #1D4ED8;
 }
 
 /* Ratings Section */
-.ratings-section {
+.ratings_section {
   padding: 32px 0;
 }
 
-.rating-card {
+.rating_card {
   background: white;
   border: 1px solid #E5E5E5;
   border-radius: 8px;
@@ -586,23 +725,12 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.rating-header {
+.rating_header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-}
-
-.user-icon {
-  width: 32px;
-  height: 32px;
-  background-color: #FACC15;
-  color: white;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
 }
 
 .username {
@@ -610,16 +738,9 @@ onMounted(() => {
   color: #111827;
 }
 
-.rating-stars {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.rating-score {
+.rating_score {
   background-color: #FACC15;
-  color: white;
+  color: #2563EB;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 14px;
@@ -640,81 +761,56 @@ onMounted(() => {
   color: #FACC15;
 }
 
-.rating-comment {
+.rating_comment {
   color: #4B5563;
   margin-bottom: 16px;
   line-height: 1.6;
 }
 
-.rating-images {
+.rating_images {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.rating-image {
+.rating_image {
   width: 60px;
   height: 60px;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.more-rating-images {
-  width: 60px;
-  height: 60px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 4px;
+.rating_images_row {
+  display: flex;
+  gap: 6px;
+}
+
+.rating_image_item {
+  position: relative;
+  width: 80px; /* bạn chỉnh kích thước theo ý */
+  height: 80px;
+  overflow: hidden;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.rating_image_item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rating_image_overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-/* Footer */
-.footer {
-  background-color: #2563EB;
-  color: white;
-  padding: 32px 0;
-}
-
-.footer-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-}
-
-.footer-logo .logo-text {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.footer-info {
-  display: flex;
-  gap: 48px;
-}
-
-.footer-info h4 {
-  margin-bottom: 12px;
-  font-size: 16px;
-}
-
-.footer-info p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.social-links {
-  display: flex;
-  gap: 8px;
-}
-
-.social-link {
-  display: inline-block;
-  font-size: 20px;
-  text-decoration: none;
 }
 
 /* Responsive */
@@ -724,36 +820,18 @@ onMounted(() => {
     height: auto;
   }
   
-  .main-image {
+  .main_image {
     height: 250px;
   }
   
-  .thumbnail-grid {
+  .thumbnail_grid {
     grid-template-columns: repeat(4, 1fr);
     height: 100px;
   }
   
-  .room-content {
+  .room_content {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-  
-  .search-form {
-    flex-direction: column;
-  }
-  
-  .search-field {
-    min-width: 100%;
-  }
-  
-  .footer-content {
-    flex-direction: column;
-    gap: 24px;
-  }
-  
-  .footer-info {
-    flex-direction: column;
-    gap: 24px;
   }
 }
 </style>
