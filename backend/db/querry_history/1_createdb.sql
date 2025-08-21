@@ -98,13 +98,13 @@ CREATE TABLE Amenities (
     description TEXT
 );
 
-CREATE TABLE rooms_amenities (
+-- Junction table to attach amenities to an accommodation (one set per accommodation)
+CREATE TABLE accommodations_amenities (
     accommodation_id INTEGER NOT NULL,
-    room_id INTEGER NOT NULL,
     amenity_id INTEGER NOT NULL,
-    PRIMARY KEY (accommodation_id, room_id, amenity_id),
+    created_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (accommodation_id, amenity_id),
     FOREIGN KEY (accommodation_id) REFERENCES Accommodations(accommodation_id) ON DELETE CASCADE,
-    FOREIGN KEY (room_id) REFERENCES Rooms(room_id) ON DELETE CASCADE,
     FOREIGN KEY (amenity_id) REFERENCES Amenities(amenity_id) ON DELETE CASCADE
 );
 
