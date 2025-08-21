@@ -154,7 +154,7 @@ async function submitAccommodation() {
       
       console.log(`Creating room for accommodation ${accommodationId} with data:`, roomPayload)
       
-      const roomResult = await api.post(`/accommodations/${accommodationId}/rooms`, roomPayload)
+  const roomResult = await api.post(`/accommodations/${accommodationId}/rooms`, roomPayload)
       
       if (!roomResult.success) {
         throw new Error(`Failed to create room: ${roomResult.message}`)
@@ -162,7 +162,8 @@ async function submitAccommodation() {
       
       return {
         roomId: roomResult.data.room_id,
-        detailImage: room.detailImage
+        detailImage: room.detailImage,
+        localId: room.id // include local id so we can match when uploading images
       }
     })
     
@@ -177,7 +178,8 @@ async function submitAccommodation() {
     // 4. Upload room images if provided
     for (const roomData of roomResults) {
       if (roomData.detailImage) {
-        const room = accommodationData.value.rooms.find(r => r.id === roomData.id)
+        // find the original room by its local id
+        const room = accommodationData.value.rooms.find(r => r.id === roomData.localId)
         if (room && room.detailImage) {
           await uploadRoomImage(accommodationId, roomData.roomId, room.detailImage)
         }
