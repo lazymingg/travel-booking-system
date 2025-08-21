@@ -96,8 +96,6 @@ app.use('/accommodations', accommodationsBookingsRouter);
 app.use('/bookings', bookingsRouter);
 app.use('/owners', ownersRouter);
 app.use('/auth', authRouter);
-app.use('/rooms', roomsRouter)
-app.use('/rooms', roomsRouter)
 app.use('/amenities', amenitiesRouter);
 app.use('/', home);
 
