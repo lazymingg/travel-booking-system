@@ -97,6 +97,18 @@ const seedDatabase = () => {
     }
   ];
 
+  const amenities = [
+    { amenity_id: 1, name: 'Swimming pool' },
+    { amenity_id: 2, name: 'Restaurant' },
+    { amenity_id: 3, name: 'Sauna' },
+    { amenity_id: 4, name: 'Smoking room' },
+    { amenity_id: 5, name: 'Golf course' },
+    { amenity_id: 6, name: 'Parking lot' },
+    { amenity_id: 7, name: 'Gym' },
+    { amenity_id: 8, name: 'Free Wifi' },
+    { amenity_id: 9, name: 'Spa' }
+  ];
+
   // Insert users idempotently
   const userInsert = db.prepare(`
     INSERT OR IGNORE INTO Users (full_name, email, password_hash, phone_number, address, role)
@@ -220,6 +232,20 @@ const seedDatabase = () => {
   roomStmt.finalize();
 
   console.log('Sample data inserted successfully');
+
+
+  const amenityStmt = db.prepare(`
+                        INSERT OR IGNORE INTO Amenities (amenity_id, name)
+                        VALUES (?, ?)
+                      `);
+
+  amenities.forEach(a => {
+    amenityStmt.run([a.amenity_id, a.name], function(err) {
+      if (err) console.error('Error inserting amenity:', err.message);
+      else console.log('Inserted amenity:', a.name);
+    });
+  });
+  amenityStmt.finalize();
 
   db.close((err) => {
     if (err) {
