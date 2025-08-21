@@ -42,7 +42,6 @@ const accommodationRoomsRouter = require('./routes/Accommodations_rooms');
 const accommodationsBookingsRouter = require('./routes/Accommodations_bookings');
 const ownersRouter = require('./routes/Owners');
 const authRouter = require('./routes/Auth');
-const roomsRouter = require('./routes/Rooms');
 
 const home = require("./routes/index");
 // connect to db
@@ -97,6 +96,7 @@ app.use('/accommodations', accommodationsBookingsRouter);
 app.use('/bookings', bookingsRouter);
 app.use('/owners', ownersRouter);
 app.use('/auth', authRouter);
+app.use('/rooms', roomsRouter)
 app.use('/rooms', roomsRouter)
 app.use('/amenities', amenitiesRouter);
 app.use('/', home);
