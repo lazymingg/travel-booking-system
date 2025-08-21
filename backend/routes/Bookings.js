@@ -110,22 +110,22 @@ const db = new sqlite3.Database('./db/db.db');
 // });
 
 // Get user's bookings (requires authentication)
-router.get('/my-bookings', requireAuth, (req, res, next) => {
-  const user_id = req.session.user.user_id;
+// router.get('/my-bookings', requireAuth, (req, res, next) => {
+//   const user_id = req.session.user.user_id;
   
-  const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
-                        r.room_type, r.price_per_night
-                 FROM Bookings b
-                 LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
-                 LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
-                 WHERE b.user_id = ?
-                 ORDER BY b.created_at DESC`;
+//   const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
+//                         r.room_type, r.price_per_night
+//                  FROM Bookings b
+//                  LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
+//                  LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
+//                  WHERE b.user_id = ?
+//                  ORDER BY b.created_at DESC`;
 
-  db.all(query, [user_id], (err, rows) => {
-    if (err) return next(err);
-    return responseHelper.success(res, rows, 'User bookings retrieved successfully');
-  });
-});
+//   db.all(query, [user_id], (err, rows) => {
+//     if (err) return next(err);
+//     return responseHelper.success(res, rows, 'User bookings retrieved successfully');
+//   });
+// });
 
 // Get user's bookings (alternative route with user_id param)
 // router.get('/user/:user_id', (req, res, next) => {
@@ -146,34 +146,34 @@ router.get('/my-bookings', requireAuth, (req, res, next) => {
 // });
 
 // Check room availability
-router.post('/check-availability', (req, res, next) => {
-  const { accommodation_id, room_id, check_in_date, check_out_date } = req.body;
+// router.post('/check-availability', (req, res, next) => {
+//   const { accommodation_id, room_id, check_in_date, check_out_date } = req.body;
 
-  if (!accommodation_id || !room_id || !check_in_date || !check_out_date) {
-    return responseHelper.validationError(res, 'Accommodation ID, room ID, check-in date, and check-out date are required');
-  }
+//   if (!accommodation_id || !room_id || !check_in_date || !check_out_date) {
+//     return responseHelper.validationError(res, 'Accommodation ID, room ID, check-in date, and check-out date are required');
+//   }
 
-  const query = `
-    SELECT COUNT(*) as count FROM Bookings 
-    WHERE accommodation_id = ? AND room_id = ? 
-    AND status != 'cancelled'
-    AND (
-      (check_in_date <= ? AND check_out_date > ?) OR
-      (check_in_date < ? AND check_out_date >= ?) OR
-      (check_in_date >= ? AND check_out_date <= ?)
-    )`;
+//   const query = `
+//     SELECT COUNT(*) as count FROM Bookings 
+//     WHERE accommodation_id = ? AND room_id = ? 
+//     AND status != 'cancelled'
+//     AND (
+//       (check_in_date <= ? AND check_out_date > ?) OR
+//       (check_in_date < ? AND check_out_date >= ?) OR
+//       (check_in_date >= ? AND check_out_date <= ?)
+//     )`;
 
-  db.get(query, 
-    [accommodation_id, room_id, check_in_date, check_in_date, check_out_date, check_out_date, check_in_date, check_out_date],
-    (err, result) => {
-      if (err) return next(err);
-      const available = result.count === 0;
-      return responseHelper.success(res, {
-        available,
-        message: available ? 'Room is available' : 'Room is not available for the selected dates'
-      }, 'Availability check completed');
-    }
-  );
-});
+//   db.get(query, 
+//     [accommodation_id, room_id, check_in_date, check_in_date, check_out_date, check_out_date, check_in_date, check_out_date],
+//     (err, result) => {
+//       if (err) return next(err);
+//       const available = result.count === 0;
+//       return responseHelper.success(res, {
+//         available,
+//         message: available ? 'Room is available' : 'Room is not available for the selected dates'
+//       }, 'Availability check completed');
+//     }
+//   );
+// });
 
 module.exports = router;
