@@ -7,10 +7,7 @@ import dotIcon from '@/assets/HomePage/dotNormal.svg' // active dot
 import dotMarkedIcon from '@/assets/HomePage/dotMarked.svg' // active dot
 
 const props = defineProps({
-  regionList: {
-    type: Array,
-    required: true
-  },
+  regionList: Array,
   title: String,
   desc: String
 })
@@ -30,11 +27,25 @@ const current = ref(0)
 const totalSlides = computed(() => Math.ceil(props.regionList.length / perSlide.value))
 const slideItems = computed(() => {
   const start = current.value * perSlide.value
-  return props.regionList.slice(start, start + perSlide.value)
+  // Always return array of length perSlide, fill empty slots with null
+  const items = props.regionList.slice(start, start + perSlide.value)
+  while (items.length < perSlide.value) {
+    items.push(null)
+  }
+  return items
 })
-function prev() { if (current.value > 0) current.value-- }
-function next() { if (current.value < totalSlides.value - 1) current.value++ }
-function go(idx) { current.value = idx }
+function prev(e) {
+  e.preventDefault()
+  if (current.value > 0) current.value--
+}
+function next(e) {
+  e.preventDefault()
+  if (current.value < totalSlides.value - 1) current.value++
+}
+function go(idx, e) {
+  e && e.preventDefault()
+  current.value = idx
+}
 
 const maxDots = computed(() => Math.ceil(props.regionList.length / perSlide.value))
 const DOT_SLOT = 28
@@ -45,7 +56,7 @@ const clampDotStart = () => {
   else dotStart.value = Math.min(Math.max(dotStart.value, 0), lastStart)
 }
 watch(maxDots, clampDotStart, { immediate: true })
-watch(current, (newVal, oldVal) => {
+watch(current, (newVal) => {
   if (maxDots.value <= 6) {
     dotStart.value = 0
     return
@@ -53,15 +64,11 @@ watch(current, (newVal, oldVal) => {
   const lastStart = maxDots.value - 6
   const pos = newVal - dotStart.value
   if (pos >= 5 && newVal < maxDots.value - 1) {
-    if (dotStart.value < lastStart) {
-      dotStart.value = Math.min(dotStart.value + 1, lastStart)
-    }
+    if (dotStart.value < lastStart) dotStart.value = Math.min(dotStart.value + 1, lastStart)
   }
   if (pos <= 0 && newVal > 0) {
     dotStart.value = Math.max(dotStart.value - 1, 0)
-    if (newVal > 0 && dotStart.value > 0) {
-      dotStart.value = newVal - 1
-    }
+    if (newVal > 0 && dotStart.value > 0) dotStart.value = newVal - 1
   }
   clampDotStart()
 })
@@ -70,11 +77,7 @@ const visibleDots = computed(() => {
   const dotCount = Math.min(6, maxDots.value)
   for (let i = 0; i < dotCount; i++) {
     const dotIndex = dotStart.value + i
-    if (dotIndex < maxDots.value) {
-      dots.push(dotIndex)
-    } else {
-      dots.push(null)
-    }
+    dots.push(dotIndex < maxDots.value ? dotIndex : null)
   }
   return dots
 })
@@ -93,9 +96,15 @@ const visibleDots = computed(() => {
         </button>
       </div>
       <div class="carousel-track region-grid">
-        <div class="carousel-card" v-for="card in slideItems" :key="card.id">
-          <img class="card-img" :src="card.image" :alt="card.name" />
-          <div class="card-name">{{ card.name }}</div>
+        <div
+          class="carousel-card"
+          v-for="(card, idx) in slideItems"
+          :key="card ? card.id : 'empty-' + idx"
+        >
+          <template v-if="card">
+            <img class="card-img" :src="card.image" :alt="card.name" />
+            <div class="card-name">{{ card.name }}</div>
+          </template>
         </div>
       </div>
       <div class="carousel-btn-wrap">
@@ -112,13 +121,12 @@ const visibleDots = computed(() => {
           :src="dotIndex !== null && current === dotIndex ? dotMarkedIcon : dotIcon"
           class="dot-icon"
           :class="{ disabled: dotIndex === null }"
-          @click="dotIndex !== null && go(dotIndex)"
+          @click="dotIndex !== null && go(dotIndex, $event)"
         />
       </div>
     </div>
   </section>
 </template>
-
 <style scoped>
 :root {
   --blue: #2563EB;
@@ -214,22 +222,35 @@ const visibleDots = computed(() => {
   max-width: 320px;
   background: #F9FAFB;
   border-radius: 1rem;
-  box-shadow: 0 4px 24px rgba(37,99,235,0.18); /* Increased shadow */
+  box-shadow: 0 4px 24px rgba(37,99,235,0.18);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  margin: 0 auto;             /* Center card in grid cell */
+  margin: 0 auto;
+  min-height: 260px;
 }
 .carousel-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 36px rgba(37,99,235,0.28); /* Stronger shadow on hover */
+  transform: scale(1.07);
+  box-shadow: 0 12px 36px rgba(37,99,235,0.28);
+}
+.carousel-card:empty,
+.carousel-card:not(:has(.card-img)) {
+  background: transparent;
+  box-shadow: none;
+  cursor: default;
+  transition: none;
+}
+.carousel-card:empty:hover,
+.carousel-card:not(:has(.card-img)):hover {
+  transform: none;
+  box-shadow: none;
 }
 .card-img {
   width: 100%;
-  max-height: 220px;
+  height: 250px;
   object-fit: cover;
   border-radius: 0.8rem;
   margin-bottom: 1.2rem;
@@ -254,8 +275,8 @@ const visibleDots = computed(() => {
   will-change: transform;
 }
 .dot-icon {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   cursor: pointer;
   transition: transform 0.2s;
 }
