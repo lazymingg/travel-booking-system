@@ -1,16 +1,18 @@
 <script setup>
 import { ref } from 'vue'
+import { useBookingStore } from '@/composables/booking'
 
 import ProgressBar from '@/components/booking/ProgressBar.vue'
 import NavigationArrow from '@/components/booking/NavigationArrow.vue'
 import SelectionPage from '@/components/booking/SelectionPage.vue'
-import DetailBookingPage from '@/components/booking/DetailBookingPage.vue'
 import ConfirmationPage from '@/components/booking/ConfirmationPage.vue'
 import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 
+const bookingStore = useBookingStore()
+
 const currentStep = ref(1)
-const totalSteps = 3
+const totalSteps = 2
 const bookingSuccess = ref(false)
 
 function handleNextStep() {
@@ -49,9 +51,6 @@ const completeBooking = () => {
         <SelectionPage/>
       </div>
       <div v-else-if="currentStep === 2">
-        <DetailBookingPage/>
-      </div>
-      <div v-else-if="currentStep === 3">
         <ConfirmationPage @booking-success="completeBooking"/>
       </div>
     </div>
