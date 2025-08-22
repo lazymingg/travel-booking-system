@@ -79,7 +79,7 @@
       <div class="attribute">
         <h3>Amenities</h3>
         <div v-for="amenity in amenities" :key="amenity">
-          <label><input type="checkbox" :value="amenity" v-model="filters.selectedAmenities"> {{ amenity }}</label>
+          <label><input type="checkbox" :value="amenity" v-model="filters.selected_amenities"> {{ amenity }}</label>
         </div>
       </div>
     </div>
@@ -89,12 +89,12 @@
       <div class="attribute">
         <h3>Rating</h3>
         <div>
-          <label><input type="radio" value="0" v-model="filters.selectedRatings"> ≥ 0.0 </label><br>
-          <label><input type="radio" value="1" v-model="filters.selectedRatings"> ≥ 1.0 </label><br>
-          <label><input type="radio" value="2" v-model="filters.selectedRatings"> ≥ 2.0 </label><br>
-          <label><input type="radio" value="3" v-model="filters.selectedRatings"> ≥ 3.0 </label><br>
-          <label><input type="radio" value="4" v-model="filters.selectedRatings"> ≥ 4.0 </label><br>
-          <label><input type="radio" value="5" v-model="filters.selectedRatings"> 5.0 </label>
+          <label><input type="radio" value="0" v-model="filters.selected_ratings"> ≥ 0.0 </label><br>
+          <label><input type="radio" value="1" v-model="filters.selected_ratings"> ≥ 1.0 </label><br>
+          <label><input type="radio" value="2" v-model="filters.selected_ratings"> ≥ 2.0 </label><br>
+          <label><input type="radio" value="3" v-model="filters.selected_ratings"> ≥ 3.0 </label><br>
+          <label><input type="radio" value="4" v-model="filters.selected_ratings"> ≥ 4.0 </label><br>
+          <label><input type="radio" value="5" v-model="filters.selected_ratings"> 5.0 </label>
         </div>
       </div>
     </div>
