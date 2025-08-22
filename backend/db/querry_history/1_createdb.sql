@@ -42,12 +42,9 @@ CREATE TABLE Rooms (
     room_id INTEGER PRIMARY KEY AUTOINCREMENT,
     number_guest INTEGER NOT NULL CHECK(number_guest > 0),
     price_per_day REAL NOT NULL CHECK(price_per_day > 0),
-    -- room_type TEXT NOT NULL,
     number_bed INTEGER NOT NULL CHECK(number_bed > 0),
     description TEXT,
     is_available INTEGER DEFAULT 1 CHECK(is_available IN (0, 1)),
-    -- available_date_start TEXT,
-    -- available_date_end TEXT,
     created_at TEXT DEFAULT (datetime('now')),
     PRIMARY KEY (accommodation_id, room_id),
     FOREIGN KEY (accommodation_id) REFERENCES Accommodations(accommodation_id) ON DELETE CASCADE

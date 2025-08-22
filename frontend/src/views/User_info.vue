@@ -150,6 +150,7 @@ const fetchUserInfo = async () => {
     error.value = null;
 
     const result = await api.get('/users/');
+
     console.log('Fetch user info result:', result);
     if (result.success) {
       Object.assign(userInfo, result.data);

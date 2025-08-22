@@ -2,12 +2,23 @@
   <!-- Header -->
   <HeaderModal/>
   <!-- Search section -->
-   <SearchModal @apply-filters="handle_apply_filters"/>
+   <SearchModal @apply-filters="handleApplyFilters"/>
   <!-- Main content -->
   <main class="main_content">
     <div class="content_layout">
-      <div class="accommodations_grid">
-        <div v-for="(accommodation, index) in displayed_accommodations" :key="index" class="accommodation_card">
+      <!-- Loading state -->
+      <div v-if="loading" class="loading-state">
+        <p>Searching accommodations...</p>
+      </div>
+      
+      <!-- Error state -->
+      <div v-if="error" class="error-state">
+        <p>{{ error }}</p>
+      </div>
+
+      <!-- Results -->
+      <div v-if="!loading && !error" class="accommodations_grid">
+        <div v-for="accommodation in displayedAccommodations" :key="accommodation.id" class="accommodation_card">
           <div class="card_image">
             <img class="accommodation_image" :src="accommodation.image" alt="Accommodation image">
           </div>
@@ -23,7 +34,13 @@
         </div>
       </div>
 
-      <div class="more_results">
+      <!-- No results message -->
+      <div v-if="!loading && !error && accommodations.length === 0" class="no-results">
+        <p>No accommodations found matching your search criteria.</p>
+      </div>
+
+      <!-- Load more / End of list -->
+      <div v-if="!loading && !error && accommodations.length > 0" class="more_results">
         <template v-if="!isEndOfList">
           <button class="more_button" @click="loadMore">
             More results
@@ -47,235 +64,108 @@ import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 import SearchModal from '@/components/SearchModal.vue'
 import heroImg from "@/assets/hero-img-singin.jpg"
+import api from '@/frontend-api-helper.js'
 
-const filters = ref(null)
+const accommodations = ref([])
+const filters = ref({})
+const loading = ref(false)
+const error = ref('')
+const displayCount = ref(6)
 
-function get_accommodations(accommodations_list) {
-  return accommodations_list
+// Mapping amenities string sang ID (giả định dựa trên DB Amenities table - bạn cần kiểm tra và update ID thực tế)
+const amenitiesMap = {
+  "Swimming pool": 1,
+  "Restaurant": 2,
+  "Sauna": 3,
+  "Smoking room": 4,
+  "Golf course": 5,
+  "Parking lot": 6,
+  "Gym": 7,
+  "Free Wifi": 8,
+  "Spa": 9
 }
 
-const default_accommodations = ref([
-  {
-    id: "ac1",
-    image: heroImg,
-    name: 'Sunrise Hotel',
-    address: 'District 1, Ho Chi Minh City',
-    rating: 4.5,
-    reviews: '234',
-    price: 120,
-    beds: 2,
-    type: 'Hotel',
-    amenities: ['Free Wifi', 'Swimming pool', 'Gym']
-  },
-  {
-    id: "ac2",
-    image: heroImg,
-    name: 'Green Hostel',
-    address: 'District 3, Ho Chi Minh City',
-    rating: 4.0,
-    reviews: '150',
-    price: 60,
-    beds: 1,
-    type: 'Hostel',
-    amenities: ['Free Wifi', 'Parking lot']
-  },
-  {
-    id: "ac3",
-    image: heroImg,
-    name: 'Sea Breeze Resort',
-    address: 'Vung Tau, Ba Ria-Vung Tau',
-    rating: 4.8,
-    reviews: '310',
-    price: 300,
-    beds: 3,
-    type: 'Resort',
-    amenities: ['Swimming pool', 'Spa', 'Restaurant']
-  },
-  {
-    id: "ac4",
-    image: heroImg,
-    name: 'City Homestay',
-    address: 'District 2, Ho Chi Minh City',
-    rating: 4.2,
-    reviews: '89',
-    price: 80,
-    beds: 2,
-    type: 'Homestay',
-    amenities: ['Free Wifi', 'Parking lot', 'Breakfast']
-  },
-  {
-    id: "ac5",
-    image: heroImg,
-    name: 'Luxury Hotel Saigon',
-    address: 'District 1, Ho Chi Minh City',
-    rating: 5.0,
-    reviews: '512',
-    price: 400,
-    beds: 2,
-    type: 'Hotel',
-    amenities: ['Swimming pool', 'Spa', 'Gym', 'Restaurant']
-  },
-  {
-    id: "ac6",
-    image: heroImg,
-    name: 'Budget Hostel',
-    address: 'District 4, Ho Chi Minh City',
-    rating: 3.8,
-    reviews: '64',
-    price: 50,
-    beds: 1,
-    type: 'Hostel',
-    amenities: ['Free Wifi', 'Smoking room']
-  },
-  {
-    id: "ac7",
-    image: heroImg,
-    name: 'Sunrise Hotel',
-    address: 'District 1, Ho Chi Minh City',
-    rating: 4.5,
-    reviews: '234',
-    price: 120,
-    beds: 2,
-    type: 'Hotel',
-    amenities: ['Free Wifi', 'Swimming pool', 'Gym']
-  },
-  {
-    id: "ac8",
-    image: heroImg,
-    name: 'Green Hostel',
-    address: 'District 3, Ho Chi Minh City',
-    rating: 4.0,
-    reviews: '150',
-    price: 60,
-    beds: 1,
-    type: 'Hostel',
-    amenities: ['Free Wifi', 'Parking lot']
-  },
-  {
-    id: "ac9",
-    image: heroImg,
-    name: 'Sea Breeze Resort',
-    address: 'Vung Tau, Ba Ria-Vung Tau',
-    rating: 4.8,
-    reviews: '310',
-    price: 300,
-    beds: 3,
-    type: 'Resort',
-    amenities: ['Swimming pool', 'Spa', 'Restaurant']
-  },
-  {
-    id: "ac10",
-    image: heroImg,
-    name: 'City Homestay',
-    address: 'District 2, Ho Chi Minh City',
-    rating: 4.2,
-    reviews: '89',
-    price: 80,
-    beds: 2,
-    type: 'Homestay',
-    amenities: ['Free Wifi', 'Parking lot', 'Breakfast']
-  },
-  {
-    id: "ac11",
-    image: heroImg,
-    name: 'Luxury Hotel Saigon',
-    address: 'District 1, Ho Chi Minh City',
-    rating: 5.0,
-    reviews: '512',
-    price: 400,
-    beds: 2,
-    type: 'Hotel',
-    amenities: ['Swimming pool', 'Spa', 'Gym', 'Restaurant']
-  },
-  {
-    id: "ac12",
-    image: heroImg,
-    name: 'Budget Hostel',
-    address: 'District 4, Ho Chi Minh City',
-    rating: 3.8,
-    reviews: '64',
-    price: 50,
-    beds: 1,
-    type: 'Hostel',
-    amenities: ['Free Wifi', 'Smoking room']
-  }
-])
-
-const accom_list = get_accommodations([])
-const all_accommodations = ref(
-  accom_list.length === 0 ? default_accommodations : accom_list
-
-)
-
-const accommodations = computed(() => {
-  if (!filters.value) return all_accommodations.value
-
-  let dest = filters.value.destination.trim().toLowerCase()
-
-  return all_accommodations.value.filter(acc => {
-    let address = acc.address.toLowerCase()
-    let name = acc.name.toLowerCase()
-    if (filters.value.destination && !(
-        address.includes(dest) ||  // địa chỉ chứa từ khóa
-        name.includes(dest) ||     // tên chứa từ khóa
-        dest.includes(name) ||    // từ khóa chứa tên accommodation
-        dest.includes(address)    // từ khóa chứa địa chỉ
-      )) {
-      return false
+async function fetchAccommodations(params = {}) {
+  loading.value = true
+  error.value = ''
+  try {
+    //map params từ filters sang backend query params
+    const queryParams = {}
+    if (params.destination) {
+      //giả định destination là city (hoặc address - bạn có thể split nếu cần)
+      queryParams.city = params.destination
     }
-    // lọc price
-    if (acc.price < filters.value.price_range[0] || acc.price > filters.value.price_range[1]) {
-      return false
+    if (params.checkin) queryParams.check_in_date = params.checkin
+    if (params.checkout) queryParams.check_out_date = params.checkout
+    if (params.price_range) {
+      queryParams.min_price = params.price_range[0]
+      queryParams.max_price = params.price_range[1]
     }
-    // lọc bed
-    if (acc.beds < filters.value.bed_range[0] || acc.beds > filters.value.bed_range[1]) {
-      return false
+    if (params.bed_range) {
+      queryParams.min_beds = params.bed_range[0]  //backend chỉ hỗ trợ min_beds, không max
     }
-    // lọc type
-    if (filters.value.accommodation_type && acc.type !== filters.value.accommodation_type) {
-      return false
+  // accommodation_type filter removed per request
+  if (params.rating) queryParams.min_rating = params.rating
+    if (params.amenities?.length > 0) {
+      // Map amenities strings sang IDs và join comma-separated
+      queryParams.amenities = params.amenities
+        .map(amenity => amenitiesMap[amenity])
+        .filter(id => id !== undefined)
+        .join(',')
     }
-    // lọc rating
-    if (filters.value.rating && acc.rating < Number(filters.value.rating)) {
-      return false
-    }
-    // lọc amenities
-    if (filters.value.amenities?.length > 0) {
-      for (let a of filters.value.amenities) {
-        if (!acc.amenities.includes(a)) return false
+
+    // Build query string
+    const query = new URLSearchParams()
+    Object.keys(queryParams).forEach(key => {
+      if (queryParams[key] !== null && queryParams[key] !== undefined && queryParams[key] !== '') {
+        query.append(key, queryParams[key])
       }
+    })
+
+    const endpoint = `/accommodations/search${query.toString() ? '?' + query.toString() : ''}`
+    const result = await api.get(endpoint)
+    console.log('Search result:', result)
+    if (result.success && Array.isArray(result.data)) {
+      accommodations.value = result.data.map(item => ({
+        id: item.accommodation_id,
+        name: item.name,
+        address: `${item.address}${item.city ? ', ' + item.city : ''}${item.country ? ', ' + item.country : ''}`,
+        rating: item.avg_rating || 0,
+        reviews: item.review_count || 0,
+        price: item.min_room_price || 0,
+        beds: item.max_beds || 1,
+        type: item.accommodation_type,
+        image: item.images?.[0] || heroImg
+      }))
+    } else {
+      accommodations.value = []
     }
-    return true
-  })
+  } catch (err) {
+    console.error('Search failed:', err)
+    error.value = err.message || 'Failed to search accommodations'
+    accommodations.value = []
+  } finally {
+    loading.value = false
+  }
 }
-)
 
-const display_count = ref(6)
-
-const displayed_accommodations = computed(() => {
-  return accommodations.value.slice(0, display_count.value)
-})
+function handleApplyFilters(selectedFilters) {
+  filters.value = selectedFilters
+  displayCount.value = 6 // Reset display count on new search
+  fetchAccommodations(selectedFilters)
+}
 
 function loadMore() {
-  display_count.value += 6
+  displayCount.value += 6
 }
 
-// kiểm tra xem đã hết danh sách chưa
-const isEndOfList = computed(() => {
-  return display_count.value >= accommodations.value.length
-})
+const displayedAccommodations = computed(() => 
+  accommodations.value.slice(0, displayCount.value)
+)
 
-function get_accommodation_cards() {
-  return all_accommodations.value
-}
-
-// Hàm này in nè
-const handle_apply_filters = (selectedFilters) => {
-  filters.value = selectedFilters
-  console.log("Filters applied:", selectedFilters)
-  console.log(get_accommodation_cards())
-}
-
+const isEndOfList = computed(() => 
+  displayCount.value >= accommodations.value.length
+)
 </script>
 
 <style scoped>
