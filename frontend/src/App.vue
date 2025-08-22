@@ -7,18 +7,31 @@ const { showError, errorMessage, errorDetails, clearError } = useError()
 </script>
 
 <template>
-  <RouterView />
+  <div class="app">
 
-  <!-- Global Error Modal -->
-  <ErrorModal
-    :show="showError"
-    :message="errorMessage"
-    :details="errorDetails"
-    @close="clearError"
+    <RouterView />
+
+    <!-- Global Error Modal -->
+    <ErrorModal
+      :show="showError"
+      :message="errorMessage"
+      :details="errorDetails"
+      @close="clearError"
   />
+  </div>
+
 </template>
 
 <style scoped>
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+router-view {
+  flex: 1;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
