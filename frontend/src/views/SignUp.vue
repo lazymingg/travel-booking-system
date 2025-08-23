@@ -5,27 +5,36 @@ import { useRouter } from 'vue-router'
 import api from '@/frontend-api-helper.js'
 import { useError } from '@/composables/useError.js'
 
+const fullName = ref('')
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const router = useRouter()
 const { handleApiError } = useError()
 
-const handleLogin = async () => {
+const handleSignUp = async () => {
+  // Validate password confirmation
+  if (password.value !== confirmPassword.value) {
+    handleApiError({ message: 'Mật khẩu xác nhận không khớp' })
+    return
+  }
+
   try {
-    const result = await api.post('/auth/login', {
+    const result = await api.post('/auth/signup', {
+      fullName: fullName.value,
       email: email.value,
       password: password.value
     });
 
     if (result.success) {
-      console.log('Login thành công:', result.message);
-      router.push('/userProfile');
+      console.log('Đăng ký thành công:', result.message);
+      router.push('/login'); // Redirect to login after successful signup
     } else {
-      console.error('Login thất bại:', result.message);
+      console.error('Đăng ký thất bại:', result.message);
       handleApiError(result);
     }
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Signup error:', error);
     handleApiError(error);
   }
 };
@@ -35,21 +44,29 @@ const handleLogin = async () => {
   <div class="main-bg">
     <div class="main-container">
       <div class="sign-in-form">
-        <h2 class="form-title">Đăng nhập</h2>
-        <form @submit.prevent="handleLogin">
+        <h2 class="form-title">Sign up</h2>
+        <form @submit.prevent="handleSignUp">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" v-model="fullName" placeholder="Enter your full name" required />
+          </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" v-model="email" placeholder="Nhập email" />
+            <input type="email" id="email" v-model="email" placeholder="Enter your email" required />
           </div>
           <div class="form-group">
-            <label for="password">Mật khẩu</label>
-            <input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu" />
+            <label for="password">Password</label>
+            <input type="password" id="password" v-model="password" placeholder="Enter your password" required />
           </div>
-          <button type="submit" class="login-btn">Đăng nhập</button>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Confirm your password" required />
+          </div>
+          <button type="submit" class="signup-btn">Sign Up</button>
         </form>
       </div>
       <div class="hero-image">
-        <img src="../assets/hero-img-signin.jpg" alt="Hero Image" class="hero-img" />
+        <img src="@/assets/hero-img-signin.jpg" alt="Hero Image" class="hero-img" />
       </div>
     </div>
   </div>
@@ -69,6 +86,7 @@ const handleLogin = async () => {
 
   --section-gap: 160px;
 }
+
 .main-bg {
   min-height: 100vh;
   width: 100vw;
@@ -87,7 +105,6 @@ const handleLogin = async () => {
   max-width: 80vw;
   min-height: 70vh;
   max-height: 80vh;
-  /* background: rgba(255, 255, 255, 0.1); */
   border: 2px solid var(--color-border);
   border-radius: 20px;
   backdrop-filter: blur(10px);
@@ -100,9 +117,6 @@ const handleLogin = async () => {
   min-width: 320px;
   max-width: 400px;
   padding: 48px 32px;
-  /* background: rgba(255, 255, 255, 0.55); */
-  /* border-radius: 24px; */
-  /* box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10); */
   margin: 32px;
   display: flex;
   flex-direction: column;
@@ -131,6 +145,7 @@ label {
   color: #444;
 }
 
+input[type="text"],
 input[type="email"],
 input[type="password"] {
   padding: 10px 14px;
@@ -141,12 +156,14 @@ input[type="password"] {
   outline: none;
   transition: border 0.2s;
 }
+
+input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
   border: 1.5px solid #7f53ac;
 }
 
-.login-btn {
+.signup-btn {
   width: 100%;
   padding: 12px 0;
   border: none;
@@ -160,7 +177,8 @@ input[type="password"]:focus {
   box-shadow: 0 2px 8px rgba(100, 125, 222, 0.15);
   transition: background 0.2s;
 }
-.login-btn:hover {
+
+.signup-btn:hover {
   background: var(--color-border-hover);
 }
 
@@ -175,9 +193,7 @@ input[type="password"]:focus {
 
 .hero-img {
   width: 100%;
-  /* height: 100%; */
   object-fit: cover;
-  /* border-radius: 0 32px 32px 0; */
 }
 
 @media (max-width: 900px) {
