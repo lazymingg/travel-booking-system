@@ -15,20 +15,20 @@ const { handleApiError } = useError()
 const handleSignUp = async () => {
   // Validate password confirmation
   if (password.value !== confirmPassword.value) {
-    handleApiError({ message: 'Mật khẩu xác nhận không khớp' })
+    handleApiError({ message: 'Passwords do not match' })
     return
   }
 
   try {
-    const result = await api.post('/auth/signup', {
-      fullName: fullName.value,
+    const result = await api.post('/auth/register', {
+      full_name: fullName.value,
       email: email.value,
       password: password.value
     });
 
     if (result.success) {
       console.log('Đăng ký thành công:', result.message);
-      router.push('/login'); // Redirect to login after successful signup
+      router.push('/login');
     } else {
       console.error('Đăng ký thất bại:', result.message);
       handleApiError(result);
