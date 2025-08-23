@@ -66,12 +66,7 @@
         />
       </div>
 
-      <div class="attribute">
-        <h3>Accommodation type</h3>
-        <div v-for="type in accommodation_types" :key="type">
-          <label><input type="radio" :value="type" v-model="filters.selectedTypes"> {{ type }}</label>
-        </div>
-      </div>
+  <!-- accommodation type filter removed per request -->
     </div>
 
     <!-- Cột 2: Amenities -->
@@ -122,17 +117,21 @@ export default {
       filters: {
         price_range: [0, 1000],
         bed_range: [1, 6],
-        price_min: 0,
-        price_max: 1000,
-        bed_min: 1,
-        bed_max: 6,
         selected_ratings: null,
-        selected_amenities: [],
-        selected_types: null
+        selected_amenities: []
       },
-      amenities: ['Swimming pool', 'Parking lot', 'Restaurant', 'Gym', 'Sauna', 'Free Wifi', 'Smoking room', 'Spa', 'Golf course'],
-      meals: ['Breakfast', 'Lunch', 'Dinner', 'Self sufficiency'],
-      accommodation_types: ['Hotel', 'Hostel', 'Resort', 'Homestay']
+      amenities: [
+  "Swimming pool",
+  "Restaurant",
+  "Sauna",
+  "Smoking room",
+  "Golf course",
+  "Parking lot",
+  "Gym",
+  "Free Wifi",
+  "Spa"
+],
+  // accommodation_types removed
     }
   },
   methods: {
@@ -147,7 +146,7 @@ export default {
         checkout: this.search_data.checkout,
         price_range: this.filters.price_range,
         bed_range: this.filters.bed_range,
-        accommodation_type: this.filters.selected_types,
+  // accommodation_type removed
         amenities: this.filters.selected_amenities,
         rating: this.filters.selected_ratings
       };
@@ -156,7 +155,7 @@ export default {
     apply_filters() {
       const selected_filters = this.get_selected_filters()
       console.log('Selected Filters:', selected_filters);
-      this.$emit('apply-filters', selected_filters)   // 👈 gửi filters ra ngoài
+      this.$emit('apply-filters', selected_filters)   // Emit filters
       this.$router.push('/accommodations');
     }
   }
