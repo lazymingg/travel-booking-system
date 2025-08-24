@@ -9,7 +9,7 @@
     :aria-label="props.accommodation?.name || 'accommodation card'"
   >
     <div class="card_image">
-      <img class="accommodation_image" :src="props.accommodation.image" :alt="props.accommodation.name">
+      <img class="accommodation_image" :src="imageSrc" :alt="props.accommodation.name">
     </div>
     <div class="card_content">
       <h3 class="accommodation_name">{{ props.accommodation.name }}</h3>
@@ -62,6 +62,10 @@ const props = defineProps({
     default: false
   }
 })
+import { computed } from 'vue'
+import convertImagePath from '@/utils/imagePath.js'
+
+const imageSrc = computed(() => convertImagePath(props.accommodation?.image))
 
 const emit = defineEmits(['click'])
 

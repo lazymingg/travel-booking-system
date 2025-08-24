@@ -57,7 +57,8 @@ import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 import SearchModal from '@/components/SearchModal.vue'
 import AccommodationCard from '@/components/AccommodationCard.vue'
-import heroImg from "@/assets/hero-img-singin.jpg"
+// import heroImg from "@/assets/hero-img-singin.jpg"
+const heroImg = '@/assets/hero-img-signin.jpg'
 import api from '@/frontend-api-helper.js'
 
 const accommodations = ref([])
