@@ -91,7 +91,7 @@ async function fetchAccommodations(params = {}) {
     const queryParams = {}
     if (params.destination) {
       //giả định destination là city (hoặc address - bạn có thể split nếu cần)
-      queryParams.city = params.destination
+      queryParams.destination = params.destination
     }
     if (params.checkin) queryParams.check_in_date = params.checkin
     if (params.checkout) queryParams.check_out_date = params.checkout
@@ -104,13 +104,13 @@ async function fetchAccommodations(params = {}) {
     }
   // accommodation_type filter removed per request
   if (params.rating) queryParams.min_rating = params.rating
-    if (params.amenities?.length > 0) {
-      // Map amenities strings sang IDs và join comma-separated
-      queryParams.amenities = params.amenities
-        .map(amenity => amenitiesMap[amenity])
-        .filter(id => id !== undefined)
-        .join(',')
-    }
+  if (params.amenities?.length > 0) {
+    // Map amenities strings sang IDs và join comma-separated
+    queryParams.amenities = params.amenities
+      .map(amenity => amenitiesMap[amenity])
+      .filter(id => id !== undefined)
+      .join(',')
+  }
 
     // Build query string
     const query = new URLSearchParams()
@@ -128,6 +128,7 @@ async function fetchAccommodations(params = {}) {
         id: item.accommodation_id,
         name: item.name,
         address: `${item.address}${item.city ? ', ' + item.city : ''}${item.country ? ', ' + item.country : ''}`,
+        count_rating: item.count_rating || 0,
         rating: item.avg_rating || 0,
         reviews: item.review_count || 0,
         price: item.min_room_price || 0,

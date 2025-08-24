@@ -36,7 +36,7 @@
         <Slider
           v-model="filters.price_range"
           :min="0"
-          :max="1000"
+          :max="5000"
           :interval="10"
           :tooltip="'always'"
           :lazy="true"
@@ -115,7 +115,7 @@ export default {
         checkout: ''
       },
       filters: {
-        price_range: [0, 1000],
+        price_range: [0, 5000],
         bed_range: [1, 6],
         selected_ratings: null,
         selected_amenities: []

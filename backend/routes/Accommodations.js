@@ -214,16 +214,15 @@ router.get('/:id(\\d+)', (req, res, next) => {
 router.get('/search', (req, res, next) => {
   console.log('Search query:', req.query);
   const {
-    city,
-    address,
-    country = 'Vietnam',
-    accommodation_type,
+    destination,
+    // country = 'Vietnam',
+    // accommodation_type,
     check_in_date,
     check_out_date,
     min_price,
     max_price,
     min_beds,
-    min_guests,
+    // min_guests,
     amenities,
     min_rating
   } = req.query;
@@ -250,6 +249,7 @@ router.get('/search', (req, res, next) => {
       a.status,
       a.created_at,
       o.owner_id,
+      (SELECT COUNT(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) as count_rating,
       (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) as avg_rating,
       (SELECT COUNT(*) FROM Rooms WHERE accommodation_id = a.accommodation_id) as room_count,
       (SELECT MIN(price_per_day) FROM Rooms WHERE accommodation_id = a.accommodation_id) as min_room_price,
@@ -263,31 +263,27 @@ router.get('/search', (req, res, next) => {
 
   const params = [];
 
-  // Add location filters
-  if (city) {
-    query += ` AND a.city LIKE ?`;
-    params.push(`%${city}%`);
+  if (destination) {
+    query += ` AND (LOWER(a.city) LIKE LOWER(?) OR LOWER(a.address) LIKE LOWER(?) OR LOWER(a.name) LIKE LOWER(?))`;
+    params.push(`%${destination}%`);
+    params.push(`%${destination}%`);
+    params.push(`%${destination}%`);
   }
   
-  if (address) {
-    query += ` AND a.address LIKE ?`;
-    params.push(`%${address}%`);
-  }
+  // if (country) {
+  //   query += ` AND a.country LIKE ?`;
+  //   params.push(`%${country}%`);
+  // }
   
-  if (country) {
-    query += ` AND a.country LIKE ?`;
-    params.push(`%${country}%`);
-  }
-  
-  if (accommodation_type) {
-    query += ` AND a.accommodation_type = ?`;
-    params.push(accommodation_type);
-  }
+  // if (accommodation_type) {
+  //   query += ` AND a.accommodation_type = ?`;
+  //   params.push(accommodation_type);
+  // }
   
   // Add rating filter
   if (min_rating) {
-    query += ` AND (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) >= ?`;
-    params.push(parseFloat(min_rating));
+      query += ` AND (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) >= ?`;
+      params.push(parseFloat(min_rating));
   }
   
   // Add room filters
@@ -296,10 +292,10 @@ router.get('/search', (req, res, next) => {
     params.push(parseInt(min_beds));
   }
   
-  if (min_guests) {
-    query += ` AND EXISTS (SELECT 1 FROM Rooms WHERE accommodation_id = a.accommodation_id AND number_guest >= ?)`;
-    params.push(parseInt(min_guests));
-  }
+  // if (min_guests) {
+  //   query += ` AND EXISTS (SELECT 1 FROM Rooms WHERE accommodation_id = a.accommodation_id AND number_guest >= ?)`;
+  //   params.push(parseInt(min_guests));
+  // }
   
   if (min_price) {
     query += ` AND EXISTS (SELECT 1 FROM Rooms WHERE accommodation_id = a.accommodation_id AND price_per_day >= ?)`;

@@ -23,7 +23,7 @@
           <!-- 2 ảnh nhỏ bên phải -->
           <div class="side_images">
             <div
-              v-for="(image, index) in accommodation.images.slice(1, 3)"
+              v-for="(image, index) in accommodation.images?.slice(1, 3)"
               :key="index"
               class="thumbnail"
               @click="openImagePopup(accommodation.images, index + 1)"
@@ -116,7 +116,7 @@
               <div class="room_image">
                 <div v-if="accommodation.rooms.images?.length >0" class="room_image_grid">
                   <div
-                    v-for="(img, img_index) in room.images.slice(0, 4)"
+                    v-for="(img, img_index) in room.images?.slice(0, 4)"
                     :key="img_index"
                     class="room_image_item"
                     @click="openImagePopup(room.images, img_index)"
@@ -163,6 +163,10 @@
                 <h4>Capacity</h4>
                 <p>{{ room.number_guest }}</p>
               </div>
+              <div class="room_guests">
+                <h4>Bed</h4>
+                <p>{{ room.number_bed }}</p>
+              </div>
               <div class="room_price">
                 <h4>Price</h4>
                 <p class="price">$ {{ room.price_per_day }}</p>
@@ -179,15 +183,15 @@
     <section class="reviews_section">
       <div class="container">
         <h2 class="section_title">Reviews</h2>
-        <div v-if="accommodation.reviews?.length !== 0" class="reviews_list">
+        <div v-if="accommodation.reviews?.length > 0" class="reviews_list">
           <div 
             v-for="(review, index) in accommodation.reviews" 
             :key="index"
             class="review_card"
           >
             <div class="review_header">
-              <span class="username">{{ review.username }}</span>
-                <span class="review_score">{{ review.score }}</span>
+              <span class="username">User #{{ review.user_id }}</span>
+                <span class="review_score">{{ review.rating }}</span>
             </div>
             <p class="review_comment">{{ review.comment }}</p>
 
@@ -195,7 +199,7 @@
             <div class="review_images">
               <div class="review_images_row">
                 <div
-                  v-for="(img, imgIndex) in review.images.slice(0, 5)"
+                  v-for="(img, imgIndex) in review.images?.slice(0, 5)"
                   :key="imgIndex"
                   class="review_image_item"
                   @click="openImagePopup(review.images, imgIndex)"
@@ -295,16 +299,16 @@ const fetch_accommodation = async (accommodationID) => {
 
       const rooms = await api.get(`/rooms/accommodation/${accommodationID}`).then(res => res.success ? res.data : [])
 
-      for (const room of rooms) {
-        const roomImages = await api.get(`/images/room_images/${room.room_id}`)
-          .then(res => res.success ? res.data : [])
+      // for (const room of rooms) {
+      //   const roomImages = await api.get(`/images/room_images/${room.room_id}`)
+      //     .then(res => res.success ? res.data : [])
 
-        const formattedRoomImages = roomImages.map(img =>
-          formatImageUrl(`http://localhost:3000/images/`, img.image_url)
-        )
+      //   const formattedRoomImages = roomImages.map(img =>
+      //     formatImageUrl(`http://localhost:3000/images/`, img.image_url)
+      //   )
 
-        room.images = formattedRoomImages
-      }
+      //   room.images = formattedRoomImages
+      // }
 
       accommodation.value = {
         ...data,
@@ -528,7 +532,7 @@ onMounted(() => {
 
 .room_content {
   display: grid;
-  grid-template-columns: 150px 5fr 0.8fr 1.5fr;
+  grid-template-columns: 150px 5fr 0.8fr 0.8fr 1.5fr;
   gap: 5px;
   align-items: start;
 }

@@ -23,7 +23,7 @@
       <div class="stats">
         <div class="rating">
           <span class="rating_badge">{{ Number(props.accommodation.rating || 0).toFixed(1) }}</span>
-          <span class="rating_text">{{ props.accommodation.reviews || 0 }} reviews</span>
+          <span class="rating_text">{{ props.accommodation.count_rating || 0 }} reviews</span>
         </div>
         <div class="room_info">
           <span>{{ props.accommodation.room_count || 0 }} rooms</span>
