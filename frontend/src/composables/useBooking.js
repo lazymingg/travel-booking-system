@@ -1,105 +1,60 @@
-import { ref, reactive } from 'vue';
-import api from '@/frontend-api-helper';
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export function useBooking() {
-  // State
-  const loading = ref(false);
-  const error = ref(null);
-  const selectedRoom = ref(null);
-  const bookingDetails = reactive({
-    accommodationId: null,
-    roomId: null,
-    checkInDate: '',
-    checkOutDate: '',
-    totalPrice: 0,
-    numberOfGuests: 0
-  });
+export const useBookingStore = defineStore('booking', () => {
+  const currentStep = ref(1);
+  const totalSteps = ref(2);
   const bookingSuccess = ref(false);
-  const bookingId = ref(null);
+  const reserveComplete = ref(false);
 
-  // Set booking details
-  const setBookingDetails = (details) => {
-    Object.assign(bookingDetails, details);
-  };
+  const bookingDetails = ref({
+    accommodationID: null,
+    roomID: null,
+    numberBeds: 0,
+    numberGuests: 0,
+    description: '',
+    amenities: [],
+    price: 0,
+    checkInDate: null,
+    checkOutDate: null
+  });
 
-  // Select a room
-  const selectRoom = (room) => {
-    selectedRoom.value = room;
-    bookingDetails.roomId = room.room_id;
-  };
-
-  // Create booking in backend
-  const createBooking = async () => {
-    try {
-      loading.value = true;
-      error.value = null;
-
-      // Validate that we have all the required information
-      if (!bookingDetails.roomId || !bookingDetails.checkInDate || 
-          !bookingDetails.checkOutDate || !bookingDetails.totalPrice) {
-        error.value = 'Missing required booking information';
-        return false;
-      }
-
-      const payload = {
-        room_id: bookingDetails.roomId,
-        check_in_date: bookingDetails.checkInDate,
-        check_out_date: bookingDetails.checkOutDate,
-        total_price: bookingDetails.totalPrice
-      };
-
-      console.log('Creating booking with payload:', payload);
-
-      const result = await api.post(`/accommodations/${bookingDetails.accommodationId}/bookings`, payload);
-
-      if (result.success) {
-        console.log('Booking created successfully:', result.data);
-        bookingSuccess.value = true;
-        bookingId.value = result.data.booking_id;
-        return true;
-      } else {
-        console.error('Failed to create booking:', result);
-        error.value = result.message || 'Failed to create booking';
-        return false;
-      }
-    } catch (err) {
-      console.error('Error creating booking:', err);
-      error.value = 'Error creating booking: ' + err.message;
-      return false;
-    } finally {
-      loading.value = false;
+  function nextStep() {
+    if (currentStep.value < totalSteps.value) {
+      currentStep.value++;
     }
-  };
+  }
 
-  // Reset booking state
-  const resetBooking = () => {
-    selectedRoom.value = null;
+  function prevStep() {
+    if (currentStep.value > 1) {
+      currentStep.value--;
+    }
+  }
+
+  function completeBooking() {
+    bookingSuccess.value = true;
+  }
+
+  function restartBooking() {
     bookingSuccess.value = false;
-    bookingId.value = null;
-    error.value = null;
-    Object.assign(bookingDetails, {
-      accommodationId: null,
-      roomId: null,
-      checkInDate: '',
-      checkOutDate: '',
-      totalPrice: 0,
-      numberOfGuests: 0
-    });
-  };
+  }
+
+  function setBookingDetails(details) {
+    bookingDetails.value = { 
+      ...bookingDetails.value, ...details 
+    }
+  }
 
   return {
-    // State
-    loading,
-    error,
-    selectedRoom,
-    bookingDetails,
+    currentStep,
+    totalSteps,
     bookingSuccess,
-    bookingId,
-    
-    // Actions
+    bookingDetails,
+    reserveComplete,
+    nextStep,
+    prevStep,
+    completeBooking,
     setBookingDetails,
-    selectRoom,
-    createBooking,
-    resetBooking
-  };
-}
+    restartBooking
+  }
+})

@@ -1,6 +1,10 @@
 <script setup>
 import greenCheck from '@/assets/bookingIcon/pros.svg'
 
+import { useBookingStore } from '@/composables/useBooking'
+
+const bookingStore = useBookingStore()
+
 const props = defineProps({
   room: {
     type: Object,
@@ -12,10 +16,19 @@ const emit = defineEmits(['reserve']);
 const priceNote = '* including taxes and charges';
 
 const handleClickReserve = () => {
-  emit('reserve', {
+  bookingStore.setBookingDetails({
+    accommodationID: props.room.accommodationID,
     roomId: props.room.id,
-    room: props.room
+    numberBeds: props.room.numberBeds,
+    numberGuests: props.room.numberGuests,
+    description: props.room.description,
+    amenities: props.room.amenities,
+    price: props.room.price,
+    checkInDate: props.room.checkInDate,
+    checkOutDate: props.room.checkOutDate
   })
+
+  bookingStore.nextStep()
 }
 </script>
 

@@ -1,16 +1,17 @@
 <script setup>
 import { ref, watch } from 'vue'
 import api from '@/frontend-api-helper'
-import { useBooking } from '@/composables/useBooking'
+import { useBookingStore } from '@/composables/useBooking'
 
 import RoomDetail from '@/components/booking/RoomDetail.vue';
 
 const loading = ref(false);
 const error = ref(null);
 const rooms = ref([])
-const reserveComplete = ref(false)
+
 const emit = defineEmits(['reserve-RoomList'])
-const { setBookingDetails } = useBooking();
+
+const bookingStore  = useBookingStore();
 
 const props = defineProps({
   filter: {
@@ -49,12 +50,15 @@ const fetchRooms = async () => {
       }
 
       rooms.value = (result.data || []).map(room => ({
-        id: room.room_id,
-        numberOfBeds: room.number_bed || 0,
-        numberOfGuests: room.number_guest || 0,
+        accommodationId: accommodationId,
+        roomId: room.room_id,
+        numberBeds: room.number_bed || 0,
+        numberGuests: props.filter.number_guest || 0,
         description: room.description || '',
         amenities: amenities || [],
-        price: room.price_per_day || 0
+        price: room.price_per_day || 0,
+        checkInDate: props.filter.check_in_date,
+        checkOutDate: props.filter.check_out_date
       }))
     } 
     
@@ -96,20 +100,9 @@ const fetchAmenity = async (accommodationId) => {
 
 // Action
 const handleReserve = (roomData) => {
-  reserveComplete.value = true;
-  
-  // Store booking details in our composable
-  setBookingDetails({
-    accommodationId: props.filter.accommodation_id,
-    roomId: roomData.roomId,
-    checkInDate: props.filter.check_in_date,
-    checkOutDate: props.filter.check_out_date,
-    totalPrice: roomData.totalPrice,
-    numberOfGuests: props.filter.number_guest
-  });
+  bookingStore.reserveComplete.value = true;
   
   emit('reserve-RoomList', roomData);
-  reserveComplete.value = false;
 }
 
 watch(

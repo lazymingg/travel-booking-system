@@ -1,4 +1,8 @@
 <script setup>
+import { useBookingStore } from '@/composables/useBooking'
+
+const bookingStore = useBookingStore()
+
 const props = defineProps({
   bookingSuccess: { type: Boolean, required: true }
 })
@@ -7,19 +11,25 @@ const emit = defineEmits(['booking-success'])
 
 const handleClick = () => {
   if (!props.bookingSuccess) {
-    // Emit để báo cho cha là booking thành công
     emit('booking-success')
-  } else {
-    // Navigate về home
+  }
+
+  else {
     window.location.href = '/'
   }
 }
+
+// API
+const handleBooking = async () => {
+
+}
+
 </script>
 
 <template>
   <div class="btn-container">
     <button class="btn" @click="handleClick">
-      {{ props.bookingSuccess ? 'Return to Home Page' : 'Complete Booking' }}
+      {{ bookingStore.bookingSuccess ? 'Return to Home Page' : 'Complete Booking' }}
     </button>
   </div>
 </template>

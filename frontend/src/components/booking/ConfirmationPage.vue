@@ -4,22 +4,15 @@ import { ref } from 'vue'
 import BookingSummary from '@/components/booking/BookingSummary.vue'
 import CompleteButton from '@/components/booking/CompleteButton.vue'
 
-// Receive from the Booking.vue
-const emit = defineEmits(['booking-success'])
-const bookingSuccess = ref(false)
+import { useBookingStore } from '@/composables/useBooking'
 
-const handleBookingSuccess = () => {
-    bookingSuccess.value = true
-
-    // Send to the Booking.vue
-    emit('booking-success')
-}
+const bookingStore = useBookingStore()
 </script>
 
 <template>
   <div id="summary-form">
     <!-- Chỉ hiển thị BookingSummary khi chưa success -->
-    <BookingSummary v-if="!bookingSuccess"/>
+    <BookingSummary v-if="!bookingStore.bookingSuccess"/>
     
     <!-- Hiển thị chữ khi success -->
     <div v-else class="success-text">
@@ -29,8 +22,8 @@ const handleBookingSuccess = () => {
 
   <div id="btn-complete">
     <CompleteButton 
-      :booking-success="bookingSuccess"
-      @booking-success="handleBookingSuccess"
+      :booking-success="bookingStore.bookingSuccess"
+      @booking-success="bookingStore.completeBooking"
     />
   </div>
 </template>
