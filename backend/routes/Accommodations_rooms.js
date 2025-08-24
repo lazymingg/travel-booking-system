@@ -256,4 +256,15 @@ router.post('/:accommodationId/rooms', requireOwner, (req, res, next) => {
 //   });
 // });
 
+// get all rooms of an accommodation
+router.get('/:accommodationId/rooms', (req, res, next) => {
+  const { accommodationId } = req.params;
+  db.all('SELECT * FROM Rooms WHERE accommodation_id = ?', [accommodationId], (err, rooms) => {
+    if (err) {
+      return responseHelper.error(res, 'Error retrieving rooms', 500, err.message);
+    }
+    return responseHelper.success(res, rooms, `Found ${rooms.length} rooms`);
+  });
+});
+
 module.exports = router;
