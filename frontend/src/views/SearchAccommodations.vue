@@ -57,15 +57,18 @@ import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 import SearchModal from '@/components/SearchModal.vue'
 import AccommodationCard from '@/components/AccommodationCard.vue'
-// import heroImg from "@/assets/hero-img-singin.jpg"
-const heroImg = '@/assets/hero-img-signin.jpg'
 import api from '@/frontend-api-helper.js'
-
+//import router
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const heroImg = '@/assets/hero-img-signin.jpg'
 const accommodations = ref([])
 const filters = ref({})
 const loading = ref(false)
 const error = ref('')
 const displayCount = ref(6)
+
+
 
 //mapping amenities string sang ID (giả định dựa trên DB Amenities table - bạn cần kiểm tra và update ID thực tế)
 const amenitiesMap = {
@@ -152,10 +155,8 @@ function handleApplyFilters(selectedFilters) {
 }
 
 function viewAccommodationDetails(accommodation) {
-  // Navigate to accommodation detail page
   console.log('View details for accommodation:', accommodation.id)
-  // You can implement navigation here
-  // this.$router.push(`/accommodation/${accommodation.id}`)
+  router.push(`/detail/${accommodation.id}`)
 }
 
 function loadMore() {
