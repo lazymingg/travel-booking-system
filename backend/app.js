@@ -45,6 +45,7 @@ const ownersRouter = require('./routes/Owners');
 const ownersBookingsRouter = require('./routes/Owners_bookings');
 const ownersAccommodationsRouter = require('./routes/Owners_Accommodations');
 const authRouter = require('./routes/Auth');
+const ownersBookingsRouter = require('./routes/Owners_bookings');
 
 const home = require("./routes/index");
 // connect to db
@@ -92,9 +93,10 @@ app.use('/reviews', reviewRouter);
 app.use('/accommodations', accommodationsRouter);
 app.use('/accommodations', accommodationsImagesRouter);
 app.use('/accommodations', accommodationsRoomsImagesRouter);
-app.use('/accommodations', accommodationRoomsRouter);;
+app.use('/accommodations', accommodationRoomsRouter);
 app.use('/accommodations', accommodationsAmenitiesRouter);
 app.use('/accommodations', accommodationsBookingsRouter);
+app.use('owners', ownersBookingsRouter);
 
 app.use('owners', ownersBookingsRouter);
 app.use('/owners', ownersAccommodationsRouter);

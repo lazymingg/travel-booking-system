@@ -41,20 +41,6 @@ defineProps({
             </span>
             <span v-else>2</span>
           </div>
-          <span class="step-label">Your details</span>
-        </div>
-
-        <!-- Line 2-3 -->
-        <div class="step-line" :class="{ active: currentStep >= 3 }"></div>
-
-        <!-- Step 3 -->
-        <div class="step">
-          <div class="step-circle" :class="{ active: currentStep >= 3 }">
-            <span v-if="success">
-              <img :src="check" alt="check" class="check-icon">
-            </span>
-            <span v-else>3</span>
-          </div>
           <span class="step-label">Confirmation</span>
         </div>
       </div>
@@ -85,6 +71,7 @@ defineProps({
   flex-direction: column;
   align-items: center;
   position: relative;
+  min-width: 6rem;
 }
 
 .step-circle {

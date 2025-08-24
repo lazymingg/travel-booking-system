@@ -72,6 +72,16 @@ const router = createRouter({
       path: '/test',
       name: 'TestPage',
       component: () => import('../views/test.vue'),
+    },
+    {
+      path: '/multer',
+      name: 'MULTER',
+      component: () => import('../views/Multer.vue'),
+    },
+    {
+      path: '/signup',
+      name: 'SignUp',
+      component: () => import('../views/SignUp.vue'),
     }
   ],
 })
