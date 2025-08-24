@@ -14,6 +14,11 @@ const props = defineProps({
   room: {
     type: Object,
     required: true,
+  },
+
+  filter: {
+    type: Object,
+    required: true
   }
 })
 
@@ -32,9 +37,9 @@ const handleClickReserve = async () => {
   bookingStore.setBookingDetails({
     accommodationId: props.room.accommodationId,
     roomId: props.room.roomId,
-    ownerId: owner.owner_id,
+    ownerId: owner.data[0].owner_id,
     numberBeds: props.room.numberBeds,
-    numberGuests: props.room.numberGuests,
+    numberGuests: props.filter.number_guest,
     description: props.room.description,
     amenities: props.room.amenities,
     price: props.room.price,

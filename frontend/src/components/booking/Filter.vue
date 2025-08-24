@@ -13,8 +13,7 @@ const showChangeSearch = ref(false)
 // Information in the filter bar
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  // accommodation_id: bookingDetails.value.accommodationId,
-  accommodation_id: 12,
+  accommodation_id: bookingDetails.value.accommodationId,
   check_in_date: 'YYYY-MM-DD',
   check_out_date: 'YYYY-MM-DD',
   number_guest: 0

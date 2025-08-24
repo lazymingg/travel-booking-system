@@ -52,7 +52,7 @@ const fetchRooms = async () => {
         accommodationId: accommodationId,
         roomId: room.room_id,
         numberBeds: room.number_bed || 0,
-        numberGuests: props.filter.number_guest || 0,
+        numberGuests: room.number_guest || 0,
         description: room.description || '',
         amenities: amenities,
         price: room.price_per_day || 0,
@@ -145,6 +145,7 @@ watch(
           v-for="room in rooms"
         :key="room.roomId"
         :room="room"
+        :filter="props.filter"
         @reserve="handleReserve"
       />
     </div>

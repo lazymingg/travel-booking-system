@@ -37,7 +37,7 @@ const { bookingDetails } = storeToRefs(bookingStore)
     
     <div class="price-section">
       <span class="price-label">Price</span>
-      <span class="price-amount">{{ bookingDetails.price }} VND</span>
+      <span class="price-amount">$ {{ bookingDetails.price }}</span>
     </div>
   </div>
 </template>

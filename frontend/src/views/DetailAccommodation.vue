@@ -165,8 +165,8 @@
               </div>
               <div class="room_price">
                 <h4>Price</h4>
-                <p class="price">{{ room.price_per_day }}.000</p>
-                <p class="price_unit">VND per day</p>
+                <p class="price">$ {{ room.price_per_day }}</p>
+                <p class="price_unit"> per day</p>
               </div>
             </div>
           </div>
