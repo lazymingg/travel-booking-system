@@ -8,26 +8,23 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
   <div class="reservation-card">
     <div class="card-header">
       <div class="hotel-status-row">
-        <span class="hotel-name">{{ reservation.hotel }}</span>
+        <span class="hotel-name">{{ reservation.accommodation_name }}</span>
         <StatusBadge :status="reservation.status" />
       </div>
     </div>
     <div class="card-body">
-      <div class="info-row"><span class="info-label">Guest:</span><span class="info-value">{{ reservation.guest }}</span></div>
-      <div class="info-row"><span class="info-label">Adults/Children:</span><span class="info-value">{{ reservation.adults }}/{{ reservation.children }}</span></div>
-      <div class="info-row"><span class="info-label">Dates:</span><span class="info-value">{{ reservation.checkIn }} → {{ reservation.checkOut }}</span></div>
-      <div class="info-row"><span class="info-label">Total:</span><span class="info-value total-amount">${{ reservation.total }}</span></div>
-      <div v-if="reservation.requirements" class="special-req">{{ reservation.requirements }}</div>
+      <div class="info-row"><span class="info-label">Guest:</span><span class="info-value">{{ reservation.guest_name }}</span></div>
+      <div class="info-row"><span class="info-label">Dates:</span><span class="info-value">{{ reservation.check_in_date }} → {{ reservation.check_out_date }}</span></div>
+      <div class="info-row"><span class="info-label">Total:</span><span class="info-value total-amount">${{ reservation.total_price }}</span></div>
     </div>
     <div class="card-footer">
-      <div class="reservation-id">#{{ reservation.id }}</div>
+      <div class="reservation-id">#{{ reservation.booking_id }}</div>
       <ActionButtons 
         :status="reservation.status" 
         @confirm="$emit('confirm', reservation)"
         @decline="$emit('decline', reservation)" 
         @edit="$emit('edit', reservation)" 
         @delete="$emit('delete', reservation)"
-        @contact="$emit('contact', reservation)"
       />
     </div>
   </div>

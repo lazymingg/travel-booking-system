@@ -7,12 +7,13 @@ import confirmedSvg from '@/assets/manageReservationIcons/status/confirmedStatus
 import cancelledSvg from '@/assets/manageReservationIcons/status/cancelledStatus.svg'
 
 const statusMap = {
-  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', svg: completedSvg },
-  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', svg: confirmedSvg },
-  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', svg: pendingSvg },
-  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', svg: cancelledSvg },
+  completed: { bg: '#F3F4F6', color: '#374151', text: 'completed', svg: completedSvg },
+  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'confirmed', svg: confirmedSvg },
+  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'pending', svg: pendingSvg },
+  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'cancelled', svg: cancelledSvg },
 }
-const badge = statusMap[props.status] || statusMap.completed
+const badge = statusMap[props.status]
+
 </script>
 <template>
   <span class="status-badge" :style="{ background: badge.bg, color: badge.color }">

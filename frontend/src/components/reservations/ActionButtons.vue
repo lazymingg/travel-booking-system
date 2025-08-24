@@ -4,7 +4,6 @@ const emit = defineEmits(['confirm', 'decline', 'edit', 'delete', 'contact'])
 import deleteSvg from '@/assets/manageReservationIcons/buttons/deleteButton.svg'
 import confirmSvg from '@/assets/manageReservationIcons/buttons/confirmButton.svg'
 import declineSvg from '@/assets/manageReservationIcons/buttons/declineButton.svg'
-import contactSvg from '@/assets/manageReservationIcons/buttons/contactButton.svg'
 import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
 
 
@@ -22,9 +21,6 @@ import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
       </button>
-      <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
-      </button>
     </template>
     <!-- Confirmed Status Buttons -->
     <template v-else-if="status === 'confirmed'">
@@ -34,17 +30,11 @@ import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
       </button>
-      <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
-      </button>
     </template>
     <!-- Completed & Cancelled Status Buttons -->
     <template v-else>
       <button class="btn btn-primary" @click="$emit('edit')" title="Edit reservation details">
         <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
-      </button>
-      <button class="btn btn-secondary" @click="$emit('contact')" title="Contact guest">
-        <img :src="contactSvg" alt="Contact" class="svg-icon" /> Contact Guest
       </button>
     </template>
   </div>
@@ -89,13 +79,6 @@ import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
 }
 .btn-success:hover {
   background: #16a34a;
-}
-.btn-secondary {
-  background: #E5E7EB;
-  color: #374151;
-}
-.btn-secondary:hover {
-  background: #d1d5db;
 }
 .btn-danger {
   background: #EF4444;

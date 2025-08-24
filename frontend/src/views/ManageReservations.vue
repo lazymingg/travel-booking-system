@@ -1,26 +1,113 @@
 <script setup>
-// const axious = require('axios');
-import HeaderModal from '@/components/HeaderModal.vue';
-import FooterModal from '@/components/FooterModal.vue';
-
-
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
 import ReservationFilter from '../components/reservations/ReservationFilter.vue'
 import ReservationCard from '../components/reservations/ReservationCard.vue'
 import DeleteReservationModal from '../components/reservations/DeleteReservationModal.vue'
 import EditReservationModal from '../components/reservations/EditReservationModal.vue'
+import api from '@/frontend-api-helper.js'
 
-const reservations = ref([
-  { id: 'R001', hotel: 'Grand Palace Hotel', guest: 'Alice Nguyen', adults: 2, children: 1, checkIn: '2024-07-01', checkOut: '2024-07-05', total: 500, requirements: 'Late check-in, vegan meals', status: 'pending' },
-  { id: 'R002', hotel: 'Sunrise Resort', guest: 'Bob Tran', adults: 1, children: 0, checkIn: '2024-07-10', checkOut: '2024-07-12', total: 300, requirements: '', status: 'confirmed' },
-  { id: 'R003', hotel: 'Ocean View Inn', guest: 'Carol Le', adults: 2, children: 2, checkIn: '2024-06-20', checkOut: '2024-06-25', total: 700, requirements: 'Baby crib', status: 'cancelled' },
-  { id: 'R004', hotel: 'Mountain Retreat', guest: 'David Pham', adults: 1, children: 0, checkIn: '2024-05-15', checkOut: '2024-05-18', total: 400, requirements: '', status: 'completed' },
-])
-
+const reservations = ref([])
 const activeTab = ref('all')
 const showDeleteModal = ref(false)
 const showEditModal = ref(false)
 const selectedReservation = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+// Fetch reservations for owner accommodations (including bookings from other users)
+const fetchReservations = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    const statusParam = activeTab.value !== 'all' ? `?status=${activeTab.value}` : ''
+    const result = await api.get(`/owners/bookings${statusParam}`)
+    if (result.success) {
+      reservations.value = result.data || []
+    } else {
+      throw new Error(result.message || 'Unknown error')
+    }
+  } catch (err) {
+    error.value = 'Failed to load reservations: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchReservations()
+})
+
+const handleConfirm = async (reservation) => {
+  loading.value = true
+  error.value = null
+  const result = await api.put(`/owners/bookings/${reservation.booking_id}/confirm`)
+  console.log('Confirming reservation:', result)
+  console.log('Reservation ID:', reservation.status)
+  if (result.success) {
+    await fetchReservations()
+    console.log('Reservation confirmed:', reservations)
+    activeTab.value = 'confirmed'
+  } else {
+    error.value = result.message
+  }
+  loading.value = false
+
+}
+
+// Edit reservation (update fields and reload)
+const handleSave = async (updated) => {
+  loading.value = true
+  error.value = null
+  const result = await api.put(`/owners/bookings/${updated.booking_id}`, updated)
+  if (result.success) {
+    await fetchReservations()
+    showEditModal.value = false // Close edit modal
+  } else {
+    error.value = result.message
+  }
+  loading.value = false
+}
+
+// Delete (move to cancelled status and close pop-up)
+const confirmDelete = async (id) => {
+  loading.value = true
+  error.value = null
+  const result = await api.put(`/owners/bookings/${id}/cancel`)
+  if (result.success) {
+    await fetchReservations()
+    showDeleteModal.value = false // Close delete modal
+    activeTab.value = 'cancelled'
+  } else {
+    error.value = result.message
+  }
+  loading.value = false
+}
+
+const handleDecline = async (reservation) => {
+  loading.value = true
+  error.value = null
+  const result = await api.delete(`/owners/bookings/${reservation.booking_id}`)
+  if (result.success) {
+    await fetchReservations()
+  } else {
+    error.value = result.message
+  }
+  loading.value = false
+}
+
+// Open edit modal
+const openEdit = (reservation) => {
+  selectedReservation.value = { ...reservation }
+  showEditModal.value = true
+}
+
+// Open delete modal
+const openDeleteModal = (reservation) => {
+  selectedReservation.value = { ...reservation }
+  showDeleteModal.value = true
+}
 
 const filteredReservations = computed(() => {
   if (activeTab.value === 'all') return reservations.value
@@ -30,82 +117,13 @@ const filteredReservations = computed(() => {
 const totalRevenue = computed(() => {
   return reservations.value
     .filter(r => r.status === 'confirmed' || r.status === 'completed')
-    .reduce((sum, r) => sum + r.total, 0)
+    .reduce((sum, r) => sum + r.total_price, 0)
 })
-
-// Confirm pending reservation (pending → confirmed) and switch to confirmed tab
-function handleConfirm(reservation) {
-  const idx = reservations.value.findIndex(r => r.id === reservation.id)
-  if (idx !== -1) {
-    reservations.value[idx].status = 'confirmed'
-    // Auto switch to confirmed tab to show the updated reservation
-    activeTab.value = 'confirmed'
-    console.log(`Reservation ${reservation.id} confirmed and moved to Confirmed filter`)
-  }
-}
-
-// Decline pending reservation (removes from list)
-function handleDecline(reservation) {
-  reservations.value = reservations.value.filter(r => r.id !== reservation.id)
-  console.log(`Reservation ${reservation.id} declined and removed`)
-}
-
-// Cancel confirmed reservation (confirmed → cancelled) and switch to cancelled tab
-function handleDelete(reservation) {
-  const idx = reservations.value.findIndex(r => r.id === reservation.id)
-  if (idx !== -1) {
-    reservations.value[idx].status = 'cancelled'
-    // Auto switch to cancelled tab to show the updated reservation
-    activeTab.value = 'cancelled'
-    console.log(`Reservation ${reservation.id} cancelled and moved to Cancelled filter`)
-  }
-}
-
-function openDeleteModal(reservation) {
-  selectedReservation.value = { ...reservation }
-  showDeleteModal.value = true
-}
-
-function openEdit(reservation) {
-  selectedReservation.value = { ...reservation }
-  showEditModal.value = true
-}
-
-function confirmDelete(id) {
-  const reservation = reservations.value.find(r => r.id === id)
-  if (reservation) {
-    handleDelete(reservation)
-  }
-  showDeleteModal.value = false
-}
-
-function handleSave(updated) {
-  const idx = reservations.value.findIndex(r => r.id === updated.id)
-  if (idx !== -1) {
-    const oldStatus = reservations.value[idx].status
-    reservations.value[idx] = { ...updated }
-
-    // Auto switch to the new status tab if status changed
-    if (oldStatus !== updated.status) {
-      activeTab.value = updated.status
-    }
-
-    console.log(`Reservation ${updated.id} updated and moved to ${updated.status} filter`)
-  }
-  showEditModal.value = false
-}
-
-function handleContact(reservation) {
-  console.log('Contacting guest:', reservation.guest)
-  // Add your contact logic here
-}
 </script>
 
 <template>
-    <HeaderModal/>
-    
+  <HeaderModal/>
   <div class="page-wrapper">
-    <!-- Section Title -->
     <div class="section-title-row">
       <div>
         <h2 class="section-title">Manage Reservation</h2>
@@ -128,13 +146,12 @@ function handleContact(reservation) {
     <div class="reservation-list">
       <ReservationCard
         v-for="reservation in filteredReservations"
-        :key="reservation.id"
+        :key="reservation.booking_id"
         :reservation="reservation"
         @confirm="handleConfirm"
         @decline="handleDecline"
         @edit="openEdit"
         @delete="openDeleteModal"
-        @contact="handleContact"
       />
     </div>
 
@@ -153,7 +170,6 @@ function handleContact(reservation) {
       @save="handleSave"
     />
   </div>
-  
   <FooterModal/>
 </template>
 

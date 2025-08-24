@@ -26,10 +26,10 @@ const details = computed(() => props.reservation || {})
       </div>
       <div class="modal-body">
         <div class="guest-info-box">
-          <div><strong>Guest:</strong> {{ details.guest }}</div>
-          <div><strong>Hotel:</strong> {{ details.hotel }}</div>
-          <div><strong>Dates:</strong> {{ details.checkIn }} → {{ details.checkOut }}</div>
-          <div><strong>Total:</strong> ${{ details.total }}</div>
+          <div><strong>Guest:</strong> {{ details.guest_name }}</div>
+          <div><strong>Hotel:</strong> {{ details.accommodation_name }}</div>
+          <div><strong>Dates:</strong> {{ details.check_in_date }} → {{ details.check_out_date }}</div>
+          <div><strong>Total:</strong> ${{ details.total_price }}</div>
         </div>
         <div class="warning-section">
           <div class="warning-section-row">
@@ -44,7 +44,7 @@ const details = computed(() => props.reservation || {})
         </div>
         <div class="modal-actions">
           <button @click="$emit('close')" class="btn btn-secondary">Keep Confirmed</button>
-          <button @click="$emit('delete', details.id)" class="btn btn-danger">Cancel Reservation</button>
+          <button @click="$emit('delete', details.booking_id)" class="btn btn-danger">Cancel Reservation</button>
         </div>
       </div>
     </div>

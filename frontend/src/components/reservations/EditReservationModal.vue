@@ -1,32 +1,32 @@
 <script setup>
 import { ref, watch } from 'vue'
 import calendarSvg from '@/assets//manageReservationIcons/edit_Check_in_out.svg' 
-import peopleSvg from '@/assets//manageReservationIcons/people.svg'
 import moneySvg from '@/assets//manageReservationIcons/money.svg'
 
-
 const props = defineProps({ reservation: Object })
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['save', 'close'])
 
 const form = ref({
-  id: '',
-  status: 'pending',
-  checkIn: '',
-  checkOut: '',
-  adults: 1,
-  children: 0,
-  total: 0,
-  requirements: '',
+  status: props.reservation.status,
+  check_in_date: props.reservation.check_in_date,
+  check_out_date: props.reservation.check_out_date,
+  total_price: props.reservation.total_price,
+  booking_id: props.reservation.booking_id
 })
 
-watch(() => props.reservation, (val) => {
-  if (val) {
-    form.value = { ...val }
+watch(() => props.reservation, (newVal) => {
+  form.value = {
+    status: newVal.status,
+    check_in_date: newVal.check_in_date,
+    check_out_date: newVal.check_out_date,
+    total_price: newVal.total_price,
+    booking_id: newVal.booking_id
   }
-}, { immediate: true })
+})
 
 function save() {
-  emit('save', { ...form.value })
+  emit('save', { ...form.value }
+  )
 }
 </script>
 
@@ -53,29 +53,14 @@ function save() {
               <img :src="calendarSvg" alt="Check-in" class="svg-label" />
               Check-in
             </label>
-            <input type="date" v-model="form.checkIn" class="form-input" />
+            <input type="date" v-model="form.check_in_date" class="form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">
               <img :src="calendarSvg" alt="Check-out" class="svg-label" />
               Check-out
             </label>
-            <input type="date" v-model="form.checkOut" class="form-input" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <img :src="peopleSvg" alt="Adults" class="svg-label" />
-              Adults
-            </label>
-            <input type="number" min="1" v-model="form.adults" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">
-              Children
-            </label>
-            <input type="number" min="0" v-model="form.children" class="form-input" />
+            <input type="date" v-model="form.check_out_date" class="form-input" />
           </div>
         </div>
         <div class="form-group">
@@ -83,11 +68,7 @@ function save() {
             <img :src="moneySvg" alt="Total" class="svg-label" />
             Total amount
           </label>
-          <input type="number" min="0" v-model="form.total" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Special requirements</label>
-          <textarea v-model="form.requirements" class="form-textarea" placeholder="Enter any special requirements..."></textarea>
+          <input type="number" min="0" v-model="form.total_price" class="form-input" />
         </div>
         <div class="modal-actions">
           <button type="button" @click="$emit('close')" class="btn btn-secondary">Cancel</button>
