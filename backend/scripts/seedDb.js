@@ -1280,6 +1280,11 @@ const seedDatabase = () => {
   });
 };
 
+
+// for each owner, upload a accommodation, rooms, amenities,
+// acmmodation images directory ./images/accommodation
+// rooms images directory ./images/rooms
+
 // Run if called directly
 if (require.main === module) {
   seedDatabase();

@@ -165,8 +165,8 @@
               </div>
               <div class="room_price">
                 <h4>Price</h4>
-                <p class="price">{{ room.price_per_day }}.000</p>
-                <p class="price_unit">VND per day</p>
+                <p class="price">$ {{ room.price_per_day }}</p>
+                <p class="price_unit"> per day</p>
               </div>
             </div>
           </div>
@@ -235,7 +235,20 @@ import { useRoute, useRouter } from 'vue-router'
 import { useBookingStore } from '@/composables/useBooking.js'
 
 const router = useRouter()
-const id = "1"
+const route = useRoute()
+
+// Read accommodation id from route params or query. Keep reactive and refetch when it changes.
+import { ref as vueRef } from 'vue'
+const accommodationId = vueRef(route.params.id || route.query.id || null)
+
+// Update accommodationId when route changes
+watch(() => route.params.id || route.query.id, (newVal) => {
+  accommodationId.value = newVal || null
+  if (accommodationId.value) {
+    loading.value = true
+    fetch_accommodation(accommodationId.value)
+  }
+})
 
 const accommodation = ref(null)
 const loading = ref(true)
@@ -283,12 +296,14 @@ const fetch_accommodation = async (accommodationID) => {
       const rooms = await api.get(`/rooms/accommodation/${accommodationID}`).then(res => res.success ? res.data : [])
 
       for (const room of rooms) {
-        const roomImages = await api.get(`/images/room_images/${room.room_id}`).then(res => res.success ? res.data : [])
-        
-        room.value = {
-          ...room,
-          images: roomImages
-        }
+        const roomImages = await api.get(`/images/room_images/${room.room_id}`)
+          .then(res => res.success ? res.data : [])
+
+        const formattedRoomImages = roomImages.map(img =>
+          formatImageUrl(`http://localhost:3000/images/`, img.image_url)
+        )
+
+        room.images = formattedRoomImages
       }
 
       accommodation.value = {
@@ -358,7 +373,9 @@ const handle_book = () => {
 }
 
 onMounted(() => {
-  fetch_accommodation(id)
+  if (accommodationId.value) {
+    fetch_accommodation(accommodationId.value)
+  }
 })
 </script>
 
@@ -731,22 +748,6 @@ onMounted(() => {
   font-size: 14px;
   font-weight: bold;
 }
-
-/* mabye xóa
-.stars {
-  display: flex;
-  gap: 2px;
-}
-
-.star {
-  color: #E5E5E5;
-  font-size: 16px;
-}
-
-.star.filled {
-  color: #FACC15;
-}
-*/
 
 .review_comment {
   color: #4B5563;

@@ -1,9 +1,21 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { onMounted } from 'vue'
 import ErrorModal from '@/components/ErrorModal.vue'
 import { useError } from '@/composables/useError.js'
+import api from '@/frontend-api-helper.js'
+import { useUserStore } from '../stores/user.js'
 
 const { showError, errorMessage, errorDetails, clearError } = useError()
+
+// Validate server session on app start. If server session is invalid,
+// clear persisted Pinia user state so UI doesn't show stale login.
+onMounted(async () => {
+  const userStore = useUserStore()
+  if (userStore.isLoggedIn && userStore.user) {
+    await userStore.validateSession(api)
+  }
+})
 </script>
 
 <template>

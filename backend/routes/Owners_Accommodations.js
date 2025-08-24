@@ -18,21 +18,22 @@ router.get('/accommodations', requireOwner, (req, res, next) => {
 
   db.all(
     `SELECT 
-      a.name,
-      a.address,
-      a.city,
-      a.country,
-      a.description,
-      a.accommodation_type,
-      a.status,
-      (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) as avg_rating,
-      (SELECT COUNT(*) FROM Reviews WHERE accommodation_id = a.accommodation_id) as review_count,
-      (SELECT COUNT(*) FROM Rooms WHERE accommodation_id = a.accommodation_id) as room_count,
-      (SELECT MIN(price_per_day) FROM Rooms WHERE accommodation_id = a.accommodation_id) as min_price,
-      (SELECT MAX(price_per_day) FROM Rooms WHERE accommodation_id = a.accommodation_id) as max_price
-    FROM Accommodations a
-    WHERE a.owner_id = ?
-    ORDER BY a.created_at DESC`,
+        a.accommodation_id,
+        a.name,
+        a.address,
+        a.city,
+        a.country,
+        a.description,
+        a.accommodation_type,
+        a.status,
+        (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) as avg_rating,
+        (SELECT COUNT(*) FROM Reviews WHERE accommodation_id = a.accommodation_id) as review_count,
+        (SELECT COUNT(*) FROM Rooms WHERE accommodation_id = a.accommodation_id) as room_count,
+        (SELECT MIN(price_per_day) FROM Rooms WHERE accommodation_id = a.accommodation_id) as min_price,
+        (SELECT MAX(price_per_day) FROM Rooms WHERE accommodation_id = a.accommodation_id) as max_price
+        FROM Accommodations a
+        WHERE a.owner_id = ?
+        ORDER BY a.created_at DESC`,
     [owner_id],
     (err, accommodations) => {
       if (err) {
@@ -40,7 +41,7 @@ router.get('/accommodations', requireOwner, (req, res, next) => {
         return responseHelper.error(res, 'Error retrieving accommodations for owner', 500, err.message);
       }
 
-      // If no accommodations are found, return an empty array
+      // If no accommodations are found1, return an empty array
       if (!accommodations || accommodations.length === 0) {
         return responseHelper.success(res, [], 'No accommodations found for this owner');
       }
