@@ -11,9 +11,9 @@ import FooterModal from '@/components/FooterModal.vue'
 
 const bookingStore = useBookingStore()
 
-// onUnmounted(() => {
-//   bookingStore.resetBooking()
-// })
+onUnmounted(() => {
+  bookingStore.resetBooking()
+})
 </script>
 
 <template>

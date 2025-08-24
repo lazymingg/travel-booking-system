@@ -7,6 +7,9 @@ import { useError } from '@/composables/useError.js'
 // Trong component Login.vue
 import { useUserStore } from '../../stores/user.js'
 
+import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
+
 const userStore = useUserStore()
 
 const email = ref('')
@@ -38,10 +41,11 @@ const handleLogin = async () => {
 </script>
 
 <template>
+  <HeaderModal/>
   <div class="main-bg">
     <div class="main-container">
       <div class="sign-in-form">
-        <h2 class="form-title">Đăng nhập</h2>
+        <h2 class="form-title">Sign In</h2>
         <form @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="email">Email</label>
@@ -51,7 +55,7 @@ const handleLogin = async () => {
             <label for="password">Mật khẩu</label>
             <input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu" />
           </div>
-          <button type="submit" class="login-btn">Đăng nhập</button>
+          <button type="submit" class="login-btn">Sign in</button>
         </form>
       </div>
       <div class="hero-image">
@@ -59,6 +63,7 @@ const handleLogin = async () => {
       </div>
     </div>
   </div>
+  <FooterModal/>
 </template>
 
 <style scoped>
