@@ -1,3 +1,15 @@
+  
+<script setup>
+import { useUserStore } from '../../stores/user.js'
+import { storeToRefs } from 'pinia'
+import SignoutPopupModal from './SignoutPopupModal.vue'
+
+const userStore = useUserStore()
+
+const { isLoggedIn, userName, isOwner, isAdmin } = storeToRefs(userStore)
+
+</script>
+
 <template>
   <header class="header">
     <div class="header_content">
@@ -13,6 +25,14 @@
         </template>
 
         <template v-else>
+          <div v-if="isOwner" class="owner_nav_links">
+            <router-link to="/owner-accommodations" class="nav_link">My Accommodations</router-link>
+            <router-link to="/manage-reservations" class="nav_link">Manage Reservations</router-link>
+            <router-link to="/upload-accommodation" class="nav_link">Add New Accommodation</router-link>
+          </div>
+          
+          <router-link v-if="isAdmin" to="/admin-dashboard" class="nav_link">Admin Dashboard</router-link>
+          
           <router-link to="/userProfile" class="nav user_profile">
             <span class="user_name">{{ userName }}</span>
             <div class="profile_icon">👤</div>
@@ -26,17 +46,6 @@
 
 
 </template>
-
-<script setup>
-import { useUserStore } from '../../stores/user.js'
-import { storeToRefs } from 'pinia'
-import SignoutPopupModal from './SignoutPopupModal.vue'
-
-const userStore = useUserStore()
-
-const { isLoggedIn, userName } = storeToRefs(userStore)
-
-</script>
 
 <style scoped>
 .header {
@@ -96,5 +105,11 @@ const { isLoggedIn, userName } = storeToRefs(userStore)
 
 .profile_icon {
   font-size: 1.2rem;
+}
+
+.owner_nav_links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 </style>
