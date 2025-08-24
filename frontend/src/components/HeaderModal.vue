@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <signout-popup-modal v-if="isLoggedIn" />
+    <SignoutPopupModal v-if="isLoggedIn" />
   </header>
 
 

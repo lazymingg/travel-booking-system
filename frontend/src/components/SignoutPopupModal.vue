@@ -1,9 +1,12 @@
 <template>
     <section class = "signout">
-        <img src="@/assets/icons/signout_icon.svg" alt="signout icon" />
+        <img src="../assets/icon/sign_out_icon.svg" alt="signout icon" />
         <p>Sign out</p>
     </section>
 </template>
+
+<script setup>
+</script>
 
 <style scoped>
 </style>
