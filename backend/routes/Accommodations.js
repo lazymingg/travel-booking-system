@@ -282,7 +282,12 @@ router.get('/search', (req, res, next) => {
   
   // Add rating filter
   if (min_rating) {
-      query += ` AND (SELECT AVG(rating) FROM Reviews WHERE accommodation_id = a.accommodation_id) >= ?`;
+      query += ` AND COALESCE(
+      (SELECT AVG(CAST(rating AS REAL)) 
+       FROM Reviews 
+       WHERE accommodation_id = a.accommodation_id), 
+   0) >= ?
+`;
       params.push(parseFloat(min_rating));
   }
   
