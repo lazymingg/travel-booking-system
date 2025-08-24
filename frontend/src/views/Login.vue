@@ -26,9 +26,9 @@ const handleLogin = async () => {
 
     if (result.success) {
       console.log('Login thành công:', result.message);
+      // Lưu toàn bộ thông tin user vào store
+      userStore.login(result.data);
       router.push('/');
-      // Lưu thông tin user vào store
-      userStore.login({ name: result.data.full_name });
     } else {
       console.error('Login thất bại:', result.message);
       handleApiError(result);

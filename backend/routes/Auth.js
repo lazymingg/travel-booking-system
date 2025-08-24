@@ -6,7 +6,7 @@ const router = express.Router();
 
 const db = new sqlite3.Database('./db/db.db');
 
-// Simple login
+//ssimple login
 router.post('/login', (req, res, next) => {
   const { email, password } = req.body;
   
@@ -20,16 +20,30 @@ router.post('/login', (req, res, next) => {
     if (!user || user.password_hash !== password) {
       return responseHelper.error(res, 'Invalid email or password', 401, 'May be email or password is incorrect');
     }
-    
-    // Store user in session
-    req.session.user = {
-      user_id: user.user_id,
-      full_name: user.full_name,
-      email: user.email,
-      role: user.role
-    };
-    
-    return responseHelper.success(res, req.session.user, 'Login successful');
+    db.get('SELECT owner_id FROM Owners WHERE user_id = ?', [user.user_id], (err2, ownerRow) => {
+      if (err2) {
+        console.error('Error checking Owners table for user:', err2.message);
+        // fallback to stored role or default to 'customer'
+        const fallbackRole = user.role || 'customer';
+        req.session.user = {
+          user_id: user.user_id,
+          full_name: user.full_name,
+          email: user.email,
+          role: fallbackRole
+        };
+        return responseHelper.success(res, req.session.user, 'Login successful');
+      }
+
+      const assignedRole = ownerRow ? 'owner' : (user.role || 'customer');
+      req.session.user = {
+        user_id: user.user_id,
+        full_name: user.full_name,
+        email: user.email,
+        role: assignedRole
+      };
+
+      return responseHelper.success(res, req.session.user, 'Login successful');
+    });
   });
 });
 
@@ -66,18 +80,10 @@ router.post('/register', (req, res, next) => {
 // Get current user
 router.get('/me', (req, res) => {
   if (req.session.user) {
-    return responseHelper.success(res, { user: req.session.user.full_name, user_id: req.session.user.user_id}, 'User info retrieved successfully');
+    // Trả về toàn bộ đối tượng user từ session, lồng trong key 'user'
+    return responseHelper.success(res, { user: req.session.user }, 'User info retrieved successfully');
   } else {
     return responseHelper.error(res, 'Not logged in', 401);
-  }
-});
-
-// check if user is owner
-router.get('/is-owner', (req, res) => {
-  if (req.session.user && req.session.user.role === 'owner') {
-    return responseHelper.success(res, { isOwner: true }, 'User is an owner');
-  } else {
-    return responseHelper.success(res, { isOwner: false }, 'User is not an owner');
   }
 });
 
@@ -90,4 +96,15 @@ router.post('/logout', (req, res) => {
     return responseHelper.success(res, null, 'Logout successful');
   });
 });
+
+// log out 
+router.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return responseHelper.error(res, 'Logout failed', 500);
+    }
+    return responseHelper.success(res, null, 'Logout successful');
+  });
+});
+
 module.exports = router;

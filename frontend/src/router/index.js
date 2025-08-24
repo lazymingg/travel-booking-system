@@ -34,11 +34,6 @@ const router = createRouter({
       component: () => import('../views/AboutUs.vue'),
     },
     {
-      path: '/manage-accommodation',
-      name: 'ManageAccommodation',
-      component: () => import('../views/ManageAccommodation.vue'),
-    },
-    {
       path: '/upload-accommodation',
       name: 'UploadAccommodation',
       component: () => import('../views/UploadAccommodation.vue'),

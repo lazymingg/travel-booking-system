@@ -1,3 +1,15 @@
+  
+<script setup>
+import { useUserStore } from '../../stores/user.js'
+import { storeToRefs } from 'pinia'
+import SignoutPopupModal from './SignoutPopupModal.vue'
+
+const userStore = useUserStore()
+
+const { isLoggedIn, userName, isOwner, isAdmin } = storeToRefs(userStore)
+
+</script>
+
 <template>
   <header class="header">
     <div class="header_content">
@@ -13,6 +25,8 @@
         </template>
 
         <template v-else>
+          <router-link v-if="isAdmin" to="/admin-dashboard" class="nav_link">Admin Dashboard</router-link>
+          
           <router-link to="/userProfile" class="nav user_profile">
             <span class="user_name">{{ userName }}</span>
             <div class="profile_icon">👤</div>
@@ -26,17 +40,6 @@
 
 
 </template>
-
-<script setup>
-import { useUserStore } from '../../stores/user.js'
-import { storeToRefs } from 'pinia'
-import SignoutPopupModal from './SignoutPopupModal.vue'
-
-const userStore = useUserStore()
-
-const { isLoggedIn, userName } = storeToRefs(userStore)
-
-</script>
 
 <style scoped>
 .header {

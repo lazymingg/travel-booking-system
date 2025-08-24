@@ -6,16 +6,6 @@ const { requireAuth } = require('../middleware/auth');
 
 const db = new sqlite3.Database('./db/db.db');
 
-//get all users
-// router.get('/', (req, res, next) => {
-//   db.all('SELECT * FROM Users', [], (err, rows) => {
-//     if (err) {
-//       return next(err);
-//     }
-//     responseHelper.success(res, rows);
-//   });
-// });
-
 //get current user info
 router.get('/', requireAuth, (req, res, next) => {
   const id = req.session.user.user_id;
@@ -53,15 +43,19 @@ router.post('/', (req, res, next) => {
 });
 
 // put update user
-router.put('/:id', (req, res, next) => {
-  const { id } = req.params;
-  const { full_name, email, password_hash, phone_number, address, role } = req.body;
+router.put('/:id', requireAuth, (req, res, next) => {
+  // Use session's user id to ensure users can only update their own profile
+  const id = req.session.user && req.session.user.user_id;
+  if (!id) return responseHelper.error(res, 'Not authenticated', 401);
+
+  // Do not accept password updates through this endpoint
+  const { full_name, email, phone_number, address, role } = req.body;
   const updated_at = new Date().toISOString();
 
   db.run(
-    `UPDATE Users SET full_name = ?, email = ?, password_hash = ?, phone_number = ?, address = ?, role = ?, updated_at = ?
+    `UPDATE Users SET full_name = ?, email = ?, phone_number = ?, address = ?, role = ?, updated_at = ?
      WHERE user_id = ?`,
-    [full_name, email, password_hash, phone_number, address, role, updated_at, id],
+    [full_name, email, phone_number, address, role, updated_at, id],
     function (err) {
       if (err) {
         return next(err);
@@ -75,8 +69,10 @@ router.put('/:id', (req, res, next) => {
 });
 
 // delete user
-router.delete('/:id', (req, res, next) => {
-  const { id } = req.params;
+router.delete('/:id', requireAuth, (req, res, next) => {
+  // Only allow deleting own account via session
+  const id = req.session.user && req.session.user.user_id;
+  if (!id) return responseHelper.error(res, 'Not authenticated', 401);
 
   db.run('DELETE FROM Users WHERE user_id = ?', [id], function (err) {
     if (err) {
