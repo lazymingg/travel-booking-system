@@ -57,6 +57,7 @@ router.post('/:accommodationId/rooms', requireOwner, (req, res, next) => {
   });
 });
 
+
 // Get room in accommodation
 // Available in date range
 // Meet the constraint about number of guests
