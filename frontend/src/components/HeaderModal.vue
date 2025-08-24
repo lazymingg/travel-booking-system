@@ -17,11 +17,11 @@ const { isLoggedIn, userName, isOwner, isAdmin } = storeToRefs(userStore)
         <img class="logo_icon" src="../assets/logo.svg" alt="Wego's logo">
       </router-link>
       <div class="header_right">
-        <router-link to="about-us" class="nav_link">About us</router-link>
+        <router-link to="/about-us" class="nav_link">About us</router-link>
 
         <template v-if="!isLoggedIn">
-          <router-link to="Login" class="nav_link">Sign in</router-link>
-          <router-link to="SignUp" class="nav_link">Sign up</router-link>
+          <router-link to="/login" class="nav_link">Sign in</router-link>
+          <router-link to="/signup" class="nav_link">Sign up</router-link>
         </template>
 
         <template v-else>
