@@ -2,14 +2,9 @@
 import previous from '@/assets/bookingIcon/leftArrow.svg'
 import next from '@/assets/bookingIcon/rightArrow.svg'
 
-// props
-const { currentStep, totalSteps } = defineProps({
-  currentStep: { type: Number, required: true },
-  totalSteps: { type: Number, required: true }
-})
+import { useBookingStore } from '@/composables/useBooking'
 
-// emit
-const emit = defineEmits(['prev', 'next'])
+const bookingStore = useBookingStore()
 </script>
 
 <template>
@@ -17,21 +12,21 @@ const emit = defineEmits(['prev', 'next'])
     <!-- Previous arrow -->
     <button
       class="btn btn-nav"
-      :disabled="currentStep === 1"
-      @click="emit('prev')"
+      :disabled="bookingStore.currentStep === 1 || bookingStore.bookingSuccess"
+      @click="bookingStore.prevStep"
       aria-label="Previous step"
       title="Previous"
     >
       <img :src="previous" alt="Previous Step" class="nav-icon">
     </button>
 
-    <span class="step-indicator">Step {{ currentStep }} / {{ totalSteps }}</span>
+    <span class="step-indicator">Step {{ bookingStore.currentStep }} / {{ bookingStore.totalSteps }}</span>
 
     <!-- Next arrow -->
     <button
       class="btn btn-nav"
-      :disabled="currentStep === totalSteps"
-      @click="emit('next')"
+      :disabled="bookingStore.currentStep === bookingStore.totalSteps"
+      @click="bookingStore.nextStep"
       aria-label="Next step"
       title="Next"
     >

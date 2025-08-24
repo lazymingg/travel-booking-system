@@ -7,7 +7,7 @@ const { requireAuth, requireOwner } = require('../middleware/auth');
 const multer = require('multer');
 const router = express.Router();
 
-// Cấu hình Multer cho Room images
+//cấu hình Multer cho Room images
 const roomsDir = path.join(__dirname, '..', 'db', 'images', 'Rooms');
 
 // Ensure destination directory exists
@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
 const roomUpload = multer({ 
   storage: roomStorage, 
   fileFilter, 
-  limits: { fileSize: 5 * 1024 * 1024 } 
+  limits: { fileSize: 20 * 1024 * 1024 } 
 });
 
 const db = new sqlite3.Database('./db/db.db');

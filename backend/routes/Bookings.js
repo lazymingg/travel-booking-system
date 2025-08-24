@@ -53,7 +53,7 @@ router.get('/:id', (req, res, next) => {
   });
 });
 
-//Simple booking creation
+// Simple booking creation
 router.post('/', requireAuth, (req, res, next) => {
   const { accommodation_id, room_id, check_in_date, check_out_date, total_price } = req.body;
   const user_id = req.session.user.user_id;
@@ -193,5 +193,6 @@ router.delete('/:id', (req, res, next) => {
       return responseHelper.success(res, id, 'Booking deleted successfully');
     });
   });
+
 
 module.exports = router;

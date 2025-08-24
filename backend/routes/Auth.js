@@ -35,6 +35,7 @@ router.post('/login', (req, res, next) => {
 
 // Simple register
 router.post('/register', (req, res, next) => {
+  console.log(req.body);
   const { full_name, email, password } = req.body;
   
   if (!full_name || !email || !password) {
@@ -50,8 +51,10 @@ router.post('/register', (req, res, next) => {
     function (err) {
       if (err) {
         if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+          console.log('Email already exists:', email);
           return responseHelper.error(res, 'Email already exists', 409);
         }
+        console.log('Error creating user:', err.message);
         return responseHelper.error(res, 'Error creating user', 500, err.message);
       }
       
@@ -63,7 +66,7 @@ router.post('/register', (req, res, next) => {
 // Get current user
 router.get('/me', (req, res) => {
   if (req.session.user) {
-    return responseHelper.success(res, req.session.user, 'User info retrieved successfully');
+    return responseHelper.success(res, { user: req.session.user.full_name, user_id: req.session.user.user_id}, 'User info retrieved successfully');
   } else {
     return responseHelper.error(res, 'Not logged in', 401);
   }
