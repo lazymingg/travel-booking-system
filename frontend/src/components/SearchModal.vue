@@ -155,7 +155,7 @@ export default {
     apply_filters() {
       const selected_filters = this.get_selected_filters()
       console.log('Selected Filters:', selected_filters);
-      this.$emit('apply-filters', selected_filters)   // Emit filters
+      this.$emit('apply-filters', selected_filters)
       this.$router.push('/accommodations');
     }
   }

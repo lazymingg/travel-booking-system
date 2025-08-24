@@ -1,4 +1,5 @@
 <template>
+  <HeaderModal />
   <div class="main-bg">
     <div class="main-container">
       <div class="profile-section">
@@ -101,6 +102,7 @@ import { useRouter } from 'vue-router'
 import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
 import api from '@/frontend-api-helper.js'
+import HeaderModal from '@/components/HeaderModal.vue'
 const router = useRouter()
 
 // State
