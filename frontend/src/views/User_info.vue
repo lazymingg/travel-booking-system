@@ -21,7 +21,7 @@
       <div v-if="loading" class="card max-w-2xl mx-auto">
         <div class="card-body text-center py-12">
           <div class="loading-spinner mx-auto mb-4"></div>
-          <p class="text-gray-600">Đang tải thông tin...</p>
+          <p class="text-gray-600">Downloading information...</p>
         </div>
       </div>
 
@@ -29,11 +29,11 @@
       <div v-else-if="error" class="card max-w-2xl mx-auto border-red-200">
         <div class="card-body text-center py-12">
           <div class="text-6xl mb-4">⚠️</div>
-          <h3 class="text-xl font-semibold text-red-600 mb-4">Có lỗi xảy ra</h3>
+          <h3 class="text-xl font-semibold text-red-600 mb-4">Error detected</h3>
           <p class="text-gray-600 mb-6">{{ error }}</p>
           <button @click="fetchUserInfo" class="btn btn-primary">
             <span class="btn-icon">🔄</span>
-            Thử lại
+            Try again
           </button>
         </div>
       </div>
@@ -49,13 +49,13 @@
             <div class="card-header">
               <h3 class="text-xl font-semibold flex items-center gap-2">
                 <span class="text-2xl">👤</span>
-                Thông tin cá nhân
+                Personal information
               </h3>
             </div>
             <div class="card-body">
               <div class="grid md:grid-cols-2 gap-6">
                 <div class="info-item-modern">
-                  <label class="info-label">Họ và tên</label>
+                  <label class="info-label">Full name</label>
                   <div class="info-value-modern">{{ userInfo.full_name }}</div>
                 </div>
                 <div class="info-item-modern">
@@ -63,11 +63,11 @@
                   <div class="info-value-modern">{{ userInfo.email }}</div>
                 </div>
                 <div class="info-item-modern">
-                  <label class="info-label">Số điện thoại</label>
+                  <label class="info-label">Phone number</label>
                   <div class="info-value-modern">{{ userInfo.phone_number }}</div>
                 </div>
                 <div class="info-item-modern">
-                  <label class="info-label">Địa chỉ</label>
+                  <label class="info-label">Address</label>
                   <div class="info-value-modern">{{ userInfo.address }}</div>
                 </div>
               </div>
@@ -79,17 +79,17 @@
             <div class="card-header">
               <h3 class="text-xl font-semibold flex items-center gap-2">
                 <span class="text-2xl">📊</span>
-                Thông tin tài khoản
+                Account information
               </h3>
             </div>
             <div class="card-body">
               <div class="grid md:grid-cols-2 gap-6">
                 <div class="info-item-modern">
-                  <label class="info-label">Ngày tạo tài khoản</label>
+                  <label class="info-label">Created date</label>
                   <div class="info-value-modern">{{ formatDate(userInfo.created_at) }}</div>
                 </div>
                 <div class="info-item-modern">
-                  <label class="info-label">Cập nhật lần cuối</label>
+                  <label class="info-label">Latest-update date</label>
                   <div class="info-value-modern">{{ formatDate(userInfo.updated_at) }}</div>
                 </div>
               </div>
@@ -105,21 +105,21 @@
             <div class="card-header">
               <h3 class="text-xl font-semibold text-white flex items-center gap-2">
                 <span class="text-2xl"></span>
-                Chức năng
+                Function
               </h3>
             </div>
             <div class="card-body space-y-3">
               <router-link to="/owner-accommodations" class="btn btn-white w-full">
                 <span class="btn-icon">🏠</span>
-                Chỗ ở của tôi
+                My accommodations
               </router-link>
               <router-link to="/manage-reservations" class="btn btn-white w-full">
                 <span class="btn-icon">📅</span>
-                Quản lý đặt phòng
+                Manage reservations
               </router-link>
               <router-link to="/upload-accommodation" class="btn btn-white w-full">
                 <span class="btn-icon">➕</span>
-                Thêm chỗ ở mới
+                Add a new accommodation
               </router-link>
             </div>
           </div>
@@ -129,18 +129,18 @@
             <div class="card-header">
               <h3 class="text-xl font-semibold flex items-center gap-2">
                 <span class="text-2xl"></span>
-                Quản lý tài khoản
+                Account management
               </h3>
             </div>
             <div class="card-body space-y-3">
               <button @click="showEditModal = true" class="btn btn-primary w-full">
                 <span class="btn-icon">✏️</span>
-                Cập nhật thông tin
+                Edit profile
               </button>
               
               <button @click="manageBookings" class="btn btn-secondary w-full">
                 <span class="btn-icon">📋</span>
-                Quản lý đặt chỗ
+                My bookings
               </button>
             </div>
           </div>
@@ -150,18 +150,18 @@
             <div class="card-header bg-red-50">
               <h3 class="text-xl font-semibold text-red-600 flex items-center gap-2">
                 <span class="text-2xl"></span>
-                Bảo Mật
+                Security
               </h3>
             </div>
             <div class="card-body space-y-3">
               <button @click="handleLogout" class="btn btn-warning w-full">
                 <span class="btn-icon">🚪</span>
-                Đăng xuất
+                Sign out
               </button>
               
               <button @click="showDeleteModal = true" class="btn btn-danger w-full">
                 <span class="btn-icon">🗑️</span>
-                Xóa tài khoản
+                Delete account
               </button>
             </div>
           </div>
@@ -245,9 +245,9 @@ const error = ref(null)
 // Computed
 const roleDisplay = computed(() => {
   const roleMap = {
-    'customer': 'Khách hàng',
-    'admin': 'Quản trị viên',
-    'staff': 'Nhân viên'
+    'customer': 'Customer',
+    'admin': 'Administrator',
+    'staff': 'Staff'
   }
   return roleMap[userInfo.role] || userInfo.role
 })
