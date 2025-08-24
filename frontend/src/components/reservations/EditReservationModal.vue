@@ -1,7 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import calendarSvg from '@/assets//manageReservationIcons/edit_Check_in_out.svg'
-import peopleSvg from '@/assets//manageReservationIcons/people.svg'
+
 import moneySvg from '@/assets//manageReservationIcons/money.svg'
 
 
@@ -16,6 +16,32 @@ const form = ref({
   total_price: 0,
 })
 
+const errorMsg = ref('')
+
+const isValid = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  const totalStr = String(form.value.total_price)
+  const onlyDigits = /^\d+(\.\d+)?$/.test(totalStr)
+  if (!form.value.check_in_date || !form.value.check_out_date) {
+    errorMsg.value = 'Please select both check-in and check-out dates.'
+    return false
+  }
+  if (form.value.check_in_date < today) {
+    errorMsg.value = 'Check-in date must be today or later.'
+    return false
+  }
+  if (form.value.check_in_date >= form.value.check_out_date) {
+    errorMsg.value = 'Check-in date must be before check-out date.'
+    return false
+  }
+  if (!onlyDigits || Number(form.value.total_price) <= 0) {
+    errorMsg.value = 'Total amount must be a positive number and contain no letters.'
+    return false
+  }
+  errorMsg.value = ''
+  return true
+})
+
 watch(() => props.reservation, (val) => {
   if (val) {
     form.value = { ...val }
@@ -23,6 +49,7 @@ watch(() => props.reservation, (val) => {
 }, { immediate: true })
 
 function save() {
+  if (!isValid.value) return // Do not emit if invalid
   emit('save', { ...form.value })
 }
 </script>
@@ -34,6 +61,7 @@ function save() {
         <h2>Edit Reservation</h2>
         <button @click="$emit('close')" class="close-btn">&times;</button>
       </div>
+      <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
       <form @submit.prevent="save">
         <div class="form-group">
           <label class="form-label">Status</label>
@@ -50,14 +78,14 @@ function save() {
               <img :src="calendarSvg" alt="Check-in" class="svg-label" />
               Check-in
             </label>
-            <input type="date" v-model="form.checkIn" class="form-input" />
+            <input type="date" v-model="form.check_in_date" class="form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">
               <img :src="calendarSvg" alt="Check-out" class="svg-label" />
               Check-out
             </label>
-            <input type="date" v-model="form.checkOut" class="form-input" />
+            <input type="date" v-model="form.check_out_date" class="form-input" />
           </div>
         </div>
         <div class="form-group">
@@ -65,11 +93,11 @@ function save() {
             <img :src="moneySvg" alt="Total" class="svg-label" />
             Total amount
           </label>
-          <input type="number" min="0" v-model="form.total" class="form-input" />
+          <input type="number" min="0" v-model="form.total_price" class="form-input" />
         </div>
         <div class="modal-actions">
           <button type="button" @click="$emit('close')" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary" :disabled="!isValid">Save changes</button>
         </div>
       </form>
     </div>
@@ -77,6 +105,14 @@ function save() {
 </template>
 
 <style scoped>
+.error-message {
+  color: #EF4444;
+  background: #fee2e2;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
 .svg-label {
   width: 1.25em;
   height: 1.25em;
