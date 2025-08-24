@@ -4,6 +4,10 @@ import { useRouter } from 'vue-router'
 
 import api from '@/frontend-api-helper.js'
 import { useError } from '@/composables/useError.js'
+// Trong component Login.vue
+import { useUserStore } from '../../stores/user.js'
+
+const userStore = useUserStore()
 
 const email = ref('')
 const password = ref('')
@@ -19,7 +23,9 @@ const handleLogin = async () => {
 
     if (result.success) {
       console.log('Login thành công:', result.message);
-      router.push('/userProfile');
+      router.push('/');
+      // Lưu thông tin user vào store
+      userStore.login({ name: result.data.full_name });
     } else {
       console.error('Login thất bại:', result.message);
       handleApiError(result);
