@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
 import api from '@/frontend-api-helper'
-import { useBookingStore } from '@/composables/useBooking'
 
 import RoomDetail from '@/components/booking/RoomDetail.vue';
 
@@ -10,8 +9,6 @@ const error = ref(null);
 const rooms = ref([])
 
 const emit = defineEmits(['reserve-RoomList'])
-
-const bookingStore  = useBookingStore();
 
 const props = defineProps({
   filter: {
@@ -27,6 +24,8 @@ const fetchRooms = async () => {
     error.value = null;
 
     const accommodationId = props.filter.accommodation_id
+
+    console.log('Accommodation ID:', accommodationId)
 
     const params = {
       check_in_date: props.filter.check_in_date,
@@ -53,7 +52,7 @@ const fetchRooms = async () => {
         accommodationId: accommodationId,
         roomId: room.room_id,
         numberBeds: room.number_bed || 0,
-        numberGuests: props.filter.number_guest || 0,
+        numberGuests: room.number_guest || 0,
         description: room.description || '',
         amenities: amenities,
         price: room.price_per_day || 0,
@@ -133,14 +132,22 @@ watch(
       </thead>
     </table>
 
-    <RoomDetail
-      v-for="room in rooms"
-      :key="room.roomId"
-      :room="room"
-      @reserve="handleReserve"
-    />
-    <div v-if="rooms.length === 0" class="empty">
+    <div v-if="props.filter?.number_guest <= 0" class="error">
+      Invalid number of guests
+    </div>
+
+    <div v-else-if="rooms.length === 0" class="empty">
       No rooms available
+    </div>
+
+    <div v-else>
+      <RoomDetail
+          v-for="room in rooms"
+        :key="room.roomId"
+        :room="room"
+        :filter="props.filter"
+        @reserve="handleReserve"
+      />
     </div>
   </div>
 </template>
