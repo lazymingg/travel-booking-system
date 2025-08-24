@@ -283,12 +283,14 @@ const fetch_accommodation = async (accommodationID) => {
       const rooms = await api.get(`/rooms/accommodation/${accommodationID}`).then(res => res.success ? res.data : [])
 
       for (const room of rooms) {
-        const roomImages = await api.get(`/images/room_images/${room.room_id}`).then(res => res.success ? res.data : [])
-        
-        room.value = {
-          ...room,
-          images: roomImages
-        }
+        const roomImages = await api.get(`/images/room_images/${room.room_id}`)
+          .then(res => res.success ? res.data : [])
+
+        const formattedRoomImages = roomImages.map(img =>
+          formatImageUrl(`http://localhost:3000/images/`, img.image_url)
+        )
+
+        room.images = formattedRoomImages
       }
 
       accommodation.value = {
@@ -731,22 +733,6 @@ onMounted(() => {
   font-size: 14px;
   font-weight: bold;
 }
-
-/* mabye xóa
-.stars {
-  display: flex;
-  gap: 2px;
-}
-
-.star {
-  color: #E5E5E5;
-  font-size: 16px;
-}
-
-.star.filled {
-  color: #FACC15;
-}
-*/
 
 .review_comment {
   color: #4B5563;

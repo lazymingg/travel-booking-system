@@ -95,7 +95,7 @@ app.use('/accommodations', accommodationsRoomsImagesRouter);
 app.use('/accommodations', accommodationRoomsRouter);
 app.use('/accommodations', accommodationsAmenitiesRouter);
 app.use('/accommodations', accommodationsBookingsRouter);
-app.use('owners', ownersBookingsRouter);
+// app.use('owners', ownersBookingsRouter);
 
 app.use('/owners', ownersAccommodationsRouter);
 
