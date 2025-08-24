@@ -32,11 +32,5 @@ router.post('/', (req, res) => {
   );
 });
 
-// // Get amenites in a room
-// router.get('/:accommodation_id/:room_id', (req, res) => {
-//   const { accommodationID, roomID } = req.params
-
-  
-// })
 
 module.exports = router;

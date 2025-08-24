@@ -3,49 +3,57 @@
   <search-modal/>
 
   <!-- Image Gallery -->
-  <section class="gallery_section">
-    <div class="container">
-      <div class="gallery">
-        <!-- Ảnh to bên trái -->
-        <div class="main_image" @click="openImagePopup(accommodation.images, 0)">
-          <img :src="accommodation.images[0]" :alt="accommodation.name" />
-        </div>
+  <section v-if="loading">
+    <p>Loading accommodation...</p>
+  </section>
 
-        <!-- 2 ảnh nhỏ bên phải -->
-        <div class="side_images">
-          <div
-            v-for="(image, index) in accommodation.images.slice(1, 3)"
-            :key="index"
-            class="thumbnail"
-            @click="openImagePopup(accommodation.images, index + 1)"
-          >
-            <img :src="image" :alt="`${accommodation.name} image ${index + 2}`" />
+  <section v-else-if="!accommodation">
+    <p>Accommodation not found.</p>
+  </section>
 
-            <!-- Overlay ở ảnh thứ 3 trở đi -->
+  <section v-else>
+    <section v-if = "accommodation.images?.length !== 0" class="gallery_section">
+      <div class="container">
+        <div class="gallery">
+          <!-- Ảnh to bên trái -->
+          <div class="main_image" @click="openImagePopup(accommodation.images, 0)">
+            <img :src="accommodation.images[0]" :alt="accommodation.name" />
+          </div>
+
+          <!-- 2 ảnh nhỏ bên phải -->
+          <div class="side_images">
             <div
-              v-if="index === 1 && accommodation.images.length > 3"
-              class="more_overlay"
+              v-for="(image, index) in accommodation.images.slice(1, 3)"
+              :key="index"
+              class="thumbnail"
+              @click="openImagePopup(accommodation.images, index + 1)"
             >
-              +{{ accommodation.images.length - 3 }}
+              <img :src="image" :alt="`${accommodation.name} image ${index + 2}`" />
+
+              <!-- Overlay ở ảnh thứ 3 trở đi -->
+              <div
+                v-if="index === 1 && accommodation.images.length > 3"
+                class="more_overlay"
+              >
+                +{{ accommodation.images.length - 3 }}
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- Popup Gallery -->
+    <div v-if="showImagePopup" class="popup_overlay" @click.self="closePopup">
+      <button class="close_btn" @click="closePopup">✕</button>
+      <div class="popup_content">
+        <img :src="accommodation.images[current_image_index]" alt="Popup Image" />
+
+        <!-- Điều hướng -->
+        <button class="nav_btn prev" @click.stop="prevImage">‹</button>
+        <button class="nav_btn next" @click.stop="nextImage">›</button>
+      </div>
     </div>
-  </section>
-
-  <!-- Popup Gallery -->
-  <div v-if="showPopup" class="popup_overlay" @click.self="closePopup">
-    <button class="close_btn" @click="closePopup">✕</button>
-    <div class="popup_content">
-      <img :src="accommodation.images[currentIndex]" alt="Popup Image" />
-
-      <!-- Điều hướng -->
-      <button class="nav_btn prev" @click.stop="prevImage">‹</button>
-      <button class="nav_btn next" @click.stop="nextImage">›</button>
-    </div>
-  </div>
-
 
     <!-- Accommodation Info -->
     <section class="info_section">
@@ -70,21 +78,21 @@
           <p class="address">{{ accommodation.address }}</p>
         </div>
 
-        <!-- Facilities -->
-        <div class="info_card">
-          <h3 class="info_title">Facilities</h3>
-          <div class="facilities_grid">
+        <!-- amenities -->
+        <div v-if="accommodation.amenities.length !== 0" class="info_card">
+          <h3 class="info_title">Amenities</h3>
+          <div class="amenities_grid">
             <div 
-              v-for="facility in accommodation.facilities" 
-              :key="facility.name"
-              class="facility_item"
+              v-for="amenity in accommodation.amenities" 
+              :key="amenity.name"
+              class="amenity_item"
             >
               <img
-                class="facility_icon"
-                :src="getFacilityIcon(facility.icon_name)" 
-                :alt="facility.name" 
+                class="amenity_icon"
+                :src="get_amenities_icon(amenity.icon_name)" 
+                :alt="amenity.name" 
               />
-              <span class="facility_name">{{ facility.name }}</span>
+              <span class="amenity_name">{{ amenity.name }}</span>
             </div>
           </div>
         </div>
@@ -95,18 +103,18 @@
     <section class="rooms_section">
       <div class="container">
         <h2 class="section_title">Rooms</h2>
-        <div class="rooms_list">
+        <div v-if="accommodation.rooms?.length > 0" class="rooms_list">
           <div 
             v-for="(room, index) in accommodation.rooms" 
             :key="index"
             class="room_card"
           >
-            <h3 class="room_title">Room {{ index + 1 }}</h3>
+            <h3 class="room_title">Room {{ room.room_id }}</h3>
             <div class="room_content">
               
               <!-- Room Images -->
               <div class="room_image">
-                <div class="room_image_grid">
+                <div v-if="accommodation.rooms.images?.length >0" class="room_image_grid">
                   <div
                     v-for="(img, img_index) in room.images.slice(0, 4)"
                     :key="img_index"
@@ -117,10 +125,10 @@
                     
                     <!-- Overlay ở ảnh thứ 3 -->
                     <div 
-                      v-if="img_index === 3 && room.images.length > 3" 
+                      v-if="img_index === 3 && room.images.length > 4" 
                       class="room_image_overlay"
                     >
-                      {{ room.images.length - 2 }}+
+                      +{{ room.images.length - 4 }}
                     </div>
                   </div>
                 </div>
@@ -132,32 +140,32 @@
 
                 <!-- Ảnh đang xem -->
                 <img 
-                  :src="selectedRoomImages[currentImageIndex]" 
-                  :alt="`Room image ${currentImageIndex+1}`" 
+                  :src="selectedRoomImages[current_image_index]" 
+                  :alt="`Room image ${current_image_index+1}`" 
                   class="popup_img_large"
                 />
 
                 <!-- Điều hướng -->
-                <button v-if="currentImageIndex > 0" class="nav_btn left" @click="prevImage">‹</button>
-                <button v-if="currentImageIndex < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
+                <button v-if="current_image_index > 0" class="nav_btn left" @click="prevImage">‹</button>
+                <button v-if="current_image_index < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
 
                 <!-- Số ảnh -->
                 <div class="image_counter">
-                  {{ currentImageIndex + 1 }} / {{ selectedRoomImages.length }}
+                  {{ current_image_index + 1 }} / {{ selectedRoomImages.length }}
                 </div>
               </div>
 
               <div class="room_detail">
                 <h4>Room Details</h4>
-                <p> {{ room.detail }}</p>
+                <p> {{ room.description }}</p>
               </div>
               <div class="room_guests">
                 <h4>Capacity</h4>
-                <p>{{ room.maxGuests }}</p>
+                <p>{{ room.number_guest }}</p>
               </div>
               <div class="room_price">
                 <h4>Price</h4>
-                <p class="price">{{ formatPrice(room.price) }}</p>
+                <p class="price">{{ formatPrice(room.price_per_day) }}</p>
                 <p class="price_unit">per day</p>
                 <button class="book_btn">Book now</button>
               </div>
@@ -167,39 +175,39 @@
       </div>
     </section>
 
-    <!-- Ratings Section -->
-    <section class="ratings_section">
+    <!-- Reviews Section -->
+    <section class="reviews_section">
       <div class="container">
-        <h2 class="section_title">Ratings</h2>
-        <div class="ratings_list">
+        <h2 class="section_title">Reviews</h2>
+        <div v-if="accommodation.reviews?.length !== 0" class="reviews_list">
           <div 
-            v-for="(rating, index) in accommodation.ratings" 
+            v-for="(review, index) in accommodation.reviews" 
             :key="index"
-            class="rating_card"
+            class="review_card"
           >
-            <div class="rating_header">
-              <span class="username">{{ rating.username }}</span>
-                <span class="rating_score">{{ rating.score }}</span>
+            <div class="review_header">
+              <span class="username">{{ review.username }}</span>
+                <span class="review_score">{{ review.score }}</span>
             </div>
-            <p class="rating_comment">{{ rating.comment }}</p>
+            <p class="review_comment">{{ review.comment }}</p>
 
-            <!-- Rating Images -->
-            <div class="rating_images">
-              <div class="rating_images_row">
+            <!-- review Images -->
+            <div class="review_images">
+              <div class="review_images_row">
                 <div
-                  v-for="(img, imgIndex) in rating.images.slice(0, 5)"
+                  v-for="(img, imgIndex) in review.images.slice(0, 5)"
                   :key="imgIndex"
-                  class="rating_image_item"
-                  @click="openImagePopup(rating.images, imgIndex)"
+                  class="review_image_item"
+                  @click="openImagePopup(review.images, imgIndex)"
                 >
-                  <img :src="img" :alt="`Rating image ${imgIndex + 1}`" />
+                  <img :src="img" :alt="`review image ${imgIndex + 1}`" />
 
                   <!-- Overlay ở ảnh thứ 5 -->
                   <div
-                    v-if="imgIndex === 4 && rating.images.length > 5"
-                    class="rating_image_overlay"
+                    v-if="imgIndex === 4 && review.images.length > 5"
+                    class="review_image_overlay"
                   >
-                    +{{ rating.images.length - 4 }}
+                    +{{ review.images.length - 4 }}
                   </div>
                 </div>
               </div>
@@ -209,6 +217,8 @@
         </div>
       </div>
     </section>
+
+  </section>
   <footer-modal/>
 </template>
 
@@ -216,30 +226,60 @@
 import HeaderModal from '@/components/HeaderModal.vue';
 import FooterModal from '@/components/FooterModal.vue';
 import SearchModal from '@/components/SearchModal.vue';
-import hero_img from "@/assets/hero-img-singin.jpg";
 import info_icon from "@/assets/icon/info_icon.svg";
 import address_icon from "@/assets/icon/address_icon.svg";
 
-import { ref, onMounted } from 'vue'
+import { ref, watch, onUnmounted, onMounted } from 'vue'
+import api from '@/frontend-api-helper.js'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const accommodationId = route.params.id
+const id = "1"
 
-// Props để nhận tên accommodation từ trang list
-const props = defineProps({
-  accommodationId: {
-    type: String,
-    default: 'default_accommodation'
+const accommodation = ref(null)
+const loading = ref(true)
+
+const to_snake_case = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, "_")   // thay khoảng trắng bằng _
+    .replace(/[^\w_]/g, "") + "_icon"// bỏ ký tự đặc biệt (nếu có)
+}
+
+const fetch_accommodation = async (accommodationID) => {
+  try {
+    const result = await api.get(`/accommodations/${accommodationID}`)
+    if (result.success) {
+      const data = result.data
+
+      if (Array.isArray(data.amenities)) {
+        data.amenities = data.amenities.map(a => ({
+          ...a,
+          icon_name: to_snake_case(a.name)
+        }))
+      }
+
+      const images = await api.get(`/images/accommodation_images/${accommodationID}`).then(res => res.success ? res.data : [])
+      const rooms = await api.get(`/rooms/accommodation/${accommodationID}`).then(res => res.success ? res.data : [])
+
+      accommodation.value = {
+        ...data,
+        images,
+        rooms
+      };
+
+      console.log('Accommodation:', accommodation.value)
+    } else {
+      console.error('Failed to fetch accommodation:', result.message)
+      accommodation.value = null
+    }
+  } catch (error) {
+    console.error('Error fetching accommodation:', error)
+    accommodation.value = null
+  } finally {
+    loading.value = false
   }
-})
-
-// Reactive data
-const searchData = ref({
-  destination: 'Ho Chi Minh City',
-  checkIn: '',
-  checkOut: ''
-})
+}
 
 const modules = import.meta.glob("@/assets/AmenityIcons/*.svg", { eager: true });
 
@@ -250,129 +290,39 @@ const amenities_icons = Object.entries(modules).map(([path, module]) => {
   };
 });
 
-const getFacilityIcon = (iconName) => {
-  const found = amenities_icons.find(icon => icon.name === iconName)
+const get_amenities_icon = (amenityName) => {
+  if (!amenityName) return ""
+  const found = amenities_icons.find(icon => icon.name === amenityName)
   return found ? found.src : ""
 }
 
 const showImagePopup = ref(false)
 const selectedRoomImages = ref([])
-const currentImageIndex = ref(0)
+const current_image_index = ref(0)
 
 const openImagePopup = (images, startIndex = 0) => {
   selectedRoomImages.value = images
-  currentImageIndex.value = startIndex
+  current_image_index.value = startIndex
   showImagePopup.value = true
 }
 
 const closeImagePopup = () => {
   showImagePopup.value = false
   selectedRoomImages.value = []
-  currentImageIndex.value = 0
+  current_image_index.value = 0
 }
 
 const nextImage = () => {
-  if (currentImageIndex.value < selectedRoomImages.value.length - 1) {
-    currentImageIndex.value++
+  if (current_image_index.value < selectedRoomImages.value.length - 1) {
+    current_image_index.value++
   }
 }
 
 const prevImage = () => {
-  if (currentImageIndex.value > 0) {
-    currentImageIndex.value--
+  if (current_image_index.value > 0) {
+    current_image_index.value--
   }
 }
-
-
-const accommodation = ref({
-  id: "ac1",
-  name: "Accommodation's name",
-  description: "Provide a brief description for this accommodation",
-  address: "XX, Street XX, Ward XX, Province XX, City XX, Vietnam",
-  images: [
-    hero_img,
-    hero_img, 
-    hero_img
-  ],
-  facilities: [
-    { name: "Free wifi", icon_name: "wifi_icon" },
-    { name: "Restaurant", icon_name: "dish_icon" },
-    { name: "Gym", icon_name: "gym_icon" },
-    { name: "Swimming pool", icon_name: "pool_icon" },
-    { name: "Smoking room", icon_name: "smoking_icon" },
-    { name: "Sauna", icon_name: "sauna_icon" },
-    { name: "Parking lot", icon_name: "parking_icon" },
-    { name: "Spa", icon_name: "spa_icon" }
-  ],
-  rooms: [
-    {
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 2000
-    },
-    {
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 30
-    },
-    {
-      images: [
-
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 25
-    }
-  ],
-  ratings: [
-    {
-      username: "User name",
-      score: 4.5,
-      comment: "Provide your comments here",
-      images: [
-  
-      ],
-    },
-    {
-      username: "User name",
-      score: 4.5,
-      comment: "Provide your comments here",
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-    },
-    {
-      username: "User name",
-      score: 4.8,
-      comment: "Provide your comments here",
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img,
-        hero_img,
-        hero_img
-      ],
-    }
-  ]
-})
-
-
 
 // Methods
 const formatPrice = (price) => {
@@ -383,9 +333,7 @@ const formatPrice = (price) => {
 }
 
 onMounted(() => {
-  // Load accommodation data based on accommodationId
-  console.log('Loading accommodation:', props.accommodationId)
-  console.log(accommodation.value)
+  fetch_accommodation(id)
 })
 </script>
 
@@ -491,20 +439,20 @@ onMounted(() => {
   line-height: 1.6;
 }
 
-.facilities_grid {
+.amenities_grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
 }
 
-.facility_item {
+.amenity_item {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #374151;
 }
 
-.facility_icon {
+.amenity_icon {
   height: 1.5em;
 }
 
@@ -539,7 +487,7 @@ onMounted(() => {
 .room_content {
   display: grid;
   grid-template-columns: 150px 5fr 0.8fr 1.5fr;
-  gap: 10px;
+  gap: 5px;
   align-items: start;
 }
 
@@ -580,6 +528,15 @@ onMounted(() => {
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.room_detail,
+.room_guests,
+.room_price {
+  height: 100%;
+  border: 1px solid #969696; /* Sửa lại cú pháp: màu, kiểu, độ dày */
+  padding: 10px;
+  border-radius: 5px;
 }
 
 /* Popup Fullscreen */
@@ -712,12 +669,12 @@ onMounted(() => {
   background-color: #1D4ED8;
 }
 
-/* Ratings Section */
-.ratings_section {
+/* reviews Section */
+.reviews_section {
   padding: 32px 0;
 }
 
-.rating_card {
+.review_card {
   background: white;
   border: 1px solid #E5E5E5;
   border-radius: 8px;
@@ -725,7 +682,7 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.rating_header {
+.review_header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -738,7 +695,7 @@ onMounted(() => {
   color: #111827;
 }
 
-.rating_score {
+.review_score {
   background-color: #FACC15;
   color: #2563EB;
   padding: 4px 8px;
@@ -761,31 +718,31 @@ onMounted(() => {
   color: #FACC15;
 }
 
-.rating_comment {
+.review_comment {
   color: #4B5563;
   margin-bottom: 16px;
   line-height: 1.6;
 }
 
-.rating_images {
+.review_images {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.rating_image {
+.review_image {
   width: 60px;
   height: 60px;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.rating_images_row {
+.review_images_row {
   display: flex;
   gap: 6px;
 }
 
-.rating_image_item {
+.review_image_item {
   position: relative;
   width: 80px; /* bạn chỉnh kích thước theo ý */
   height: 80px;
@@ -794,14 +751,14 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.rating_image_item img {
+.review_image_item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.rating_image_overlay {
+.review_image_overlay {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.6);
