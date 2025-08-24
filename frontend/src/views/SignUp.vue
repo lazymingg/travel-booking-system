@@ -5,6 +5,9 @@ import { useRouter } from 'vue-router'
 import api from '@/frontend-api-helper.js'
 import { useError } from '@/composables/useError.js'
 
+import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
+
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
@@ -40,6 +43,7 @@ const handleSignUp = async () => {
 </script>
 
 <template>
+  <HeaderModal/>
   <div class="main-bg">
     <div class="main-container">
       <div class="sign-in-form">
@@ -69,6 +73,7 @@ const handleSignUp = async () => {
       </div>
     </div>
   </div>
+  <FooterModal/>
 </template>
 
 <style scoped>

@@ -1,4 +1,5 @@
 <template>
+  <HeaderModal/>
   <div class="main-bg">
     <div class="main-container">
       <div class="profile-section">
@@ -59,20 +60,44 @@
           </div>
 
           <div v-if="!loading && !error" class="action-buttons">
-            <button @click="showEditModal = true" class="btn btn-primary">
-              <span class="btn-icon">✏️</span>
-              Cập nhật thông tin
-            </button>
+            <div v-if="isOwner" class="owner-actions">
+              <h3 class="actions-title">Chức năng Chủ sở hữu</h3>
+              <router-link to="/owner-accommodations" class="btn btn-owner">
+                <span class="btn-icon">🏠</span>
+                Chỗ ở của tôi
+              </router-link>
+              <router-link to="/manage-reservations" class="btn btn-owner">
+                <span class="btn-icon">📅</span>
+                Quản lý Đặt phòng
+              </router-link>
+              <router-link to="/upload-accommodation" class="btn btn-owner">
+                <span class="btn-icon">➕</span>
+                Thêm chỗ ở mới
+              </router-link>
+            </div>
+            
+            <div class="user-actions">
+              <h3 class="actions-title">Quản lý tài khoản</h3>
+              <button @click="showEditModal = true" class="btn btn-primary">
+                <span class="btn-icon">✏️</span>
+                Cập nhật thông tin
+              </button>
 
-            <button @click="manageBookings" class="btn btn-secondary">
-              <span class="btn-icon">📋</span>
-              Quản lý đặt chỗ
-            </button>
+              <button @click="manageBookings" class="btn btn-secondary">
+                <span class="btn-icon">📋</span>
+                Quản lý đặt chỗ
+              </button>
 
-            <button @click="showDeleteModal = true" class="btn btn-danger">
-              <span class="btn-icon">🗑️</span>
-              Xóa tài khoản
-            </button>
+              <button @click="handleLogout" class="btn btn-warning">
+                <span class="btn-icon">🚪</span>
+                Đăng xuất
+              </button>
+
+              <button @click="showDeleteModal = true" class="btn btn-danger">
+                <span class="btn-icon">🗑️</span>
+                Xóa tài khoản
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -93,6 +118,7 @@
       @delete="handleDeleteAccount"
     />
   </div>
+  <FooterModal/>
 </template>
 
 <script setup>
@@ -100,8 +126,15 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
+import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
 import api from '@/frontend-api-helper.js'
+import { useUserStore } from '../../stores/user.js'
+import { storeToRefs } from 'pinia'
+
 const router = useRouter()
+const userStore = useUserStore()
+const { isOwner } = storeToRefs(userStore)
 
 // State
 
@@ -171,9 +204,74 @@ const fetchUserInfo = async () => {
 };
 
 // Actions
-const handleUpdateProfile = (updatedData) => {
-  Object.assign(userInfo, updatedData)
-  alert('Cập nhật thông tin thành công!')
+const handleUpdateProfile = async (updatedData) => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Sử dụng endpoint phù hợp với backend
+    // Backend sử dụng session để xác định user_id, nên có thể dùng ID từ userInfo hoặc endpoint cố định
+    const endpoint = userInfo.user_id ? `/users/${userInfo.user_id}` : '/users/me'
+    
+    const result = await api.put(endpoint, {
+      full_name: updatedData.full_name,
+      email: updatedData.email,
+      phone_number: updatedData.phone_number,
+      address: updatedData.address,
+      role: updatedData.role
+    })
+
+    console.log('Update profile result:', result)
+
+    if (result.success) {
+      // Cập nhật dữ liệu local
+      Object.assign(userInfo, updatedData)
+      
+      // Cập nhật dữ liệu trong Pinia store nếu cần
+      if (userStore.user) {
+        userStore.user = { ...userStore.user, ...updatedData }
+      }
+      
+      alert('Cập nhật thông tin thành công!')
+      showEditModal.value = false
+    } else {
+      error.value = result.message || result.error || 'Có lỗi xảy ra khi cập nhật thông tin'
+      alert('Lỗi: ' + error.value)
+    }
+  } catch (err) {
+    console.error('Update profile error:', err)
+    error.value = 'Không thể kết nối đến server. Vui lòng thử lại.'
+    alert('Lỗi: ' + error.value)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleLogout = async () => {
+  try {
+    const confirmLogout = confirm('Bạn có chắc chắn muốn đăng xuất?')
+    if (!confirmLogout) return
+
+    // Gọi API đăng xuất (nếu có)
+    try {
+      await api.post('/auth/logout')
+    } catch (err) {
+      console.warn('Logout API error:', err)
+      // Tiếp tục đăng xuất local ngay cả khi API lỗi
+    }
+
+    // Xóa thông tin user khỏi store
+    userStore.logout()
+    
+    // Chuyển hướng về trang chủ
+    router.push('/')
+    
+  } catch (err) {
+    console.error('Logout error:', err)
+    // Vẫn thực hiện đăng xuất local nếu có lỗi
+    userStore.logout()
+    router.push('/')
+  }
 }
 
 const manageBookings = () => {
@@ -362,6 +460,16 @@ onMounted(fetchUserInfo)
   box-shadow: 0 0.25rem 0.75rem rgba(255, 107, 107, 0.4);
 }
 
+.btn-warning {
+  background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+  color: var(--vt-c-white);
+}
+
+.btn-warning:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(255, 167, 38, 0.4);
+}
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -461,10 +569,48 @@ onMounted(fetchUserInfo)
   .info-value {
     font-size: 1rem;
   }
+}
 
-  .btn {
-    font-size: 0.75rem;
-  }
+/* Thêm CSS cho các phần owner actions và user actions */
+.owner-actions, .user-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9375rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.actions-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.btn-owner {
+  background: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-owner:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(149, 153, 226, 0.4);
 }
 
 .loading-state, .error-state {

@@ -34,14 +34,14 @@ const router = createRouter({
       component: () => import('../views/AboutUs.vue'),
     },
     {
-      path: '/manage-accommodation',
-      name: 'ManageAccommodation',
-      component: () => import('../views/ManageAccommodation.vue'),
-    },
-    {
       path: '/upload-accommodation',
       name: 'UploadAccommodation',
       component: () => import('../views/UploadAccommodation.vue'),
+    },
+    {
+      path: '/owner-accommodations',
+      name: 'OwnerAccommodations',
+      component: () => import('../views/OwnerAccommodations.vue'),
     },
      {
       path: '/about-us',
@@ -59,9 +59,19 @@ const router = createRouter({
       component: () => import('../views/Booking.vue'),
     },
     {
-      path: '/detail',
+      path: '/detail/:id',
       name: 'DetailPage',
       component: () => import('../views/DetailAccommodation.vue'),
+    },
+    {
+      path: '/test',
+      name: 'TestPage',
+      component: () => import('../views/test.vue'),
+    },
+    {
+      path: '/multer',
+      name: 'MULTER',
+      component: () => import('../views/Multer.vue'),
     },
     {
       path: '/signup',
