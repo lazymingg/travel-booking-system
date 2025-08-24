@@ -5,11 +5,11 @@ export const useBookingStore = defineStore('booking', () => {
   const currentStep = ref(1);
   const totalSteps = ref(2);
   const bookingSuccess = ref(false);
-  const reserveComplete = ref(false);
 
   const bookingDetails = ref({
     accommodationId: 0,
     roomId: 0,
+    ownerId: 0,
     numberBeds: 0,
     numberGuests: 0,
     description: '',
@@ -35,8 +35,9 @@ export const useBookingStore = defineStore('booking', () => {
     bookingSuccess.value = true;
   }
 
-  function restartBooking() {
+  function resetBooking() {
     bookingSuccess.value = false;
+    currentStep.value = 1;
   }
 
   function setBookingDetails(details) {
@@ -50,11 +51,10 @@ export const useBookingStore = defineStore('booking', () => {
     totalSteps,
     bookingSuccess,
     bookingDetails,
-    reserveComplete,
     nextStep,
     prevStep,
     completeBooking,
     setBookingDetails,
-    restartBooking
+    resetBooking
   }
 })

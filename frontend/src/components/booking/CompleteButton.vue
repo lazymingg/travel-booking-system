@@ -2,22 +2,26 @@
 import { useBookingStore } from '@/composables/useBooking'
 import { storeToRefs } from 'pinia'
 import { useError } from '@/composables/useError'
+import { useRouter } from 'vue-router'
 import api from '@/frontend-api-helper'
 
-const bookingStore = useBookingStore()
-const { bookingDetails } = storeToRefs(bookingStore)
+const bookingStore = useBookingStore();
+const { bookingDetails } = storeToRefs(bookingStore);
+
+const router = useRouter();
 
 const { handleApiError } = useError()
 
 // API
 const handleBooking = async () => {
-  if(!bookingDetails.bookingSuccess) {
+  if(!bookingStore.bookingSuccess) {
     try {
-      const result = await api.post(`/accommodations/${bookingDetails.value.accommodationId}/bookings_temp`, {
+      const result = await api.post(`/accommodations/${bookingDetails.value.accommodationId}/bookings`, {
         room_id : bookingDetails.value.roomId,
         check_in_date: bookingDetails.value.checkInDate,
         check_out_date: bookingDetails.value.checkOutDate,
-        total_price: bookingDetails.value.price
+        total_price: bookingDetails.value.price,
+        owner_id: bookingDetails.value.ownerId
       });
 
       if (result.success) {
@@ -37,7 +41,7 @@ const handleBooking = async () => {
   }
 
   else {
-    window.location.href = '/';
+    router.push({ name: 'HomePage' });
   }
 }
 

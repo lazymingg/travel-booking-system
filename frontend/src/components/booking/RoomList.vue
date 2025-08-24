@@ -5,7 +5,7 @@ import { useBookingStore } from '@/composables/useBooking'
 
 import RoomDetail from '@/components/booking/RoomDetail.vue';
 
-const loading = ref(false);
+const loading = ref(false)
 const error = ref(null);
 const rooms = ref([])
 
@@ -42,7 +42,7 @@ const fetchRooms = async () => {
 
     if (result.success) {
       console.log('Success load rooms:', result.message);
-      const amenitiesList = fetchAmenity(accommodationId);
+      const amenitiesList = await fetchAmenity(accommodationId);
 
       let amenities = [];
       if (amenitiesList.success) {
@@ -55,7 +55,7 @@ const fetchRooms = async () => {
         numberBeds: room.number_bed || 0,
         numberGuests: props.filter.number_guest || 0,
         description: room.description || '',
-        amenities: amenities || [],
+        amenities: amenities,
         price: room.price_per_day || 0,
         checkInDate: props.filter.check_in_date,
         checkOutDate: props.filter.check_out_date
@@ -66,9 +66,13 @@ const fetchRooms = async () => {
       throw new Error(result.error || result.message || 'Unknown error');
     }
 
-  } catch (err) {
+  } 
+  
+  catch (err) {
     error.value = 'Failed to load rooms: ' + err.message;
-  } finally {
+  }
+
+  finally {
     loading.value = false;
   }
 };
@@ -82,6 +86,8 @@ const fetchAmenity = async (accommodationId) => {
 
     if (result.success) {
       console.log('Success load amenities: ', result.message);
+
+      return result;
     }
 
     else {
@@ -90,11 +96,13 @@ const fetchAmenity = async (accommodationId) => {
   }
 
   catch (err) {
-    error.value = 'Failed to load amenities: ', err.message;
+    error.value = 'Failed to load amenities: ' + err.message;
+
+    return { success: false, error: error.value, data: null};
   }
 
   finally {
-    loading.value = true;
+    loading.value = false;
   }
 };
 
@@ -127,7 +135,7 @@ watch(
 
     <RoomDetail
       v-for="room in rooms"
-      :key="room.room_id"
+      :key="room.roomId"
       :room="room"
       @reserve="handleReserve"
     />

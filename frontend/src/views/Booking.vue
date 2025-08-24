@@ -1,5 +1,6 @@
 <script setup>
 import { useBookingStore } from '@/composables/useBooking'
+import { onUnmounted } from 'vue'
 
 import ProgressBar from '@/components/booking/ProgressBar.vue'
 import NavigationArrow from '@/components/booking/NavigationArrow.vue'
@@ -9,6 +10,10 @@ import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 
 const bookingStore = useBookingStore()
+
+// onUnmounted(() => {
+//   bookingStore.resetBooking()
+// })
 </script>
 
 <template>
@@ -30,7 +35,7 @@ const bookingStore = useBookingStore()
         <SelectionPage/>
       </div>
       <div v-else-if="bookingStore.currentStep === 2">
-        <ConfirmationPage @booking-success="completeBooking"/>
+        <ConfirmationPage/>
       </div>
     </div>
 

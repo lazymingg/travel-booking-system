@@ -1,10 +1,12 @@
 <script setup>
 import greenCheck from '@/assets/bookingIcon/pros.svg'
 
-import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 import { useBookingStore } from '@/composables/useBooking'
 
 const bookingStore = useBookingStore()
+
+const error = ref(null)
 
 const props = defineProps({
   room: {
@@ -16,10 +18,15 @@ const props = defineProps({
 const emit = defineEmits(['reserve']);
 const priceNote = '* including taxes and charges';
 
-const handleClickReserve = () => {
+const handleClickReserve = async () => {
+  console.log("Click reserve room: ", props.room)
+
+  const owner = await fetchOwner(props.room.accommodationId, props.room.roomId);
+
   bookingStore.setBookingDetails({
     accommodationId: props.room.accommodationId,
     roomId: props.room.roomId,
+    ownerId: owner.owner_id,
     numberBeds: props.room.numberBeds,
     numberGuests: props.room.numberGuests,
     description: props.room.description,
@@ -31,6 +38,30 @@ const handleClickReserve = () => {
 
   bookingStore.nextStep()
 }
+
+// API
+const fetchOwner = async (accommodationId, roomId) => {
+  try {
+    error.value = null;
+    
+    const result = await api.get(`/accommodations/${accommodationId}/rooms/${roomId}/owner`);
+
+    if (result.success) {
+      console.log('Success load owner: ', result.message);
+      return result;
+    } 
+    
+    else {
+      throw new Error(result.error || result.message || 'Unknown error');
+    }
+  } 
+  
+  catch (err) {
+    error.value = 'Failed to load owner: ' + err.message;
+    return { success: false, data: null};
+  } 
+};
+
 </script>
 
 <template>
@@ -47,9 +78,9 @@ const handleClickReserve = () => {
               </div>
 
               <div class="amenities-list">
-                <div v-for="amenity in room.amenities" :key="amenity" class="amenity-item">
+                <div v-for="amenity in room.amenities" :key="amenity.id" class="amenity-item">
                   <img :src="greenCheck" alt="Green Check" class="check-icon">
-                  {{ amenity }}
+                  {{ amenity.name }}
                 </div>
               </div>
             </div>

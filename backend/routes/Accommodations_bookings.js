@@ -96,4 +96,4 @@ router.patch('/:accommodation_id/bookings/:id', (req, res) => {
   });
 });
 
-module.exports = router;
+module.exports = router
