@@ -54,25 +54,25 @@ const db = new sqlite3.Database('./db/db.db');
 // });
 
 // Simple booking creation
-// router.post('/', requireAuth, (req, res, next) => {
-//   const { accommodation_id, room_id, check_in_date, check_out_date, total_price } = req.body;
-//   const user_id = req.session.user.user_id;
-//   const created_at = new Date().toISOString();
+router.post('/', requireAuth, (req, res, next) => {
+  const { accommodation_id, room_id, check_in_date, check_out_date, total_price } = req.body;
+  const user_id = req.session.user.user_id;
+  const created_at = new Date().toISOString();
 
-//   if (!accommodation_id || !room_id || !check_in_date || !check_out_date || !total_price) {
-//     return responseHelper.validationError(res, 'Missing required booking information');
-//   }
+  if (!accommodation_id || !room_id || !check_in_date || !check_out_date || !total_price) {
+    return responseHelper.validationError(res, 'Missing required booking information');
+  }
 
-//   db.run(
-//     `INSERT INTO Bookings (user_id, accommodation_id, room_id, check_in_date, check_out_date, total_price, created_at)
-//      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-//     [user_id, accommodation_id, room_id, check_in_date, check_out_date, total_price, created_at],
-//     function (err) {
-//       if (err) return next(err);
-//       return responseHelper.success(res, { booking_id: this.lastID }, 'Booking created successfully', 201);
-//     }
-//   );
-// });
+  db.run(
+    `INSERT INTO Bookings (user_id, accommodation_id, room_id, check_in_date, check_out_date, total_price, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [user_id, accommodation_id, room_id, check_in_date, check_out_date, total_price, created_at],
+    function (err) {
+      if (err) return next(err);
+      return responseHelper.success(res, { booking_id: this.lastID }, 'Booking created successfully', 201);
+    }
+  );
+});
 
 // Update booking status
 // router.put('/:id', (req, res, next) => {
@@ -175,5 +175,6 @@ const db = new sqlite3.Database('./db/db.db');
 //     }
 //   );
 // });
+
 
 module.exports = router;

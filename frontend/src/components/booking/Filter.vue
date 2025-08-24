@@ -8,7 +8,7 @@ const showChangeSearch = ref(false)
 // Information in the filter bar
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  accommodation_id: 1,
+  accommodation_id: 13,
   check_in_date: 'YYYY-MM-DD',
   check_out_date: 'YYYY-MM-DD',
   number_guest: 0
@@ -84,7 +84,7 @@ const applyFilter = () => {
           <label class="label">Guests</label>
           <div class="input-wrapper">
             <input
-            v-model="formFilter.capacity"
+            v-model="formFilter.number_guest"
             type="number"
             min="0"
             class="input"
@@ -181,6 +181,8 @@ const applyFilter = () => {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .btn {

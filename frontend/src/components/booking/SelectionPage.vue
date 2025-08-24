@@ -14,7 +14,7 @@ const updateFilter = (newFilter) => {
 <template>
     <Filter @filter="updateFilter"/>
     <div id="room-list">
-        <RoomList v-if="filter" :filter="filter"/>
+        <RoomList :filter="filter"/>
     </div>
 </template>
 

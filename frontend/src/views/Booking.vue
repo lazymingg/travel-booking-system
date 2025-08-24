@@ -1,33 +1,19 @@
 <script setup>
-import { ref } from 'vue'
+import { useBookingStore } from '@/composables/useBooking'
+import { onUnmounted } from 'vue'
 
 import ProgressBar from '@/components/booking/ProgressBar.vue'
 import NavigationArrow from '@/components/booking/NavigationArrow.vue'
 import SelectionPage from '@/components/booking/SelectionPage.vue'
-import DetailBookingPage from '@/components/booking/DetailBookingPage.vue'
 import ConfirmationPage from '@/components/booking/ConfirmationPage.vue'
 import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 
-const currentStep = ref(1)
-const totalSteps = 3
-const bookingSuccess = ref(false)
+const bookingStore = useBookingStore()
 
-function handleNextStep() {
-  if (currentStep.value < totalSteps) {
-    currentStep.value++
-  }
-}
-
-function handlePrevStep() {
-  if (currentStep.value > 1) {
-    currentStep.value--
-  }
-}
-
-const completeBooking = () => {
-  bookingSuccess.value = true
-}
+// onUnmounted(() => {
+//   bookingStore.resetBooking()
+// })
 </script>
 
 <template>
@@ -39,30 +25,27 @@ const completeBooking = () => {
 
     <!-- Progress bar -->
     <ProgressBar 
-      :currentStep="currentStep"
-      :success="bookingSuccess" 
+      :currentStep="bookingStore.currentStep"
+      :success="bookingStore.bookingSuccess" 
     />
 
     <!-- Nội dung theo step -->
     <div class="step-content">
-      <div v-if="currentStep === 1">
+      <div v-if="bookingStore.currentStep === 1">
         <SelectionPage/>
       </div>
-      <div v-else-if="currentStep === 2">
-        <DetailBookingPage/>
-      </div>
-      <div v-else-if="currentStep === 3">
-        <ConfirmationPage @booking-success="completeBooking"/>
+      <div v-else-if="bookingStore.currentStep === 2">
+        <ConfirmationPage/>
       </div>
     </div>
 
     <!-- Navigation buttons -->
     <NavigationArrow 
         class="nav-arrow"
-        :currentStep="currentStep"
-        :totalSteps="totalSteps"
-        @prev="handlePrevStep"
-        @next="handleNextStep"
+        :currentStep="bookingStore.currentStep"
+        :totalSteps="bookingStore.totalSteps"
+        @prev="bookingStore.prevStep"
+        @next="bookingStore.nextStep"
     />
 
     <!-- Footer -->

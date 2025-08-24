@@ -55,7 +55,7 @@ const handleLogin = async () => {
         </form>
       </div>
       <div class="hero-image">
-        <img src="../assets/hero-img-singin.jpg" alt="Hero Image" class="hero-img" />
+        <img src="../assets/hero-img-signin.jpg" alt="Hero Image" class="hero-img" />
       </div>
     </div>
   </div>

@@ -59,6 +59,8 @@ router.post('/:accommodationId/rooms', requireOwner, (req, res, next) => {
 
 
 
+
+
 // Get room in accommodation
 // Available in date range
 // Meet the constraint about number of guests
@@ -267,6 +269,83 @@ router.get('/:accommodationId/rooms', (req, res, next) => {
     }
     return responseHelper.success(res, rooms, `Found ${rooms.length} rooms`);
   });
+});
+
+// Get room in accommodation
+// Available in date range
+// Meet the constraint about number of guests
+router.get('/:accommodationId/available', (req, res, next) => {
+  console.log(req.query)
+
+  // param name in route is :accommodationId
+  const { accommodationId } = req.params;
+  const { check_in_date, check_out_date, number_guest } = req.query;
+  
+  if (!check_in_date || !check_out_date || !number_guest) {
+    const e = new Error('Check-in date, check-out date and capacity are required');
+      e.status = 400;
+      throw e;
+  }
+
+  const query = `
+    SELECT r.* FROM Rooms r
+    WHERE 
+      r.accommodation_id = ? AND r.is_available = 1
+      
+      -- Check capacity
+      AND r.number_guest >= ?
+      
+      -- Except booked rooms
+      AND NOT EXISTS (
+        SELECT 1 FROM Bookings b
+        WHERE b.accommodation_id = ?
+          AND b.status != 'cancelled'
+          AND NOT (b.check_out_date <= ? OR b.check_in_date >= ?)
+      )`;
+
+  db.all(query, 
+    [
+      accommodationId,
+      number_guest,
+      accommodationId,
+      check_in_date, check_out_date
+    ],
+    (err, rows) => {
+      if (err) {
+        console.error("SQL: ", err.message)
+        return next(err)
+      }
+
+      return responseHelper.success(res, rows, 'Available rooms retrieved successfully');
+    }
+  );
+});
+
+
+// Get owner of room
+router.get('/:accommodationId/rooms/:roomId/owner', (req, res, next) => {
+  const { accommodationId, roomId } = req.params;
+
+  const query = `
+    SELECT o.* FROM Owners o
+    JOIN Accommodations a ON o.owner_id = a.owner_id
+    JOIN Rooms r ON a.accommodation_id = r.accommodation_id
+    WHERE r.accommodation_id = ? AND r.room_id = ?`;
+
+
+  db.all(
+    query,
+    [ accommodationId, roomId ],
+    (err, rows) => {
+      if (err) {
+        console.error("SQL: ", err.message);
+        
+        return next(err);
+      }
+
+      return responseHelper.success(res, rows, 'Owner retrieved successfully')
+    }
+  )
 });
 
 module.exports = router;
