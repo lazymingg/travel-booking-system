@@ -1,47 +1,57 @@
- 
+  
   <script setup>
   import HeaderModal from '@/components/HeaderModal.vue';
   import FooterModal from '@/components/FooterModal.vue';
-  import { ref, computed } from 'vue'
-  const tab = ref('users')
+  import DeleteUserModal from '@/components/adminDashboard/DeleteUserModal.vue';
+  import DeleteAccommodationModal from '@/components/adminDashboard/DeleteAccommodationModal.vue';
+
+  import tempImg from '@/assets/Image/Teams/TranCaoVan.jpg'
+  import userIcon from '@/assets/adminDashboardIcons/userIcon.svg'
+  import accommodationIcon from '@/assets/adminDashboardIcons/accommodationIcon.svg'
+  import bookingIcon from '@/assets/adminDashboardIcons/bookingIcon.svg'
+  import revenueIcon from '@/assets/adminDashboardIcons/revenueIcon.svg'
   
+  import { ref, computed } from 'vue';
+
+  const tab = ref('users');
+
   const users = [
-    { id: 1, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Alice', email: 'alice@mail.com', role: 'admin', status: 'active' },
-    { id: 2, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Bob', email: 'bob@mail.com', role: 'user', status: 'inactive' },
-    { id: 3, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Charlie', email: 'charlie@mail.com', role: 'manager', status: 'active' },
-    { id: 4, avatar: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'David', email: 'david@mail.com', role: 'user', status: 'active' },
-  ]
-  
+    { id: 1, avatar: tempImg, name: 'Alice', email: 'alice@mail.com', role: 'admin', status: 'active' },
+    { id: 2, avatar: tempImg, name: 'Bob', email: 'bob@mail.com', role: 'user', status: 'active' },
+    { id: 3, avatar: tempImg, name: 'Charlie', email: 'charlie@mail.com', role: 'manager', status: 'active' },
+    { id: 4, avatar: tempImg, name: 'David', email: 'david@mail.com', role: 'user', status: 'active' },
+  ];
+
   const accommodations = [
-    { id: 1, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Sunrise Hotel', address: '123 Beach Ave', price: 120, status: 'approved' },
-    { id: 2, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Mountain Resort', address: '456 Hill St', price: 180, status: 'pending' },
-    { id: 3, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'City Hostel', address: '789 Main Rd', price: 60, status: 'approved' },
-    { id: 4, image: 'src/assets/Image/Teams/TranCaoVan.jpg', name: 'Lakeview Inn', address: '321 Lake Rd', price: 90, status: 'approved' },
-  ]
-  
+    { id: 1, image: tempImg, name: 'Sunrise Hotel', address: '123 Beach Ave', price: 120, status: 'approved' },
+    { id: 2, image: tempImg, name: 'Mountain Resort', address: '456 Hill St', price: 180, status: 'pending' },
+    { id: 3, image: tempImg, name: 'City Hostel', address: '789 Main Rd', price: 60, status: 'approved' },
+    { id: 4, image: tempImg, name: 'Lakeview Inn', address: '321 Lake Rd', price: 90, status: 'approved' },
+  ];
+
   const bookings = [
     { id: 'B001', guest: 'Alice', property: 'Sunrise Hotel', dates: '2024-06-01 ~ 2024-06-05', status: 'confirmed', total: 480 },
-    { id: 'B002', guest: 'Bob', property: 'Mountain Resort', dates: '2024-06-10 ~ 2024-06-12', status: 'pending', total: 360 },
+    { id: 'B002', guest: 'Bob', property: 'Mountain Resort', dates: '2024-06-10 ~ 2024-06-12', status: 'confirmed', total: 360 },
     { id: 'B003', guest: 'Charlie', property: 'City Hostel', dates: '2024-06-15 ~ 2024-06-16', status: 'completed', total: 60 },
     { id: 'B004', guest: 'David', property: 'Lakeview Inn', dates: '2024-06-20 ~ 2024-06-22', status: 'confirmed', total: 180 },
     { id: 'B005', guest: 'Bob', property: 'Sunrise Hotel', dates: '2024-06-25 ~ 2024-06-27', status: 'completed', total: 240 },
-  ]
-  
+  ];
+
   const statList = computed(() => [
     {
       label: 'Total Users',
       value: users.filter(u => u.role !== 'admin').length,
-      icon: 'src/assets/adminDashboardIcons/userIcon.svg'
+      icon: userIcon
     },
     {
       label: 'Properties',
       value: accommodations.filter(a => a.status === 'approved').length,
-      icon: 'src/assets/adminDashboardIcons/accommodationIcon.svg'
+      icon: accommodationIcon
     },
     {
       label: 'Bookings',
       value: bookings.filter(b => b.status === 'completed' || b.status === 'confirmed').length,
-      icon: 'src/assets/adminDashboardIcons/bookingIcon.svg'
+      icon: bookingIcon
     },
     {
       label: 'Revenue',
@@ -49,11 +59,38 @@
         .filter(b => b.status === 'completed' || b.status === 'confirmed')
         .reduce((sum, b) => sum + b.total, 0)
         .toLocaleString(),
-        icon: 'src/assets/adminDashboardIcons/revenueIcon.svg'
+      icon: revenueIcon
     }
-  ])
+  ]);
+
+  const showSuspendUserModal = ref(false);
+  const selectedUser = ref(null);
+  function openSuspendUser(user) {
+    selectedUser.value = user;
+    showSuspendUserModal.value = true;
+  }
+  function handleSuspendUser({ id, reason }) {
+    const user = users.find(u => u.id === id)
+    if (user) user.status = 'deleted'
+    showSuspendUserModal.value = false;
+    // Add your API call or logic here
+  }
+
+  const showSuspendAccommodationModal = ref(false);
+  const selectedAccommodation = ref(null);
+  function openSuspendAccommodation(acc) {
+    selectedAccommodation.value = acc;
+    showSuspendAccommodationModal.value = true;
+  }
+  function handleSuspendAccommodation({ id, reason }) {
+    const acc = accommodations.find(a => a.id === id)
+    if (acc) acc.status = 'deleted'
+    showSuspendAccommodationModal.value = false;
+    // Add your API call or logic here
+  }
   </script>
-<template>
+
+  <template>
     <HeaderModal/>
     <div class="admin-dashboard">
       <!-- Header Stats -->
@@ -68,20 +105,14 @@
           </div>
         </div>
       </div>
-  
+
       <!-- Tabs -->
       <div class="tabs">
-        <button :class="{active: tab==='users'}" @click="tab='users'">
-          Users
-        </button>
-        <button :class="{active: tab==='accommodations'}" @click="tab='accommodations'">
-          Accommodations
-        </button>
-        <button :class="{active: tab==='bookings'}" @click="tab='bookings'">
-          Bookings
-        </button>
+        <button :class="{active: tab==='users'}" @click="tab='users'">Users</button>
+        <button :class="{active: tab==='accommodations'}" @click="tab='accommodations'">Accommodations</button>
+        <button :class="{active: tab==='bookings'}" @click="tab='bookings'">Bookings</button>
       </div>
-  
+
       <!-- Users Tab -->
       <div v-if="tab==='users'" class="tab-content">
         <h2 class="section-header">User Management</h2>
@@ -93,7 +124,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Status</th>
+                <!-- <th>Status</th> -->
                 <th>Actions</th>
               </tr>
             </thead>
@@ -106,24 +137,34 @@
                 </td>
                 <td>{{ user.email }}</td>
                 <td><span :class="['badge', user.role]">{{ user.role }}</span></td>
-                <td><span :class="['badge', user.status]">{{ user.status }}</span></td>
+                <!-- <td><span :class="['badge', user.status]">{{ user.status }}</span></td> -->
                 <td>
                   <button class="details-btn">
                     <img src="@/assets/adminDashboardIcons/viewIcon.svg" alt="logo" class="svg-icon" />
-                    <span>View Details</span>
+                    <span>View</span>
+                  </button>
+                  <button v-if="user.status !== 'deleted'" class="suspend-btn" @click="openSuspendUser(user)">
+                    <img src="@/assets/adminDashboardIcons/suspendIcon.svg" alt="logo" class="svg-icon" />
+                    <span>Delete</span>
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <DeleteUserModal
+          v-if="showSuspendUserModal"
+          :user="selectedUser"
+          @close="showSuspendUserModal = false"
+          @suspend="handleSuspendUser"
+        />
       </div>
-  
+
       <!-- Accommodations Tab -->
       <div v-if="tab==='accommodations'" class="tab-content">
         <h2 class="section-header">Accommodations</h2>
-        <div class="accommodation-grid">
-          <div class="accommodation-card" v-for="acc in accommodations" :key="acc.id">
+        <div class="accommodation-grid" >
+          <div class="accommodation-card" v-for="acc in accommodations" :key="acc.id" >
             <img :src="acc.image" alt="acc.name" class="acc-img" />
             <div class="acc-content">
               <div class="acc-name">{{ acc.name }}</div>
@@ -132,15 +173,27 @@
                 <div class="acc-price">${{ acc.price }}/night</div>
                 <span :class="['badge', acc.status]">{{ acc.status }}</span>
               </div>
-              <button class="details-btn acc-detail-btn">
-                <img src="@/assets/adminDashboardIcons/viewIcon.svg" alt="logo" class="svg-icon" />
-                <span>View Details</span>
-              </button>
+              <div class="acc-action-group">
+                <button class="details-btn acc-detail-btn">
+                  <img src="@/assets/adminDashboardIcons/viewIcon.svg" alt="logo" class="svg-icon" />
+                  <span>View</span>
+                </button>
+                <button class="suspend-btn acc-suspend-btn" @click="openSuspendAccommodation(acc)">
+                  <img src="@/assets/adminDashboardIcons/suspendIcon.svg" alt="suspend" class="svg-icon" />
+                  <span>Delete</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        <DeleteAccommodationModal
+          v-if="showSuspendAccommodationModal"
+          :acc="selectedAccommodation"
+          @close="showSuspendAccommodationModal = false"
+          @suspend="handleSuspendAccommodation"
+        />
       </div>
-  
+
       <!-- Bookings Tab -->
       <div v-if="tab==='bookings'" class="tab-content">
         <h2 class="section-header">Booking Management</h2>
@@ -173,9 +226,7 @@
       </div>
     </div>
     <FooterModal/>
-  </template>
- 
-  
+  </template>  
   <style>
   :root {
     --background: #FFFFFF;
@@ -364,40 +415,75 @@
   .manager { background: var(--green-100); color: var(--green-800);}
   .user { background: var(--gray-100); color: var(--gray-900);}
   .active, .confirmed, .approved { background: var(--green-100); color: var(--green-800); animation: pulseGreen 1.5s infinite;}
-  .inactive, .cancelled, .suspended { background: var(--red-100); color: var(--red-600); animation: pulseRed 1.5s infinite;}
+  .inactive, .deleted { background: var(--red-100); color: var(--red-600); animation: pulseRed 1.5s infinite;}
   .pending { background: var(--yellow-100); color: var(--yellow-600); animation: pulseYellow 1.5s infinite;}
+
   
   /* View Details Button */
-  .details-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(90deg, #2563EB 60%, #3B82F6 100%);
-    color: #fff;
-    border: none;
-    border-radius: 1rem;
-    padding: 0.5rem 1.2rem;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
-    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-  }
-  .details-btn:hover {
-    background: linear-gradient(90deg, #1E40AF 60%, #2563EB 100%);
-    box-shadow: 0 6px 18px rgba(37,99,235,0.18);
-    transform: scale(1.05);
-  }
-  .acc-detail-btn {
-    margin-top: 1rem;
-    width: fit-content;
-  }
-  .svg-icon {
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
-  }
-  
+  .acc-action-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: space-around;
+}
+
+  .details-btn,
+.suspend-btn,
+.acc-detail-btn,
+.acc-suspend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-width: 110px;
+  max-width: 130px;
+  justify-content: center;
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+.details-btn,
+.acc-detail-btn {
+  background: #2563eb;
+  color: #fff;
+  margin-left: 0.5em; /* Only the first button has no left margin */
+}
+
+.details-btn:hover,
+.acc-detail-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+}
+
+.suspend-btn,
+.acc-suspend-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.suspend-btn:hover,
+.acc-suspend-btn:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 16px rgba(239,68,68,0.18);
+}
+
+.details-btn .svg-icon,
+.suspend-btn .svg-icon,
+.acc-detail-btn .svg-icon,
+.acc-suspend-btn .svg-icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
   /* Accommodation Cards */
   .accommodation-grid {
     display: grid;

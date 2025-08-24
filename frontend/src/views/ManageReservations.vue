@@ -1,65 +1,130 @@
 <script setup>
-// const axious = require('axios');
-import HeaderModal from '@/components/HeaderModal.vue';
-import FooterModal from '@/components/FooterModal.vue';
+import { ref, computed, onMounted } from 'vue'
+import pendingSvg from '@/assets/manageReservationIcons/status/pendingStatus.svg'
+import completedSvg from '@/assets/manageReservationIcons/status/completedStatus.svg'
+import confirmedSvg from '@/assets/manageReservationIcons/status/confirmedStatus.svg'
+import cancelledSvg from '@/assets/manageReservationIcons/status/cancelledStatus.svg'
+import deleteSvg from '@/assets/manageReservationIcons/buttons/deleteButton.svg'
+import confirmSvg from '@/assets/manageReservationIcons/buttons/confirmButton.svg'
+import declineSvg from '@/assets/manageReservationIcons/buttons/declineButton.svg'
+import editSvg from '@/assets/manageReservationIcons/buttons/editButton.svg'
 
-
-import { ref, computed } from 'vue'
+import HeaderModal from '../components/HeaderModal.vue'
+import FooterModal from '../components/FooterModal.vue'
 import ReservationFilter from '../components/reservations/ReservationFilter.vue'
-import ReservationCard from '../components/reservations/ReservationCard.vue'
 import DeleteReservationModal from '../components/reservations/DeleteReservationModal.vue'
 import EditReservationModal from '../components/reservations/EditReservationModal.vue'
 
-const reservations = ref([
-  { id: 'R001', hotel: 'Grand Palace Hotel', guest: 'Alice Nguyen', adults: 2, children: 1, checkIn: '2024-07-01', checkOut: '2024-07-05', total: 500, requirements: 'Late check-in, vegan meals', status: 'pending' },
-  { id: 'R002', hotel: 'Sunrise Resort', guest: 'Bob Tran', adults: 1, children: 0, checkIn: '2024-07-10', checkOut: '2024-07-12', total: 300, requirements: '', status: 'confirmed' },
-  { id: 'R003', hotel: 'Ocean View Inn', guest: 'Carol Le', adults: 2, children: 2, checkIn: '2024-06-20', checkOut: '2024-06-25', total: 700, requirements: 'Baby crib', status: 'cancelled' },
-  { id: 'R004', hotel: 'Mountain Retreat', guest: 'David Pham', adults: 1, children: 0, checkIn: '2024-05-15', checkOut: '2024-05-18', total: 400, requirements: '', status: 'completed' },
-])
+import api from '@/frontend-api-helper.js'
+
+const reservations = ref([])
+const loading = ref(false)
+const error = ref(null)
 
 const activeTab = ref('all')
 const showDeleteModal = ref(false)
 const showEditModal = ref(false)
 const selectedReservation = ref(null)
 
+const statusMap = {
+  completed: { bg: '#F3F4F6', color: '#374151', text: 'Completed', svg: completedSvg },
+  confirmed: { bg: '#dcfce7', color: '#22C55E', text: 'Confirmed', svg: confirmedSvg },
+  pending: { bg: '#FEF3C7', color: '#F59E0B', text: 'Pending', svg: pendingSvg },
+  cancelled: { bg: '#fee2e2', color: '#EF4444', text: 'Cancelled', svg: cancelledSvg },
+}
+
+const fetchReservations = async (status = 'all') => {
+  try {
+    loading.value = true
+    error.value = null
+    const params = status !== 'all' ? `?status=${status}` : ''
+    const result = await api.get(`/owners/bookings${params}`)
+    if (result.success) {
+      reservations.value = result.data
+      console.log('Reservations fetched:', reservations.value)
+    } else {
+      throw new Error(result.message || 'Unknown error')
+    }
+  } catch (err) {
+    error.value = 'Can not upload the reservations: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchReservations('all')
+})
+
+const handleConfirm = async (reservation) => {
+  try {
+    loading.value = true
+    error.value = null
+    const result = await api.put(`/owners/bookings/${reservation.booking_id}/confirm`)
+    if (!result.success) throw new Error(result.message || 'Unknown error')
+    await fetchReservations(activeTab.value)
+  } catch (err) {
+    error.value = 'Can not confirm: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSave = async (updated) => {
+  try {
+    loading.value = true
+    error.value = null
+    const result = await api.put(`/owners/bookings/${updated.booking_id}`, {
+      status: updated.status,
+      check_in_date: updated.checkIn,
+      check_out_date: updated.checkOut,
+      total_price: updated.total
+    })
+    if (!result.success) throw new Error(result.message || 'Unknown error')
+    await fetchReservations(activeTab.value)
+    showEditModal.value = false
+    window.location.reload() // Reload to reflect changes in the UI
+  } catch (err) {
+    error.value = 'Can not update: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleDelete = async (updated) => {
+  try {
+    loading.value = true
+    error.value = null
+    const result = await api.put(`/owners/bookings/${updated.booking_id}/cancel`)
+    if (!result.success) throw new Error(result.message || 'Unknown error')
+    await fetchReservations('cancelled')
+    showDeleteModal.value = false
+  } catch (err) {
+    error.value = 'Can not cancel: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleDecline = async (reservation) => {
+  try {
+    loading.value = true
+    error.value = null
+    const result = await api.delete(`/owners/bookings/${reservation.booking_id}`)
+    if (!result.success) throw new Error(result.message || 'Unknown error')
+    await fetchReservations(activeTab.value)
+  } catch (err) {
+    error.value = 'Can not decline: ' + err.message
+  } finally {
+    loading.value = false
+  }
+}
+
 const filteredReservations = computed(() => {
   if (activeTab.value === 'all') return reservations.value
   return reservations.value.filter(r => r.status === activeTab.value)
 })
 
-const totalRevenue = computed(() => {
-  return reservations.value
-    .filter(r => r.status === 'confirmed' || r.status === 'completed')
-    .reduce((sum, r) => sum + r.total, 0)
-})
-
-// Confirm pending reservation (pending → confirmed) and switch to confirmed tab
-function handleConfirm(reservation) {
-  const idx = reservations.value.findIndex(r => r.id === reservation.id)
-  if (idx !== -1) {
-    reservations.value[idx].status = 'confirmed'
-    // Auto switch to confirmed tab to show the updated reservation
-    activeTab.value = 'confirmed'
-    console.log(`Reservation ${reservation.id} confirmed and moved to Confirmed filter`)
-  }
-}
-
-// Decline pending reservation (removes from list)
-function handleDecline(reservation) {
-  reservations.value = reservations.value.filter(r => r.id !== reservation.id)
-  console.log(`Reservation ${reservation.id} declined and removed`)
-}
-
-// Cancel confirmed reservation (confirmed → cancelled) and switch to cancelled tab
-function handleDelete(reservation) {
-  const idx = reservations.value.findIndex(r => r.id === reservation.id)
-  if (idx !== -1) {
-    reservations.value[idx].status = 'cancelled'
-    // Auto switch to cancelled tab to show the updated reservation
-    activeTab.value = 'cancelled'
-    console.log(`Reservation ${reservation.id} cancelled and moved to Cancelled filter`)
-  }
-}
 
 function openDeleteModal(reservation) {
   selectedReservation.value = { ...reservation }
@@ -71,34 +136,12 @@ function openEdit(reservation) {
   showEditModal.value = true
 }
 
-function confirmDelete(id) {
-  const reservation = reservations.value.find(r => r.id === id)
-  if (reservation) {
-    handleDelete(reservation)
-  }
-  showDeleteModal.value = false
-}
+const totalRevenue = computed(() => {
+  return reservations.value
+    .filter(r => r.status === 'confirmed' || r.status === 'completed')
+    .reduce((sum, r) => sum + (Number(r.total_price) || 0), 0)
+})
 
-function handleSave(updated) {
-  const idx = reservations.value.findIndex(r => r.id === updated.id)
-  if (idx !== -1) {
-    const oldStatus = reservations.value[idx].status
-    reservations.value[idx] = { ...updated }
-
-    // Auto switch to the new status tab if status changed
-    if (oldStatus !== updated.status) {
-      activeTab.value = updated.status
-    }
-
-    console.log(`Reservation ${updated.id} updated and moved to ${updated.status} filter`)
-  }
-  showEditModal.value = false
-}
-
-function handleContact(reservation) {
-  console.log('Contacting guest:', reservation.guest)
-  // Add your contact logic here
-}
 </script>
 
 <template>
@@ -126,16 +169,56 @@ function handleContact(reservation) {
 
     <!-- Reservation List -->
     <div class="reservation-list">
-      <ReservationCard
+      <div
         v-for="reservation in filteredReservations"
-        :key="reservation.id"
-        :reservation="reservation"
-        @confirm="handleConfirm"
-        @decline="handleDecline"
-        @edit="openEdit"
-        @delete="openDeleteModal"
-        @contact="handleContact"
-      />
+        :key="reservation.booking_id"
+        class="reservation-card"
+      >
+        <div class="card-header">
+          <div class="hotel-status-row">
+            <span class="hotel-name">{{ reservation.accommodation_name }}</span>
+            <span class="status-badge" :style="{ background: statusMap[reservation.status]?.bg, color: statusMap[reservation.status]?.color }">
+              <img :src="statusMap[reservation.status]?.svg" alt="Status" class="svg-icon" />
+              {{ statusMap[reservation.status]?.text || reservation.status }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">Guest:</span><span class="info-value">{{ reservation.user_name }}</span></div>
+          <div class="info-row"><span class="info-label">Dates:</span><span class="info-value">{{ reservation.check_in_date }} → {{ reservation.check_out_date }}</span></div>
+          <div class="info-row"><span class="info-label">Total:</span><span class="info-value total-amount">${{ reservation.total_price }}</span></div>
+        </div>
+        <hr class="card-divider" />
+        <div class="card-footer">
+          <div class="reservation-id">#{{ reservation.booking_id }}</div>
+          <div class="card-actions">
+            <template v-if="reservation.status === 'pending'">
+              <button class="btn btn-success" @click="handleConfirm(reservation)" title="Move to Confirmed">
+                <img :src="confirmSvg" alt="Confirm" class="svg-icon" /> Confirm
+              </button>
+              <button class="btn btn-danger" @click="handleDecline(reservation)" title="Remove reservation">
+                <img :src="declineSvg" alt="Decline" class="svg-icon" /> Decline
+              </button>
+              <button class="btn btn-primary" @click="openEdit(reservation)" title="Edit reservation details">
+                <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
+              </button>
+            </template>
+            <template v-else-if="reservation.status === 'confirmed'">
+              <button class="btn btn-danger" @click="openDeleteModal(reservation)" title="Move to Cancelled">
+                <img :src="deleteSvg" alt="Delete" class="svg-icon" /> Cancel
+              </button>
+              <button class="btn btn-primary" @click="openEdit(reservation)" title="Edit reservation details">
+                <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
+              </button>
+            </template>
+            <template v-else>
+              <button class="btn btn-primary" @click="openEdit(reservation)" title="Edit reservation details">
+                <img :src="editSvg" alt="Edit" class="svg-icon" /> Edit
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Modals -->
@@ -143,7 +226,7 @@ function handleContact(reservation) {
       v-if="showDeleteModal"
       :reservation="selectedReservation"
       @close="showDeleteModal = false"
-      @delete="confirmDelete"
+      @delete="handleDelete"
     />
 
     <EditReservationModal
@@ -158,6 +241,125 @@ function handleContact(reservation) {
 </template>
 
 <style scoped>
+.reservation-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(30,64,175,0.08);
+  border: 1px solid #E5E7EB;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+}
+.hotel-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.hotel-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1E40AF;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+.svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  margin-right: 0.5em;
+}
+.card-body {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.info-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.info-label {
+  font-weight: 500;
+  color: #6B7280;
+}
+.info-value {
+  color: #374151;
+}
+.total-amount {
+  font-weight: bold;
+  color: #22C55E;
+}
+.special-req {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #F59E0B;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+.card-divider {
+  border: none;
+  border-top: 1px solid #E5E7EB;
+  margin: 0.5rem 0 1rem 0;
+}
+.reservation-id {
+  font-size: 0.95rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: #1E40AF;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #1e3a8a;
+}
+.btn-success {
+  background: #22C55E;
+  color: #fff;
+}
+.btn-success:hover {
+  background: #16a34a;
+}
+.btn-danger {
+  background: #EF4444;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #dc2626;
+}
+
 .layout-wrapper {
   min-height: 100vh;
   display: flex;

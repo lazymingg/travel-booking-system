@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import calendarSvg from '@/assets//manageReservationIcons/edit_Check_in_out.svg' 
+import calendarSvg from '@/assets//manageReservationIcons/edit_Check_in_out.svg'
 import peopleSvg from '@/assets//manageReservationIcons/people.svg'
 import moneySvg from '@/assets//manageReservationIcons/money.svg'
 
@@ -9,14 +9,11 @@ const props = defineProps({ reservation: Object })
 const emit = defineEmits(['close', 'save'])
 
 const form = ref({
-  id: '',
+  booking_id: '',
   status: 'pending',
-  checkIn: '',
-  checkOut: '',
-  adults: 1,
-  children: 0,
-  total: 0,
-  requirements: '',
+  check_in_date: '',
+  check_out_date: '',
+  total_price: 0,
 })
 
 watch(() => props.reservation, (val) => {
@@ -63,31 +60,12 @@ function save() {
             <input type="date" v-model="form.checkOut" class="form-input" />
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <img :src="peopleSvg" alt="Adults" class="svg-label" />
-              Adults
-            </label>
-            <input type="number" min="1" v-model="form.adults" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">
-              Children
-            </label>
-            <input type="number" min="0" v-model="form.children" class="form-input" />
-          </div>
-        </div>
         <div class="form-group">
           <label class="form-label">
             <img :src="moneySvg" alt="Total" class="svg-label" />
             Total amount
           </label>
           <input type="number" min="0" v-model="form.total" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Special requirements</label>
-          <textarea v-model="form.requirements" class="form-textarea" placeholder="Enter any special requirements..."></textarea>
         </div>
         <div class="modal-actions">
           <button type="button" @click="$emit('close')" class="btn btn-secondary">Cancel</button>

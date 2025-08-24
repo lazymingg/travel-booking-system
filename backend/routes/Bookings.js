@@ -6,52 +6,52 @@ const { requireAuth, requireOwner } = require('../middleware/auth');
 
 const db = new sqlite3.Database('./db/db.db');
 
-// Get all bookings of a user or all bookings with optional filtering
-// router.get('/', requireAuth, (req, res, next) => {
-//   const { user_id, status } = req.query;
-//   let query = `SELECT b.*, u.full_name as user_name, a.name as accommodation_name, a.address
-//                FROM Bookings b
-//                LEFT JOIN Users u ON b.user_id = u.user_id
-//                LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
-//                WHERE 1=1`;
-//   let params = [];
+//Get all bookings of a user or all bookings with optional filtering
+router.get('/', requireAuth, (req, res, next) => {
+  const { user_id, status } = req.query;
+  let query = `SELECT b.*, u.full_name as user_name, a.name as accommodation_name, a.address
+               FROM Bookings b
+               LEFT JOIN Users u ON b.user_id = u.user_id
+               LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
+               WHERE 1=1`;
+  let params = [];
 
-//   if (user_id) {
-//     query += ' AND b.user_id = ?';
-//     params.push(user_id);
-//   }
-//   if (status) {
-//     query += ' AND b.status = ?';
-//     params.push(status);
-//   }
+  if (user_id) {
+    query += ' AND b.user_id = ?';
+    params.push(user_id);
+  }
+  if (status) {
+    query += ' AND b.status = ?';
+    params.push(status);
+  }
 
-//   db.all(query, params, (err, rows) => {
-//     if (err) return next(err);
-//     return responseHelper.success(res, rows, 'Bookings retrieved successfully');
-//   });
-// });
+  db.all(query, params, (err, rows) => {
+    if (err) return next(err);
+    return responseHelper.success(res, rows, 'Bookings retrieved successfully');
+  });
+});
 
-// Get booking by ID
-// router.get('/:id', (req, res, next) => {
-//   const { id } = req.params;
+//Get booking by ID
+router.get('/:id', (req, res, next) => {
+  const { id } = req.params;
   
-//   const query = `SELECT b.*, u.full_name as user_name, u.email, u.phone_number,
-//                         a.name as accommodation_name, a.address, a.city, a.country,
-//                         r.room_type, r.price_per_night
-//                  FROM Bookings b
-//                  LEFT JOIN Users u ON b.user_id = u.user_id
-//                  LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
-//                  LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
-//                  WHERE b.booking_id = ?`;
+  const query = `SELECT b.*, u.full_name as user_name, u.email, u.phone_number,
+                        a.name as accommodation_name, a.address, a.city, a.country,
+                        r.room_type, r.price_per_night
+                 FROM Bookings b
+                 LEFT JOIN Users u ON b.user_id = u.user_id
+                 LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
+                 LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
+                 WHERE b.booking_id = ?`;
 
-//   db.get(query, [id], (err, row) => {
-//     if (err) return next(err);
-//     if (!row) {
-//       return responseHelper.error(res, 'Booking not found', 404);
-//     }
-//     return responseHelper.success(res, row, 'Booking retrieved successfully');
-//   });
-// });
+  db.get(query, [id], (err, row) => {
+    if (err) return next(err);
+    if (!row) {
+      return responseHelper.error(res, 'Booking not found', 404);
+    }
+    return responseHelper.success(res, row, 'Booking retrieved successfully');
+  });
+});
 
 // Simple booking creation
 router.post('/', requireAuth, (req, res, next) => {
@@ -74,107 +74,125 @@ router.post('/', requireAuth, (req, res, next) => {
   );
 });
 
-// Update booking status
-// router.put('/:id', (req, res, next) => {
-//   const { id } = req.params;
-//   const { status } = req.body;
+// Update booking details
+router.put('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const { status, check_in_date, check_out_date, total_price } = req.body;
+  let fields = [];
+  let params = [];
+  if (status) { fields.push('status = ?'); params.push(status); }
+  if (check_in_date) { fields.push('check_in_date = ?'); params.push(check_in_date); }
+  if (check_out_date) { fields.push('check_out_date = ?'); params.push(check_out_date); }
+  if (total_price) { fields.push('total_price = ?'); params.push(total_price); }
+  if (fields.length === 0) return responseHelper.validationError(res, 'No fields to update');
+  params.push(id);
+  db.run(
+    `UPDATE Bookings SET ${fields.join(', ')} WHERE booking_id = ?`,
+    params,
+    function (err) {
+      if (err) return next(err);
+      if (this.changes === 0) {
+        return responseHelper.error(res, 'Booking not found', 404);
+      }
+      return responseHelper.success(res, null, 'Booking updated successfully');
+    }
+  );
+});
 
-//   db.run(
-//     'UPDATE Bookings SET status = ? WHERE booking_id = ?',
-//     [status, id],
-//     function (err) {
-//       if (err) return next(err);
-//       if (this.changes === 0) {
-//         return responseHelper.error(res, 'Booking not found', 404);
-//       }
-//       return responseHelper.success(res, null, 'Booking status updated successfully');
-//     }
-//   );
-// });
+// Cancel booking
+router.patch('/:id/cancel', (req, res, next) => {
+  const { id } = req.params;
 
-// // Cancel booking
-// router.patch('/:id/cancel', (req, res, next) => {
-//   const { id } = req.params;
+  db.run(
+    'UPDATE Bookings SET status = ? WHERE booking_id = ?',
+    ['cancelled', id],
+    function (err) {
+      if (err) return next(err);
+      if (this.changes === 0) {
+        return responseHelper.error(res, 'Booking not found', 404);
+      }
+      return responseHelper.success(res, null, 'Booking cancelled successfully');
+    }
+  );
+});
 
-//   db.run(
-//     'UPDATE Bookings SET status = ? WHERE booking_id = ?',
-//     ['cancelled', id],
-//     function (err) {
-//       if (err) return next(err);
-//       if (this.changes === 0) {
-//         return responseHelper.error(res, 'Booking not found', 404);
-//       }
-//       return responseHelper.success(res, null, 'Booking cancelled successfully');
-//     }
-//   );
-// });
-
-// Get user's bookings (requires authentication)
-// router.get('/my-bookings', requireAuth, (req, res, next) => {
-//   const user_id = req.session.user.user_id;
+//Get user's bookings (requires authentication)
+router.get('/my-bookings', requireAuth, (req, res, next) => {
+  const user_id = req.session.user.user_id;
   
-//   const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
-//                         r.room_type, r.price_per_night
-//                  FROM Bookings b
-//                  LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
-//                  LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
-//                  WHERE b.user_id = ?
-//                  ORDER BY b.created_at DESC`;
+  const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
+                        r.room_type, r.price_per_night
+                 FROM Bookings b
+                 LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
+                 LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
+                 WHERE b.user_id = ?
+                 ORDER BY b.created_at DESC`;
 
-//   db.all(query, [user_id], (err, rows) => {
-//     if (err) return next(err);
-//     return responseHelper.success(res, rows, 'User bookings retrieved successfully');
-//   });
-// });
+  db.all(query, [user_id], (err, rows) => {
+    if (err) return next(err);
+    return responseHelper.success(res, rows, 'User bookings retrieved successfully');
+  });
+});
 
-// Get user's bookings (alternative route with user_id param)
-// router.get('/user/:user_id', (req, res, next) => {
-//   const { user_id } = req.params;
+//Get user's bookings (alternative route with user_id param)
+router.get('/user/:user_id', (req, res, next) => {
+  const { user_id } = req.params;
   
-//   const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
-//                         r.room_type, r.price_per_night
-//                  FROM Bookings b
-//                  LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
-//                  LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
-//                  WHERE b.user_id = ?
-//                  ORDER BY b.created_at DESC`;
+  const query = `SELECT b.*, a.name as accommodation_name, a.address, a.city,
+                        r.room_type, r.price_per_night
+                 FROM Bookings b
+                 LEFT JOIN Accommodations a ON b.accommodation_id = a.accommodation_id
+                 LEFT JOIN Rooms r ON b.accommodation_id = r.accommodation_id AND b.room_id = r.room_id
+                 WHERE b.user_id = ?
+                 ORDER BY b.created_at DESC`;
 
-//   db.all(query, [user_id], (err, rows) => {
-//     if (err) return next(err);
-//     return responseHelper.success(res, rows, 'User bookings retrieved successfully');
-//   });
-// });
+  db.all(query, [user_id], (err, rows) => {
+    if (err) return next(err);
+    return responseHelper.success(res, rows, 'User bookings retrieved successfully');
+  });
+});
 
-// Check room availability
-// router.post('/check-availability', (req, res, next) => {
-//   const { accommodation_id, room_id, check_in_date, check_out_date } = req.body;
+//Check room availability
+router.post('/check-availability', (req, res, next) => {
+  const { accommodation_id, room_id, check_in_date, check_out_date } = req.body;
 
-//   if (!accommodation_id || !room_id || !check_in_date || !check_out_date) {
-//     return responseHelper.validationError(res, 'Accommodation ID, room ID, check-in date, and check-out date are required');
-//   }
+  if (!accommodation_id || !room_id || !check_in_date || !check_out_date) {
+    return responseHelper.validationError(res, 'Accommodation ID, room ID, check-in date, and check-out date are required');
+  }
 
-//   const query = `
-//     SELECT COUNT(*) as count FROM Bookings 
-//     WHERE accommodation_id = ? AND room_id = ? 
-//     AND status != 'cancelled'
-//     AND (
-//       (check_in_date <= ? AND check_out_date > ?) OR
-//       (check_in_date < ? AND check_out_date >= ?) OR
-//       (check_in_date >= ? AND check_out_date <= ?)
-//     )`;
+  const query = `
+    SELECT COUNT(*) as count FROM Bookings 
+    WHERE accommodation_id = ? AND room_id = ? 
+    AND status != 'cancelled'
+    AND (
+      (check_in_date <= ? AND check_out_date > ?) OR
+      (check_in_date < ? AND check_out_date >= ?) OR
+      (check_in_date >= ? AND check_out_date <= ?)
+    )`;
 
-//   db.get(query, 
-//     [accommodation_id, room_id, check_in_date, check_in_date, check_out_date, check_out_date, check_in_date, check_out_date],
-//     (err, result) => {
-//       if (err) return next(err);
-//       const available = result.count === 0;
-//       return responseHelper.success(res, {
-//         available,
-//         message: available ? 'Room is available' : 'Room is not available for the selected dates'
-//       }, 'Availability check completed');
-//     }
-//   );
-// });
+  db.get(query, 
+    [accommodation_id, room_id, check_in_date, check_in_date, check_out_date, check_out_date, check_in_date, check_out_date],
+    (err, result) => {
+      if (err) return next(err);
+      const available = result.count === 0;
+      return responseHelper.success(res, {
+        available,
+        message: available ? 'Room is available' : 'Room is not available for the selected dates'
+      }, 'Availability check completed');
+    }
+  );
+});
+
+router.delete('/:id', (req, res, next) => {
+    const { id } = req.params;
+    db.run('DELETE FROM Bookings WHERE booking_id = ?', [id], function (err) {
+      if (err) return next(err);
+      if (this.changes === 0) {
+        return responseHelper.error(res, 'Booking not found', 404);
+      }
+      return responseHelper.success(res, id, 'Booking deleted successfully');
+    });
+  });
 
 
 module.exports = router;

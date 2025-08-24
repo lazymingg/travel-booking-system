@@ -37,7 +37,6 @@ onMounted(async () => {
 <style scoped>
 .app {
   min-height: 100vh;
-  display: flex;
   flex-direction: column;
 }
 router-view {
