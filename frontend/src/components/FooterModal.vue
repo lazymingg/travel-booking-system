@@ -31,9 +31,6 @@
   </footer>
 </template>
 
-<script setup>
-</script>
-
 <style scoped>
 /* Footer */
 .footer {
