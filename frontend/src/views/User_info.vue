@@ -70,6 +70,11 @@
               Quản lý đặt chỗ
             </button>
 
+            <button @click="showSignoutModal = true" class="btn btn-secondary">
+              <img class = "sign_out_icon" src="../assets/icon/sign_out_icon.svg" alt="sign out icon" />
+              Sign out
+            </button>
+
             <button @click="showDeleteModal = true" class="btn btn-danger">
               <span class="btn-icon">🗑️</span>
               Xóa tài khoản
@@ -87,6 +92,11 @@
       @update="handleUpdateProfile"
     />
 
+    <SignoutModal
+      :show="showSignoutModal"
+      @close="showSignoutModal = false"
+      @signed_out="signoutAccount"/>
+
     <!-- Delete Account Modal Component -->
     <DeleteAccountModal
       :show="showDeleteModal"
@@ -103,6 +113,8 @@ import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
 import api from '@/frontend-api-helper.js'
 import HeaderModal from '@/components/HeaderModal.vue'
+import SignoutModal from '@/components/SignoutModal.vue'
+
 const router = useRouter()
 
 // State
@@ -122,6 +134,7 @@ const userInfo = reactive({
 
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
+const showSignoutModal = ref(false)
 const loading = ref(true)
 const error = ref(null)
 
@@ -180,6 +193,10 @@ const handleUpdateProfile = (updatedData) => {
 
 const manageBookings = () => {
   alert('Chuyển đến trang quản lý đặt chỗ...')
+}
+
+const signoutAccount = () => {
+  alert('Chuyển đến trang đăng xuất!')
 }
 
 const handleDeleteAccount = () => {
@@ -375,7 +392,10 @@ onMounted(fetchUserInfo)
   /* font-weight: 600; */
 }
 
-
+.sign_out_icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
 
 /* Responsive Design using rem */
 @media (max-width: 48rem) { /* 768px */
