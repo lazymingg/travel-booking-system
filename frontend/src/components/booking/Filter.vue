@@ -1,14 +1,17 @@
 <script setup>
 import { ref, reactive , computed } from 'vue'
+import { useBookingStore } from '@/composables/useBooking'
+import { storeToRefs } from 'pinia'
 
 const emit = defineEmits(['filter'])
-
+const bookingStore = useBookingStore()
+const { bookingDetails } = storeToRefs(bookingStore)
 const showChangeSearch = ref(false)
 
 // Information in the filter bar
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  accommodation_id: 13,
+  accommodation_id: bookingDetails.value.accommodationId,
   check_in_date: 'YYYY-MM-DD',
   check_out_date: 'YYYY-MM-DD',
   number_guest: 0

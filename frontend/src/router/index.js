@@ -64,15 +64,9 @@ const router = createRouter({
       component: () => import('../views/DetailAccommodation.vue'),
     },
     {
-<<<<<<< HEAD
-      path: '/multer',
-      name: 'MULTER',
-      component: () => import('../views/Multer.vue'),
-=======
       path: '/signup',
       name: 'SignUp',
       component: () => import('../views/SignUp.vue'),
->>>>>>> 99f75c8e5e1e91b85afae5ff592fd6b0650b4c74
     }
   ],
 })

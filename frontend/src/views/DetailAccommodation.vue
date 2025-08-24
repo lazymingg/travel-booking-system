@@ -50,8 +50,8 @@
         <img :src="accommodation.images[current_image_index]" alt="Popup Image" />
 
         <!-- Điều hướng -->
-        <button class="nav_btn prev" @click.stop="prevImage">‹</button>
-        <button class="nav_btn next" @click.stop="nextImage">›</button>
+        <button v-if="current_image_index > 0" class="nav_btn prev" @click.stop="prevImage">‹</button>
+        <button v-if="current_image_index < accommodation.images.length - 1" class="nav_btn next" @click.stop="nextImage">›</button>
       </div>
     </div>
 
@@ -165,16 +165,16 @@
               </div>
               <div class="room_price">
                 <h4>Price</h4>
-                <p class="price">{{ formatPrice(room.price_per_day) }}</p>
-                <p class="price_unit">per day</p>
-                <button class="book_btn">Book now</button>
+                <p class="price">{{ room.price_per_day }}.000</p>
+                <p class="price_unit">VND per day</p>
               </div>
             </div>
           </div>
         </div>
+        <button @click="handle_book" class="book_btn">Book now</button>
       </div>
     </section>
-
+    
     <!-- Reviews Section -->
     <section class="reviews_section">
       <div class="container">
@@ -231,13 +231,15 @@ import address_icon from "@/assets/icon/address_icon.svg";
 
 import { ref, watch, onUnmounted, onMounted } from 'vue'
 import api from '@/frontend-api-helper.js'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useBookingStore } from '@/composables/useBooking.js'
 
-const route = useRoute()
+const router = useRouter()
 const id = "1"
 
 const accommodation = ref(null)
 const loading = ref(true)
+const bookingStore = useBookingStore()
 
 const to_snake_case = (str) => {
   return str
@@ -266,6 +268,7 @@ const fetch_accommodation = async (accommodationID) => {
     const result = await api.get(`/accommodations/${accommodationID}`)
     if (result.success) {
       const data = result.data
+      bookingStore.setAccommodationId(accommodationID)
 
       if (Array.isArray(data.amenities)) {
         data.amenities = data.amenities.map(a => ({
@@ -281,6 +284,7 @@ const fetch_accommodation = async (accommodationID) => {
 
       for (const room of rooms) {
         const roomImages = await api.get(`/images/room_images/${room.room_id}`).then(res => res.success ? res.data : [])
+        
         room.value = {
           ...room,
           images: roomImages
@@ -349,12 +353,8 @@ const prevImage = () => {
   }
 }
 
-// Methods
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(price)
+const handle_book = () => {
+  router.push('/booking')
 }
 
 onMounted(() => {
@@ -684,10 +684,13 @@ onMounted(() => {
   background-color: #2563EB;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 1rem 4rem;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: 500;
+  margin: 10px auto 0;
+  display: block;
+  font-size: 1.3rem;
 }
 
 .book_btn:hover {
@@ -729,6 +732,7 @@ onMounted(() => {
   font-weight: bold;
 }
 
+/* mabye xóa
 .stars {
   display: flex;
   gap: 2px;
@@ -742,6 +746,7 @@ onMounted(() => {
 .star.filled {
   color: #FACC15;
 }
+*/
 
 .review_comment {
   color: #4B5563;
