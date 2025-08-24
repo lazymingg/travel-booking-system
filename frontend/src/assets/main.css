@@ -1,4 +1,5 @@
 @import './base.css';
+@import './global-styles.css';
 
 #app {
   margin: 0 0;
