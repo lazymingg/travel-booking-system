@@ -44,7 +44,7 @@ const accommodationsBookingsRouter = require('./routes/Accommodations_bookings')
 const ownersRouter = require('./routes/Owners');
 const ownersBookingsRouter = require('./routes/Owners_bookings');
 const ownersAccommodationsRouter = require('./routes/Owners_Accommodations');
-const ownersBookingsRouter = require('./routes/Owners_bookings');
+
 const authRouter = require('./routes/Auth');
 
 const home = require("./routes/index");

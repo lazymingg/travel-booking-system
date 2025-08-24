@@ -83,6 +83,7 @@ const handleSave = async (updated) => {
     if (!result.success) throw new Error(result.message || 'Unknown error')
     await fetchReservations(activeTab.value)
     showEditModal.value = false
+    window.location.reload() // Reload to reflect changes in the UI
   } catch (err) {
     error.value = 'Can not update: ' + err.message
   } finally {
