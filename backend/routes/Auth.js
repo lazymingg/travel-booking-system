@@ -63,7 +63,7 @@ router.post('/register', (req, res, next) => {
 // Get current user
 router.get('/me', (req, res) => {
   if (req.session.user) {
-    return responseHelper.success(res, req.session.user, 'User info retrieved successfully');
+    return responseHelper.success(res, { user: req.session.user.full_name, user_id: req.session.user.user_id}, 'User info retrieved successfully');
   } else {
     return responseHelper.error(res, 'Not logged in', 401);
   }
