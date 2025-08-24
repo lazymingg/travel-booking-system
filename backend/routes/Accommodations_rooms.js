@@ -298,7 +298,7 @@ router.get('/:accommodationId/available', (req, res, next) => {
       -- Except booked rooms
       AND NOT EXISTS (
         SELECT 1 FROM Bookings b
-        WHERE b.accommodation_id = ?
+        WHERE b.room_id = r.room_id
           AND b.status != 'cancelled'
           AND NOT (b.check_out_date <= ? OR b.check_in_date >= ?)
       )`;
@@ -307,8 +307,8 @@ router.get('/:accommodationId/available', (req, res, next) => {
     [
       accommodationId,
       number_guest,
-      accommodationId,
-      check_in_date, check_out_date
+      check_in_date, 
+      check_out_date
     ],
     (err, rows) => {
       if (err) {
