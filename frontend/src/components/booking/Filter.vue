@@ -1,9 +1,11 @@
 <script setup>
-import { ref, reactive , computed } from 'vue'
+import { ref, reactive , computed, watch } from 'vue'
 import { useBookingStore } from '@/composables/useBooking'
 import { storeToRefs } from 'pinia'
 
 const emit = defineEmits(['filter'])
+
+const today = new Date().toISOString().split('T')[0]
 const bookingStore = useBookingStore()
 const { bookingDetails } = storeToRefs(bookingStore)
 const showChangeSearch = ref(false)
@@ -11,16 +13,17 @@ const showChangeSearch = ref(false)
 // Information in the filter bar
 // Data in below is the default if the filter bar not receiving any data
 const filterData = reactive({
-  accommodation_id: bookingDetails.value.accommodationId,
+  // accommodation_id: bookingDetails.value.accommodationId,
+  accommodation_id: 12,
   check_in_date: 'YYYY-MM-DD',
   check_out_date: 'YYYY-MM-DD',
   number_guest: 0
-})
+});
 
 // Add string person in the Number of Guest of Filter bar
 const guestWithText = computed(() => {
   return filterData.number_guest + ' person'
-})
+});
 
 // Temporary data for Filter bar form
 const formFilter = reactive({ ...filterData })
@@ -40,6 +43,12 @@ const applyFilter = () => {
   emit('filter', { ...filterData })
   showChangeSearch.value = false
 }
+
+watch(() => formFilter.number_guest, (newVal) => {
+  if (newVal < 0) {
+    formFilter.number_guest = 0
+  }
+})
 </script>
 
 <template>
@@ -73,6 +82,7 @@ const applyFilter = () => {
             v-model="formFilter.check_in_date" 
             type="date"
             class="input"
+            :min="today"
           />
         </div>
         <div>
@@ -81,6 +91,7 @@ const applyFilter = () => {
             v-model="formFilter.check_out_date" 
             type="date" 
             class="input"
+            :min="formFilter.check_in_date || today"
           />
         </div>
         <div>
@@ -91,8 +102,7 @@ const applyFilter = () => {
             type="number"
             min="0"
             class="input"
-            >
-            </input>
+            />
             <span class="suffix">person</span>
           </div>
         </div>

@@ -3,7 +3,9 @@ import greenCheck from '@/assets/bookingIcon/pros.svg'
 
 import { ref } from 'vue'
 import { useBookingStore } from '@/composables/useBooking'
+import api from '@/frontend-api-helper'
 
+const emit = defineEmits(['reserve']);
 const bookingStore = useBookingStore()
 
 const error = ref(null)
@@ -15,13 +17,17 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['reserve']);
 const priceNote = '* including taxes and charges';
 
 const handleClickReserve = async () => {
-  console.log("Click reserve room: ", props.room)
-
   const owner = await fetchOwner(props.room.accommodationId, props.room.roomId);
+
+  if (!owner.data) {
+    console.error('Error fetching owner: ', error.value);
+    return;
+  }
+
+  console.log('Owner data: ', owner.data[0].owner_id);
 
   bookingStore.setBookingDetails({
     accommodationId: props.room.accommodationId,

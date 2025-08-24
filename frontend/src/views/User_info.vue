@@ -1,5 +1,5 @@
 <template>
-  <HeaderModal />
+  <HeaderModal/>
   <div class="main-bg">
     <div class="main-container">
       <div class="profile-section">
@@ -94,6 +94,7 @@
       @delete="handleDeleteAccount"
     />
   </div>
+  <FooterModal/>
 </template>
 
 <script setup>
@@ -101,8 +102,9 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import EditProfileModal from '@/components/EditProfileModal.vue'
 import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
-import api from '@/frontend-api-helper.js'
 import HeaderModal from '@/components/HeaderModal.vue'
+import FooterModal from '@/components/FooterModal.vue'
+import api from '@/frontend-api-helper.js'
 const router = useRouter()
 
 // State
