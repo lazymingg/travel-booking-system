@@ -1,33 +1,42 @@
 <template>
-  <div class="upload-container">
-    <h2>Upload Hình ảnh cho Accommodation</h2>
+  <div class="form-container">
+    <h2>Tạo Accommodation</h2>
 
-    <!-- Nhập ID accommodation -->
-    <input 
-      type="number" 
-      v-model="accommodationId" 
-      placeholder="Nhập accommodation_id"
-      class="input-id"
-    />
+    <!-- Accommodation Info -->
+    <form @submit.prevent="createAccommodation">
+      <input v-model="accommodation.name" placeholder="Tên accommodation" required />
+      <input v-model="accommodation.address" placeholder="Địa chỉ" required />
+      <input v-model="accommodation.city" placeholder="Thành phố" required />
+      <input v-model="accommodation.description" placeholder="Mô tả" />
+      <input v-model="accommodation.accommodation_type" placeholder="Loại accommodation" required />
 
-    <!-- Chọn file -->
-    <input 
-      type="file" 
-      multiple 
-      @change="onFileChange"
-    />
+      <button type="submit">Tạo Accommodation</button>
+    </form>
 
-    <!-- Nút upload -->
-    <button @click="uploadImages" :disabled="!files.length || !accommodationId">
-      Upload
-    </button>
+    <!-- Upload accommodation images -->
+    <div v-if="accommodationId">
+      <h3>Upload ảnh cho accommodation</h3>
+      <input type="file" multiple @change="onAccommodationFilesChange" />
+      <button @click="uploadAccommodationImages">Upload Accommodation Images</button>
+    </div>
 
-    <!-- Preview ảnh -->
-    <div v-if="previewUrls.length" class="preview">
-      <h3>Xem trước:</h3>
-      <div v-for="(url, index) in previewUrls" :key="index">
-        <img :src="url" alt="preview" width="150" />
+    <!-- Rooms -->
+    <div v-if="accommodationId">
+      <h3>Rooms</h3>
+      <div v-for="(room, index) in rooms" :key="index" class="room-block">
+        <h4>Room {{ index + 1 }}</h4>
+        <input v-model="room.number_guest" type="number" placeholder="Số khách" required />
+        <input v-model="room.price_per_day" type="number" placeholder="Giá mỗi ngày" required />
+        <input v-model="room.number_bed" type="number" placeholder="Số giường" required />
+        <input v-model="room.description" placeholder="Mô tả" />
+
+        <input type="file" multiple @change="(e) => onRoomFilesChange(e, index)" />
+
+        <button @click="createRoom(index)">Tạo phòng</button>
+        <button @click="removeRoom(index)">Xóa phòng</button>
       </div>
+
+      <button @click="addRoom">+ Thêm phòng</button>
     </div>
   </div>
 </template>
@@ -35,61 +44,143 @@
 <script setup>
 import { ref } from "vue";
 
-const accommodationId = ref(""); // ID nhập vào
-const files = ref([]);
-const previewUrls = ref([]);
+const accommodation = ref({
+  name: "",
+  address: "",
+  city: "",
+  description: "",
+  accommodation_type: ""
+});
 
-function onFileChange(e) {
-  files.value = Array.from(e.target.files);
+const accommodationId = ref(null);
+const accommodationFiles = ref([]);
 
-  // tạo preview
-  previewUrls.value = files.value.map(file => URL.createObjectURL(file));
+const rooms = ref([]); // { number_guest, price_per_day, number_bed, description, files, room_id }
+
+function onAccommodationFilesChange(e) {
+  accommodationFiles.value = Array.from(e.target.files);
 }
 
-async function uploadImages() {
-  if (!files.value.length || !accommodationId.value) {
-    alert("Vui lòng nhập ID và chọn ảnh");
-    return;
+async function createAccommodation() {
+  try {
+    const res = await fetch("http://localhost:3000/accommodations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(accommodation.value)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      accommodationId.value = data.data.accommodation_id;
+      alert("Accommodation created!");
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function uploadAccommodationImages() {
+  if (!accommodationFiles.value.length) return alert("Chọn ảnh trước");
+  const formData = new FormData();
+  accommodationFiles.value.forEach(f => formData.append("images", f));
+
+  const res = await fetch(
+    `http://localhost:3000/accommodations/${accommodationId.value}/images`,
+    {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    }
+  );
+  const data = await res.json();
+  if (res.ok) alert("Upload accommodation images thành công");
+  else alert("Error: " + data.message);
+}
+
+// Rooms
+function addRoom() {
+  rooms.value.push({
+    number_guest: "",
+    price_per_day: "",
+    number_bed: "",
+    description: "",
+    files: [],
+    room_id: null
+  });
+}
+
+function removeRoom(index) {
+  rooms.value.splice(index, 1);
+}
+
+function onRoomFilesChange(e, index) {
+  rooms.value[index].files = Array.from(e.target.files);
+}
+
+async function createRoom(index) {
+  const room = rooms.value[index];
+  if (!room.number_guest || !room.price_per_day || !room.number_bed) {
+    return alert("Điền đầy đủ thông tin phòng");
   }
 
-  const formData = new FormData();
-  files.value.forEach(file => {
-    formData.append("images", file); // "images" phải trùng multer.array("images")
-  });
-
-  try {
-    const res = await fetch(`http://localhost:3000/accommodations/${accommodationId.value}/images`, {
+  // Step 1: create room (POST /:accommodationId/rooms)
+  const res = await fetch(
+    `http://localhost:3000/accommodations/${accommodationId.value}/rooms`,
+    {
       method: "POST",
-      body: formData
-    });
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        number_guest: room.number_guest,
+        price_per_day: room.price_per_day,
+        number_bed: room.number_bed,
+        description: room.description
+      })
+    }
+  );
+  const data = await res.json();
+  if (!res.ok) {
+    alert("Error: " + data.message);
+    return;
+  }
+  room.room_id = data.data.room_id;
+  alert(`Room ${room.room_id} created!`);
 
-    const data = await res.json();
-    console.log("Upload thành công:", data);
-    alert("Upload thành công!");
-  } catch (err) {
-    console.error("Lỗi upload:", err);
-    alert("Upload thất bại!");
+  // Step 2: upload room images (if any)
+  if (room.files.length) {
+    const formData = new FormData();
+    room.files.forEach(f => formData.append("images", f));
+
+    const imgRes = await fetch(
+      `http://localhost:3000/accommodations/${accommodationId.value}/rooms/${room.room_id}/images`,
+      {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      }
+    );
+    const imgData = await imgRes.json();
+    if (imgRes.ok) {
+      alert(`Upload ảnh room ${room.room_id} thành công`);
+    } else {
+      alert("Error upload images: " + imgData.message);
+    }
   }
 }
 </script>
 
 <style scoped>
-.upload-container {
+.form-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.input-id {
-  padding: 0.5rem;
-  width: 200px;
+.room-block {
   border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.preview img {
-  margin: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 </style>
