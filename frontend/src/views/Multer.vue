@@ -3,119 +3,132 @@
     <h2 class="title">Tạo mới Accommodation (Thu thập trước, Submit một lần)</h2>
     <p class="subtitle">Mọi dữ liệu (thông tin & ảnh) chỉ được gửi lên server khi bạn bấm <b>Submit tất cả</b>.</p>
 
-    <!-- Step navigation (clickable) -->
-    <div class="steps">
-      <button :class="['step', step===1 ? 'active' : accomReady ? 'done' : '']" @click="goToStep(1)">1. Accommodation</button>
-      <button :class="['step', step===2 ? 'active' : '']" @click="goToStep(2)">2. Rooms & Submit</button>
+    <div class="steps-container">
+      <div :class="['step-item', step === 1 ? 'active' : accomReady ? 'done' : '']">
+        <div class="step-circle" @click="goToStep(1)">1</div>
+        <div class="step-label">Place detail</div>
+      </div>
+      <div class="step-line"></div>
+      <div :class="['step-item', step === 2 ? 'active' : '']">
+        <div class="step-circle" @click="goToStep(2)">2</div>
+        <div class="step-label">Rooms & Submit</div>
+      </div>
     </div>
 
-    <!-- ===== Step 1: Accommodation ===== -->
-    <section v-show="step === 1" class="card">
-      <h3>Thông tin Accommodation</h3>
-      <div class="form-grid">
-        <label>
-          <span>Tên *</span>
-          <input v-model.trim="accommodation.name" required />
-        </label>
-        <label>
-          <span>Địa chỉ *</span>
-          <input v-model.trim="accommodation.address" required />
-        </label>
-        <label>
-          <span>Thành phố *</span>
-          <input v-model.trim="accommodation.city" required />
-        </label>
-        <label>
-          <span>Loại accommodation *</span>
-          <input v-model.trim="accommodation.accommodation_type" required />
-        </label>
-        <label class="full">
-          <span>Mô tả</span>
-          <textarea v-model.trim="accommodation.description" rows="3"></textarea>
-        </label>
-      </div>
+    <h3 class="form-title-main">Upload your accommodation here</h3>
 
-      <div class="uploader">
-        <div class="uploader-header">
-          <h4>Ảnh accommodation *</h4>
-          <input type="file" multiple accept="image/*" @change="onAccomFilesChange" />
+    <section v-show="step === 1" class="form-section">
+      <div class="form-row">
+        <div class="form-fields">
+          <label>
+            <span class="label">Your accommodation name</span>
+            <input v-model.trim="accommodation.name" required placeholder="EX: ABC" />
+          </label>
+          <label>
+            <span class="label">Type of accommodation</span>
+            <input v-model.trim="accommodation.accommodation_type" required placeholder="EX: Hotels, Villas, Homestay,..." />
+          </label>
+          <label>
+            <span class="label">City / Province</span>
+            <input v-model.trim="accommodation.city" required placeholder="EX: Hà Nội, TP HCM,..." />
+          </label>
+          <label>
+            <span class="label">Address</span>
+            <input v-model.trim="accommodation.address" required placeholder="123 street 456, ward KLAS,..." />
+          </label>
+          <label class="full">
+            <span class="label">Other notes</span>
+            <textarea v-model.trim="accommodation.description" rows="3" placeholder="Ex:"></textarea>
+          </label>
         </div>
-        <div v-if="accomPreviews.length" class="grid">
-          <div v-for="(src, i) in accomPreviews" :key="i" class="thumb">
-            <img :src="src" alt="preview" />
-            <button class="remove" @click="removeAccomImage(i)" title="Xóa ảnh">×</button>
+
+        <div class="image-uploader-container">
+          <div class="uploader">
+            <div class="uploader-header">
+              <span class="image-label">Thumbnail image of the place</span>
+              <input type="file" multiple accept="image/*" @change="onAccomFilesChange" />
+            </div>
+            <div v-if="accomPreviews.length" class="grid">
+              <div v-for="(src, i) in accomPreviews" :key="i" class="thumb">
+                <img :src="src" alt="preview" />
+                <button class="remove" @click="removeAccomImage(i)" title="Xóa ảnh">×</button>
+              </div>
+            </div>
+            <p v-else class="hint">Hãy chọn ít nhất 1 ảnh để hoàn tất bước này.</p>
           </div>
         </div>
-        <p v-else class="hint">Hãy chọn ít nhất 1 ảnh để hoàn tất bước này.</p>
       </div>
 
       <div class="actions">
-        <button class="secondary" :disabled="!canProceedRooms" @click="goToStep(2)">Tiếp tục: Rooms →</button>
+        <button class="arrow-button right" :disabled="!canProceedRooms" @click="goToStep(2)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
       </div>
     </section>
 
-    <!-- ===== Step 2: Rooms & Submit ===== -->
-    <section v-show="step === 2" class="card">
+    <section v-show="step === 2" class="form-section">
       <div class="header-row">
-        <h3>Thêm các Phòng</h3>
-        <div class="spacer"></div>
-        <button class="secondary" @click="addRoom">+ Thêm phòng</button>
+        <h3 class="form-title">Your room(s) detail information</h3>
+        <button class="add-room-button" @click="addRoom">+ Add more room</button>
       </div>
 
-      <div v-if="!rooms.length" class="hint">Bạn có thể submit chỉ accommodation (không bắt buộc phải có phòng). Nếu thêm phòng, mỗi phòng phải có thông tin & ít nhất 1 ảnh.</div>
+      <p v-if="!rooms.length" class="hint">Bạn có thể submit chỉ accommodation (không bắt buộc phải có phòng). Nếu thêm phòng, mỗi phòng phải có thông tin & ít nhất 1 ảnh.</p>
 
-      <div v-for="(room, index) in rooms" :key="index" class="room">
-        <div class="room-head">
+      <div v-for="(room, index) in rooms" :key="index" class="room-card">
+        <div class="room-header">
           <h4>Room {{ index + 1 }}</h4>
-          <button class="danger outline" @click="removeRoom(index)">❌ Xóa</button>
+          <button class="danger-button" @click="removeRoom(index)">❌ Delete</button>
         </div>
 
-        <div class="form-grid">
-          <label>
-            <span>Số khách *</span>
-            <input type="number" min="1" v-model.number="room.number_guest" />
-          </label>
-          <label>
-            <span>Giá/ngày (VND) *</span>
-            <input type="number" min="0" v-model.number="room.price_per_day" />
-          </label>
-          <label>
-            <span>Số giường *</span>
-            <input type="number" min="1" v-model.number="room.number_bed" />
-          </label>
-          <label class="full">
-            <span>Mô tả</span>
-            <textarea rows="2" v-model.trim="room.description"></textarea>
-          </label>
-        </div>
-
-        <div class="uploader">
-          <div class="uploader-header">
-            <h4>Ảnh phòng *</h4>
-            <input type="file" multiple accept="image/*" @change="(e) => onRoomFilesChange(e, index)" />
+        <div class="room-row">
+          <div class="room-fields">
+            <label>
+              <span class="label">Human capacity:</span>
+              <input type="number" min="1" v-model.number="room.number_guest" placeholder="EX: 4" />
+            </label>
+            <label>
+              <span class="label">Number of bed(s):</span>
+              <input type="number" min="1" v-model.number="room.number_bed" placeholder="EX: 2" />
+            </label>
+            <label>
+              <span class="label">Price/day (VND) *</span>
+              <input type="number" min="0" v-model.number="room.price_per_day" />
+            </label>
+            <label class="full">
+              <span class="label">Description</span>
+              <textarea rows="2" v-model.trim="room.description" placeholder="Ex: lorem ipsum,...."></textarea>
+            </label>
           </div>
-          <div v-if="room.previews.length" class="grid">
-            <div v-for="(src, j) in room.previews" :key="j" class="thumb">
-              <img :src="src" alt="room preview" />
-              <button class="remove" @click="removeRoomImage(index, j)" title="Xóa ảnh">×</button>
+          <div class="image-uploader-container">
+            <div class="uploader">
+              <div class="uploader-header">
+                <span class="image-label">Detailed image of the room</span>
+                <input type="file" multiple accept="image/*" @change="(e) => onRoomFilesChange(e, index)" />
+              </div>
+              <div v-if="room.previews.length" class="grid">
+                <div v-for="(src, j) in room.previews" :key="j" class="thumb">
+                  <img :src="src" alt="room preview" />
+                  <button class="remove" @click="removeRoomImage(index, j)" title="Xóa ảnh">×</button>
+                </div>
+              </div>
+              <div v-else class="hint">Chưa chọn ảnh cho phòng này.</div>
+              <div class="inline-valid">
+                <span :class="isRoomValid(room) ? 'ok' : 'bad'">{{ isRoomValid(room) ? 'Phòng hợp lệ' : 'Thiếu thông tin/ảnh' }}</span>
+              </div>
             </div>
-          </div>
-          <div v-else class="hint">Chưa chọn ảnh cho phòng này.</div>
-
-          <div class="inline-valid">
-            <span :class="isRoomValid(room) ? 'ok' : 'bad'">{{ isRoomValid(room) ? 'Phòng hợp lệ' : 'Thiếu thông tin/ảnh' }}</span>
           </div>
         </div>
       </div>
 
       <div class="actions">
-        <button class="secondary" @click="goToStep(1)">← Quay lại Accommodation</button>
+        <button class="arrow-button left" @click="goToStep(1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </button>
         <button :disabled="!isAllValid || isSubmittingAll" @click="submitAll">
           {{ isSubmittingAll ? 'Đang gửi...' : 'Submit tất cả' }}
         </button>
       </div>
 
-      <!-- Progress area -->
       <div v-if="submitLog.length" class="progress">
         <h4>Tiến trình</h4>
         <ul>
@@ -310,45 +323,318 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.page { max-width: 980px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-.title { margin: .2rem 0; }
-.subtitle { color: #6b7280; margin: 0; }
+/* GENERAL STYLES */
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+.title {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+.subtitle {
+  text-align: center;
+  color: #888;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
 
-.steps { display: flex; gap: .5rem; margin-top: .25rem; }
-.step { padding: .45rem .8rem; border-radius: 999px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; cursor: pointer; }
-.step.active { background: #2563eb; color: white; border-color: #2563eb; }
-.step.done { background: #10b981; color: white; border-color: #10b981; }
+/* STEPS COMPONENT */
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.step-item.active .step-circle {
+  background-color: #007bff;
+}
+.step-item.done .step-circle {
+  background-color: #28a745;
+}
+.step-label {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+.step-line {
+  height: 2px;
+  width: 100px;
+  background-color: #e0e0e0;
+  margin: 0 -5px;
+  position: relative;
+}
+.step-item.active + .step-line, .step-item.done + .step-line {
+  background-color: #007bff;
+}
+.step-item.done + .step-line {
+  background-color: #28a745;
+}
 
-.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .8rem; }
-.form-grid .full { grid-column: 1 / -1; }
-label { display: flex; flex-direction: column; gap: .25rem; font-size: .92rem; }
-input, textarea { padding: .55rem .6rem; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
-input:focus, textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+/* MAIN FORM STYLING */
+.form-title-main {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+}
+.form-section {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+.form-row {
+  display: flex;
+  gap: 2rem;
+}
+.form-fields {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.image-uploader-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+label {
+  display: flex;
+  flex-direction: column;
+}
+.label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+input, textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+.full {
+  grid-column: 1 / -1;
+}
 
-.uploader { margin-top: .8rem; }
-.uploader-header { display: flex; align-items: center; gap: 1rem; }
-.hint { color: #6b7280; font-size: .9rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: .6rem; margin-top: .6rem; }
-.thumb { position: relative; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #f9fafb; }
-.thumb img { width: 100%; height: 110px; object-fit: cover; display: block; }
-.thumb .remove { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,.65); color: white; border: none; border-radius: 999px; width: 22px; height: 22px; line-height: 22px; text-align: center; cursor: pointer; }
+/* UPLOADER STYLES */
+.uploader {
+  width: 100%;
+}
+.uploader-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.image-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.image-placeholder {
+  width: 200px;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+.image-placeholder .icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb .remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.thumb .remove:hover {
+  background-color: #dc3545;
+}
 
-.actions { margin-top: 1rem; display: flex; gap: .6rem; }
-button { padding: .6rem .95rem; border-radius: 9px; border: 1px solid #d1d5db; background: #111827; color: #fff; cursor: pointer; }
-button.secondary { background: #374151; }
-button.danger { background: #ef4444; border-color: #ef4444; }
-button.danger.outline { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-button[disabled] { opacity: .6; cursor: not-allowed; }
+/* ACTIONS & NAVIGATION */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+.arrow-button {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.arrow-button:hover {
+  background-color: #f1f1f1;
+}
+.arrow-button svg {
+  width: 20px;
+  height: 20px;
+  color: #333;
+}
+.arrow-button.left {
+  transform: scaleX(1);
+}
+.arrow-button.right {
+  transform: scaleX(1);
+}
+.arrow-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-.header-row { display: flex; align-items: center; gap: .8rem; margin-bottom: .4rem; }
-.spacer { flex: 1; }
-.room { border: 1px dashed #e5e7eb; border-radius: 12px; padding: .9rem; margin: .9rem 0; }
-.room-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
-.inline-valid { margin-top: .4rem; font-size: .9rem; }
-.inline-valid .ok { color: #10b981; }
-.inline-valid .bad { color: #ef4444; }
-
-.progress { margin-top: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: .8rem; }
-.progress ul { margin: .4rem 0 0; padding-left: 1rem; }
+/* ROOMS SECTION */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.form-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.add-room-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.add-room-button:hover {
+  background-color: #0056b3;
+}
+.room-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #f1f1f1;
+}
+.room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.room-header h4 {
+  margin: 0;
+}
+.danger-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.danger-button:hover {
+  background-color: #c82333;
+}
+.room-row {
+  display: flex;
+  gap: 2rem;
+}
+.room-fields {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.inline-valid {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+.inline-valid .ok {
+  color: #28a745;
+}
+.inline-valid .bad {
+  color: #dc3545;
+}
 </style>
