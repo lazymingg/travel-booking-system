@@ -78,9 +78,9 @@ const handleSave = async (updated) => {
     error.value = null
     const result = await api.put(`/owners/bookings/${updated.booking_id}`, {
       status: updated.status,
-      check_in_date: updated.checkIn,
-      check_out_date: updated.checkOut,
-      total_price: updated.total
+      check_in_date: updated.check_in_date,
+      check_out_date: updated.check_out_date,
+      total_price: updated.total_price
     })
     if (!result.success) throw new Error(result.message || 'Unknown error')
     await fetchReservations(updated.status)
