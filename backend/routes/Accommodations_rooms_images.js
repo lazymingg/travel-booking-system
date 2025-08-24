@@ -7,7 +7,7 @@ const { requireAuth, requireOwner } = require('../middleware/auth');
 const multer = require('multer');
 const router = express.Router();
 
-// Cấu hình Multer cho Room images
+//cấu hình Multer cho Room images
 const roomsDir = path.join(__dirname, '..', 'db', 'images', 'Rooms');
 
 // Ensure destination directory exists

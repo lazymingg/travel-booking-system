@@ -24,3 +24,5 @@ router.get('/bookings', requireOwner, (req, res) => {
         return responseHelper.success(res, rows, 'Bookings retrieved successfully');
     });
 });
+
+module.exports = router;
