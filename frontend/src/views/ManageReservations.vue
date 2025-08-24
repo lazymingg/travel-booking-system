@@ -62,7 +62,9 @@ const handleConfirm = async (reservation) => {
     error.value = null
     const result = await api.put(`/owners/bookings/${reservation.booking_id}/confirm`)
     if (!result.success) throw new Error(result.message || 'Unknown error')
-    await fetchReservations(activeTab.value)
+    await fetchReservations('confirmed')
+    activeTab.value = 'confirmed'
+    
   } catch (err) {
     error.value = 'Can not confirm: ' + err.message
   } finally {
@@ -81,9 +83,8 @@ const handleSave = async (updated) => {
       total_price: updated.total
     })
     if (!result.success) throw new Error(result.message || 'Unknown error')
-    await fetchReservations(activeTab.value)
+    await fetchReservations(updated.status)
     showEditModal.value = false
-    window.location.reload() // Reload to reflect changes in the UI
   } catch (err) {
     error.value = 'Can not update: ' + err.message
   } finally {
@@ -99,6 +100,7 @@ const handleDelete = async (updated) => {
     if (!result.success) throw new Error(result.message || 'Unknown error')
     await fetchReservations('cancelled')
     showDeleteModal.value = false
+    activeTab.value = 'cancelled'
   } catch (err) {
     error.value = 'Can not cancel: ' + err.message
   } finally {
