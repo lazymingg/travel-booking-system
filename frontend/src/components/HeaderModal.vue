@@ -20,12 +20,17 @@
         </template>
       </div>
     </div>
+
+    <SignoutPopupModal v-if="isLoggedIn" />
   </header>
+
+
 </template>
 
 <script setup>
 import { useUserStore } from '../../stores/user.js'
 import { storeToRefs } from 'pinia'
+import SignoutPopupModal from './SignoutPopupModal.vue'
 
 const userStore = useUserStore()
 
