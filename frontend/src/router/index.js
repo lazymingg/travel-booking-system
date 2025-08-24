@@ -43,6 +43,11 @@ const router = createRouter({
       name: 'UploadAccommodation',
       component: () => import('../views/UploadAccommodation.vue'),
     },
+    {
+      path: '/owner-accommodations',
+      name: 'OwnerAccommodations',
+      component: () => import('../views/OwnerAccommodations.vue'),
+    },
      {
       path: '/about-us',
       name: 'AboutUs',
@@ -62,6 +67,16 @@ const router = createRouter({
       path: '/detail',
       name: 'DetailPage',
       component: () => import('../views/DetailAccommodation.vue'),
+    },
+    {
+      path: '/test',
+      name: 'TestPage',
+      component: () => import('../views/test.vue'),
+    },
+    {
+      path: '/multer',
+      name: 'MULTER',
+      component: () => import('../views/Multer.vue'),
     },
     {
       path: '/signup',

@@ -18,20 +18,13 @@
 
       <!-- Results -->
       <div v-if="!loading && !error" class="accommodations_grid">
-        <div v-for="accommodation in displayedAccommodations" :key="accommodation.id" class="accommodation_card">
-          <div class="card_image">
-            <img class="accommodation_image" :src="accommodation.image" alt="Accommodation image">
-          </div>
-          <div class="card_content">
-            <h3 class="accommodation_name">{{ accommodation.name }}</h3>
-            <p class="accommodation_address">{{ accommodation.address }}</p>
-            <div class="rating">
-              <span class="rating_badge">{{ Number(accommodation.rating).toFixed(1) }}</span>
-              <span class="rating_text">{{ accommodation.reviews }} ratings</span>
-            </div>
-            <div class="price">Price: {{ Number(accommodation.price).toFixed(2) }}$ per day</div>
-          </div>
-        </div>
+        <AccommodationCard 
+          v-for="accommodation in displayedAccommodations" 
+          :key="accommodation.id"
+          :accommodation="accommodation"
+          :clickable="true"
+          @click="viewAccommodationDetails"
+        />
       </div>
 
       <!-- No results message -->
@@ -59,11 +52,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import HeaderModal from '@/components/HeaderModal.vue'
 import FooterModal from '@/components/FooterModal.vue'
 import SearchModal from '@/components/SearchModal.vue'
-import heroImg from "@/assets/hero-img-singin.jpg"
+import AccommodationCard from '@/components/AccommodationCard.vue'
+// import heroImg from "@/assets/hero-img-singin.jpg"
+const heroImg = '@/assets/hero-img-signin.jpg'
 import api from '@/frontend-api-helper.js'
 
 const accommodations = ref([])
@@ -72,7 +67,7 @@ const loading = ref(false)
 const error = ref('')
 const displayCount = ref(6)
 
-// Mapping amenities string sang ID (giả định dựa trên DB Amenities table - bạn cần kiểm tra và update ID thực tế)
+//mapping amenities string sang ID (giả định dựa trên DB Amenities table - bạn cần kiểm tra và update ID thực tế)
 const amenitiesMap = {
   "Swimming pool": 1,
   "Restaurant": 2,
@@ -133,6 +128,7 @@ async function fetchAccommodations(params = {}) {
         rating: item.avg_rating || 0,
         reviews: item.review_count || 0,
         price: item.min_room_price || 0,
+        room_count: item.room_count || 0,
         beds: item.max_beds || 1,
         type: item.accommodation_type,
         image: item.images?.[0] || heroImg
@@ -155,6 +151,13 @@ function handleApplyFilters(selectedFilters) {
   fetchAccommodations(selectedFilters)
 }
 
+function viewAccommodationDetails(accommodation) {
+  // Navigate to accommodation detail page
+  console.log('View details for accommodation:', accommodation.id)
+  // You can implement navigation here
+  // this.$router.push(`/accommodation/${accommodation.id}`)
+}
+
 function loadMore() {
   displayCount.value += 6
 }
@@ -166,6 +169,12 @@ const displayedAccommodations = computed(() =>
 const isEndOfList = computed(() => 
   displayCount.value >= accommodations.value.length
 )
+
+// Initial load: fetch a default list so the page shows results without extra user action
+onMounted(() => {
+  // fetch using empty params (backend will return default/approved accommodations)
+  fetchAccommodations({})
+})
 </script>
 
 <style scoped>
@@ -195,84 +204,9 @@ body {
 
 .accommodations_grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
-}
-
-.accommodation_card {
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
-}
-
-.accommodation_card:hover {
-  transform: translateY(-2px);
-}
-
-.card_image {
-  height: 200px;
-  background-color: #4B5563;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.placeholder_image {
-  font-size: 3rem;
-  color: #9CA3AF;
-}
-
-.accommodation_image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;   /* hoặc contain tùy nhu cầu */
-  border-radius: 0;
-}
-
-.card_content {
-  padding: 1rem;
-}
-
-.accommodation_name {
-  color: #2563EB;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.accommodation_address {
-  color: #4B5563;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.rating_badge {
-  background-color: #FACC15;
-  color: #2563EB;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.rating_text {
-  color: #4B5563;
-  font-size: 0.8rem;
-}
-
-.price {
-  color: #1D4ED8;
-  font-weight: bold;
 }
 
 .more_results {
