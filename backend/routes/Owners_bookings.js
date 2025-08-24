@@ -46,6 +46,7 @@ router.put('/bookings/:id/confirm', requireOwner, (req, res) => {
 router.put('/bookings/:id', requireOwner, (req, res) => {
     const { id } = req.params;
     const { status, check_in_date, check_out_date, total_price } = req.body;
+    console.log(req.body);
     let fields = [];
     let params = [];
     // Date validation logic
@@ -59,7 +60,7 @@ router.put('/bookings/:id', requireOwner, (req, res) => {
     if (fields.length === 0) return responseHelper.validationError(res, 'No fields to update');
     params.push(id);
     db.run(
-        `UPDATE Bookings SET ${fields.join(', ')} WHERE booking_id = ?`,
+        `UPDATE Bookings SET ${fields.join('AND ')} WHERE booking_id = ?`,
         params,
         function (err) {
             if (err) return responseHelper.error(res, 'Error updating booking', 500, err.message);

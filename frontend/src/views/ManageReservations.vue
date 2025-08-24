@@ -60,7 +60,14 @@ const handleConfirm = async (reservation) => {
 const handleSave = async (updated) => {
   loading.value = true
   error.value = null
-  const result = await api.put(`/owners/bookings/${updated.booking_id}`, updated)
+  // Send updated fields to backend
+  const payload = {
+    status: updated.status,
+    check_in_date: updated.check_in_date,
+    check_out_date: updated.check_out_date,
+    total_price: updated.total_price
+  }
+  const result = await api.put(`/owners/bookings/${updated.booking_id}`, payload)
   if (result.success) {
     await fetchReservations()
     showEditModal.value = false // Close edit modal
