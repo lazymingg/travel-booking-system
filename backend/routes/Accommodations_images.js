@@ -35,7 +35,7 @@ const fileFilter = (req, file, cb) => {
 const accommodationUpload = multer({ 
   storage: accommodationStorage, 
   fileFilter, 
-  limits: { fileSize: 5 * 1024 * 1024 } 
+  limits: { fileSize: 20 * 1080 * 720} 
 });
 
 const db = new sqlite3.Database('./db/db.db');
