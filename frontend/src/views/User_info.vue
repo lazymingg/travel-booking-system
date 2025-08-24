@@ -1,99 +1,165 @@
 <template>
   <HeaderModal/>
-  <div class="main-bg">
-    <div class="main-container">
-      <div class="profile-section">
-        <div class="profile-header">
-          <div class="avatar-section">
-            <div class="avatar">
-              <span class="avatar-text">{{ userInfo.full_name.charAt(0) }}</span>
+  
+  <!-- Modern Layout với Global CSS -->
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+    <div class="container">
+      
+      <!-- Hero Section với Avatar lớn -->
+      <div class="text-center mb-12">
+        <div class="relative inline-block">
+          <div class="avatar-large">
+            {{ userInfo.full_name.charAt(0) }}
+          </div>
+          <div class="status-indicator"></div>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mt-4">{{ userInfo.full_name }}</h1>
+        <div class="role-badge-large">{{ roleDisplay }}</div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="card max-w-2xl mx-auto">
+        <div class="card-body text-center py-12">
+          <div class="loading-spinner mx-auto mb-4"></div>
+          <p class="text-gray-600">Đang tải thông tin...</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="card max-w-2xl mx-auto border-red-200">
+        <div class="card-body text-center py-12">
+          <div class="text-6xl mb-4">⚠️</div>
+          <h3 class="text-xl font-semibold text-red-600 mb-4">Có lỗi xảy ra</h3>
+          <p class="text-gray-600 mb-6">{{ error }}</p>
+          <button @click="fetchUserInfo" class="btn btn-primary">
+            <span class="btn-icon">🔄</span>
+            Thử lại
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div v-else class="grid lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column - Thông tin cá nhân -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Personal Information Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="text-xl font-semibold flex items-center gap-2">
+                <span class="text-2xl">👤</span>
+                Thông tin cá nhân
+              </h3>
             </div>
-            <h2 class="profile-title">Thông tin cá nhân</h2>
+            <div class="card-body">
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="info-item-modern">
+                  <label class="info-label">Họ và tên</label>
+                  <div class="info-value-modern">{{ userInfo.full_name }}</div>
+                </div>
+                <div class="info-item-modern">
+                  <label class="info-label">Email</label>
+                  <div class="info-value-modern">{{ userInfo.email }}</div>
+                </div>
+                <div class="info-item-modern">
+                  <label class="info-label">Số điện thoại</label>
+                  <div class="info-value-modern">{{ userInfo.phone_number }}</div>
+                </div>
+                <div class="info-item-modern">
+                  <label class="info-label">Địa chỉ</label>
+                  <div class="info-value-modern">{{ userInfo.address }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Information Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="text-xl font-semibold flex items-center gap-2">
+                <span class="text-2xl">📊</span>
+                Thông tin tài khoản
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="info-item-modern">
+                  <label class="info-label">Ngày tạo tài khoản</label>
+                  <div class="info-value-modern">{{ formatDate(userInfo.created_at) }}</div>
+                </div>
+                <div class="info-item-modern">
+                  <label class="info-label">Cập nhật lần cuối</label>
+                  <div class="info-value-modern">{{ formatDate(userInfo.updated_at) }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="profile-content">
-          <div v-if="loading" class="loading-state">
-            <p>Đang tải thông tin...</p>
-          </div>
-
-          <div v-else-if="error" class="error-state">
-            <p>{{ error }}</p>
-            <button @click="fetchUserInfo" class="btn btn-primary">Thử lại</button>
-          </div>
-
-          <div v-else class="info-grid">
-            <div class="info-item">
-              <label>Họ và tên</label>
-              <div class="info-value">{{ userInfo.full_name }}</div>
+        <!-- Right Column - Actions -->
+        <div class="space-y-6">
+          
+          <!-- Owner Actions (nếu là owner) -->
+          <div v-if="isOwner" class="card gradient-owner">
+            <div class="card-header">
+              <h3 class="text-xl font-semibold text-white flex items-center gap-2">
+                <span class="text-2xl"></span>
+                Chức năng
+              </h3>
             </div>
-
-            <div class="info-item">
-              <label>Email</label>
-              <div class="info-value">{{ userInfo.email }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Số điện thoại</label>
-              <div class="info-value">{{ userInfo.phone_number }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Địa chỉ</label>
-              <div class="info-value">{{ userInfo.address }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Vai trò</label>
-              <div class="info-value role-badge">{{ roleDisplay }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Ngày tạo tài khoản</label>
-              <div class="info-value">{{ formatDate(userInfo.created_at) }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Cập nhật lần cuối</label>
-              <div class="info-value">{{ formatDate(userInfo.updated_at) }}</div>
-            </div>
-          </div>
-
-          <div v-if="!loading && !error" class="action-buttons">
-            <div v-if="isOwner" class="owner-actions">
-              <h3 class="actions-title">Chức năng Chủ sở hữu</h3>
-              <router-link to="/owner-accommodations" class="btn btn-owner">
+            <div class="card-body space-y-3">
+              <router-link to="/owner-accommodations" class="btn btn-white w-full">
                 <span class="btn-icon">🏠</span>
                 Chỗ ở của tôi
               </router-link>
-              <router-link to="/manage-reservations" class="btn btn-owner">
+              <router-link to="/manage-reservations" class="btn btn-white w-full">
                 <span class="btn-icon">📅</span>
-                Quản lý Đặt phòng
+                Quản lý đặt phòng
               </router-link>
-              <router-link to="/upload-accommodation" class="btn btn-owner">
+              <router-link to="/upload-accommodation" class="btn btn-white w-full">
                 <span class="btn-icon">➕</span>
                 Thêm chỗ ở mới
               </router-link>
             </div>
-            
-            <div class="user-actions">
-              <h3 class="actions-title">Quản lý tài khoản</h3>
-              <button @click="showEditModal = true" class="btn btn-primary">
+          </div>
+
+          <!-- Account Actions -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="text-xl font-semibold flex items-center gap-2">
+                <span class="text-2xl"></span>
+                Quản lý tài khoản
+              </h3>
+            </div>
+            <div class="card-body space-y-3">
+              <button @click="showEditModal = true" class="btn btn-primary w-full">
                 <span class="btn-icon">✏️</span>
                 Cập nhật thông tin
               </button>
-
-              <button @click="manageBookings" class="btn btn-secondary">
+              
+              <button @click="manageBookings" class="btn btn-secondary w-full">
                 <span class="btn-icon">📋</span>
                 Quản lý đặt chỗ
               </button>
+            </div>
+          </div>
 
-              <button @click="handleLogout" class="btn btn-warning">
+          <!-- Danger Zone -->
+          <div class="card border-red-200">
+            <div class="card-header bg-red-50">
+              <h3 class="text-xl font-semibold text-red-600 flex items-center gap-2">
+                <span class="text-2xl"></span>
+                Bảo Mật
+              </h3>
+            </div>
+            <div class="card-body space-y-3">
+              <button @click="handleLogout" class="btn btn-warning w-full">
                 <span class="btn-icon">🚪</span>
                 Đăng xuất
               </button>
-
-              <button @click="showDeleteModal = true" class="btn btn-danger">
+              
+              <button @click="showDeleteModal = true" class="btn btn-danger w-full">
                 <span class="btn-icon">🗑️</span>
                 Xóa tài khoản
               </button>
@@ -103,21 +169,41 @@
       </div>
     </div>
 
-    <!-- Edit Profile Modal Component -->
-    <EditProfileModal
-      :show="showEditModal"
-      :userInfo="userInfo"
-      @close="showEditModal = false"
-      @update="handleUpdateProfile"
-    />
+    <!-- Modern Modal System -->
+    <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
+      <div class="modal-content max-w-2xl" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">✏️ Cập nhật thông tin</h3>
+          <button @click="closeEditModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <EditProfileModal 
+            :show="showEditModal"
+            :userInfo="userInfo"
+            @close="closeEditModal"
+            @update="handleUpdateProfile"
+          />
+        </div>
+      </div>
+    </div>
 
-    <!-- Delete Account Modal Component -->
-    <DeleteAccountModal
-      :show="showDeleteModal"
-      @close="showDeleteModal = false"
-      @delete="handleDeleteAccount"
-    />
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal-content max-w-lg" @click.stop>
+        <div class="modal-header bg-red-50">
+          <h3 class="modal-title text-red-600">⚠️ Xác nhận xóa tài khoản</h3>
+          <button @click="closeDeleteModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <DeleteAccountModal
+            :show="showDeleteModal"
+            @close="closeDeleteModal"
+            @delete="handleDeleteAccount"
+          />
+        </div>
+      </div>
+    </div>
   </div>
+  
   <FooterModal/>
 </template>
 
@@ -282,351 +368,311 @@ const handleDeleteAccount = () => {
   alert('Tài khoản đã được xóa!')
 }
 
+// Modal helpers
+const closeEditModal = () => {
+  showEditModal.value = false
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+}
+
 // Lifecycle
 onMounted(fetchUserInfo)
 </script>
 
 <style scoped>
-:root {
-  font-size: 16px;
+/* ==========================================
+   MODERN USER PROFILE - CUSTOM STYLES
+   ========================================== */
+
+/* Custom gradients and modern elements */
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #f0f9ff, #e0e7ff);
 }
 
-.main-bg {
+.min-h-screen {
   min-height: 100vh;
-  width: 100vw;
-  background: var(--color-background);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* padding: 1.25rem; */
 }
 
-.main-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  /* max-width: 100vw; */
-  min-height: 60vh;
-  /* background-color: #667eea; */
-  /* border-radius: 2rem; */
-  /* box-shadow: 0 0.5rem 2rem 0 rgba(31, 38, 135, 0.18); */
-  /* backdrop-filter: blur(0.625rem); */
-  /* -webkit-backdrop-filter: blur(0.625rem); */
-  overflow: hidden;
-}
-
-.profile-section {
-  width: 100%;
-  padding: 2.5rem;
-  /* background: yellow; */
-  /* border-radius: 1.5rem; */
-  /* box-shadow: 0 0.25rem 1.5rem 0 rgba(31, 38, 135, 0.10); */
-  margin: 1.25rem;
-}
-
-.profile-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.avatar {
-  width: 5rem;
-  height: 5rem;
+/* Large Avatar with status indicator */
+.avatar-large {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
-}
-
-.avatar-text {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--vt-c-white);
-}
-
-.profile-title {
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: var(--color-heading);
-  margin: 0;
+  color: white;
+  box-shadow: 0 10px 25px rgba(29, 78, 216, 0.3);
+  border: 4px solid white;
 }
 
-.profile-content {
-  display: flex;
-  flex-direction: column;
-  /* theem vien */
-  /* border-color: var(--color-border); */
-  gap: 1.875rem;
+.status-indicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: var(--success-green);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr));
-  gap: 1.25rem;
-}
-
-.info-item {
-  background: (--color-background);
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
-}
-
-.info-item label {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--vt-c-text-light-2);
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.info-value {
-  font-size: 1.1rem;
-  color: var(--color-text);
-  font-weight: 500;
-}
-
-.role-badge {
-  display: inline-block;
-  background: var(--color-border);
-  color: var(--color-text);
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 1rem;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9375rem;
-  margin-top: 1.25rem;
-  font-weight: 500;
-}
-
-.btn {
-  display: flex;
+.role-badge-large {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  padding: var(--spacing-3) var(--spacing-6);
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-top: var(--spacing-4);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+}
+
+/* Grid system */
+.grid {
+  display: grid;
+}
+
+.lg\\:grid-cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.lg\\:col-span-2 {
+  grid-column: span 2;
+}
+
+.md\\:grid-cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.gap-6 {
+  gap: var(--spacing-6);
+}
+
+.gap-8 {
+  gap: var(--spacing-8);
+}
+
+.space-y-3 > * + * {
+  margin-top: var(--spacing-3);
+}
+
+.space-y-6 > * + * {
+  margin-top: var(--spacing-6);
+}
+
+/* Modern info items */
+.info-item-modern {
+  padding: var(--spacing-4);
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--primary-blue);
+  transition: all var(--transition-fast);
+}
+
+.info-item-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.info-label {
+  display: block;
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  color: var(--gray-600);
+  margin-bottom: var(--spacing-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value-modern {
+  font-size: var(--font-size-base);
+  color: var(--gray-800);
   font-weight: 600;
+  word-break: break-word;
 }
 
-.btn-primary {
-  background: var(--color-background-soft);
-  color: var(--color-text);
-}
-
-.btn-primary:hover {
-  transform: translateY(-0.125rem);
-  background-color: var(--color-border);
-}
-
-.btn-secondary {
-  background: var(--color-background-soft);
-  color: var(--color-text);
-}
-
-.btn-secondary:hover {
-  transform: translateY(-0.125rem);
-  background-color: var(--color-border);
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  color: var(--vt-c-white);
-}
-
-.btn-danger:hover {
-  transform: translateY(-0.125rem);
-  box-shadow: 0 0.25rem 0.75rem rgba(255, 107, 107, 0.4);
-}
-
-.btn-warning {
-  background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
-  color: var(--vt-c-white);
-}
-
-.btn-warning:hover {
-  transform: translateY(-0.125rem);
-  box-shadow: 0 0.25rem 0.75rem rgba(255, 167, 38, 0.4);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-icon {
-  font-size: 1.2rem;
-  /* font-weight: 600; */
-}
-
-
-
-/* Responsive Design using rem */
-@media (max-width: 48rem) { /* 768px */
-  .main-container {
-    margin: 0.625rem;
-  }
-
-  .profile-section {
-    padding: 1.25rem;
-    margin: 0.625rem;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .action-buttons {
-    gap: 0.75rem;
-  }
-
-  .btn {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-  }
-
-  .modal-content {
-    width: 95%;
-    margin: 0.625rem;
-  }
-
-  .profile-title {
-    font-size: 1.5rem;
-  }
-
-  .avatar {
-    width: 4rem;
-    height: 4rem;
-  }
-
-  .avatar-text {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 30rem) { /* 480px */
-  .main-bg {
-    padding: 0.5rem;
-  }
-
-  .profile-section {
-    padding: 1rem;
-    margin: 0.5rem;
-  }
-
-  .info-item {
-    padding: 1rem;
-  }
-
-  .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-  }
-
-  .modal-content {
-    width: 98%;
-    margin: 0.25rem;
-  }
-
-  .modal-header,
-  .edit-form,
-  .delete-content {
-    padding: 1rem;
-  }
-
-  .modal-actions {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 20rem) { /* 320px */
-  .profile-title {
-    font-size: 1.25rem;
-  }
-
-  .info-value {
-    font-size: 1rem;
-  }
-}
-
-/* Thêm CSS cho các phần owner actions và user actions */
-.owner-actions, .user-actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9375rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.actions-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--color-heading);
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.btn-owner {
+/* Special gradient cards */
+.gradient-owner {
   background: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
   color: white;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.btn-owner:hover {
-  transform: translateY(-0.125rem);
-  box-shadow: 0 0.25rem 0.75rem rgba(149, 153, 226, 0.4);
+.gradient-owner .card-header,
+.gradient-owner .card-body {
+  background: transparent;
 }
 
-.loading-state, .error-state {
-  text-align: center;
-  padding: 2rem;
-  color: var(--color-text);
+/* White button for gradient backgrounds */
+.btn-white {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--gray-800);
+  backdrop-filter: blur(10px);
 }
 
-.loading-state p {
-  font-size: 1.2rem;
-  color: var(--vt-c-text-light-2);
+.btn-white:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.error-state p {
-  color: #ff6b6b;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
+/* Utility classes */
+.w-full {
+  width: 100%;
+}
+
+.max-w-2xl {
+  max-width: 42rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mb-4 {
+  margin-bottom: var(--spacing-4);
+}
+
+.mb-6 {
+  margin-bottom: var(--spacing-6);
+}
+
+.mb-12 {
+  margin-bottom: var(--spacing-12);
+}
+
+.mt-4 {
+  margin-top: var(--spacing-4);
+}
+
+.py-8 {
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+.py-12 {
+  padding-top: var(--spacing-12);
+  padding-bottom: var(--spacing-12);
+}
+
+.text-3xl {
+  font-size: var(--font-size-3xl);
+}
+
+.text-xl {
+  font-size: var(--font-size-xl);
+}
+
+.text-6xl {
+  font-size: 4rem;
+}
+
+.border-red-200 {
+  border-color: #fecaca;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-gray-600 {
+  color: var(--gray-600);
+}
+
+.text-gray-800 {
+  color: var(--gray-800);
+}
+
+/* Enhanced modal styling */
+.modal-content.max-w-2xl {
+  max-width: 42rem;
+}
+
+.modal-content.max-w-lg {
+  max-width: 32rem;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .lg\\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .lg\\:col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .avatar-large {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+  
+  .text-3xl {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .py-8 {
+    padding-top: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+  }
+  
+  .gap-8 {
+    gap: var(--spacing-4);
+  }
+}
+
+/* Animation enhancements */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: slideUp 0.3s ease-out;
+}
+
+.card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Loading state enhancement */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
 }
 </style>
