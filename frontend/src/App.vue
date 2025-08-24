@@ -25,7 +25,6 @@ const { showError, errorMessage, errorDetails, clearError } = useError()
 <style scoped>
 .app {
   min-height: 100vh;
-  display: flex;
   flex-direction: column;
 }
 router-view {
