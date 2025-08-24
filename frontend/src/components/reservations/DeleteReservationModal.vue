@@ -4,7 +4,7 @@ import trashSvg from '@/assets/manageReservationIcons/buttons/deleteButton.svg'
 import warningSvg from '@/assets//manageReservationIcons/warning.svg'
 
 const props = defineProps({ reservation: Object })
-const emit = defineEmits(['close', 'delete'])
+const emit = defineEmits(['close', 'cancel'])
 const details = computed(() => props.reservation || {})
 </script>
 <template>
@@ -26,7 +26,7 @@ const details = computed(() => props.reservation || {})
       </div>
       <div class="modal-body">
         <div class="guest-info-box">
-          <div><strong>Guest:</strong> {{ details.guest_name }}</div>
+          <div><strong>Guest:</strong> {{ details.user_name }}</div>
           <div><strong>Hotel:</strong> {{ details.accommodation_name }}</div>
           <div><strong>Dates:</strong> {{ details.check_in_date }} → {{ details.check_out_date }}</div>
           <div><strong>Total:</strong> ${{ details.total_price }}</div>
@@ -44,7 +44,7 @@ const details = computed(() => props.reservation || {})
         </div>
         <div class="modal-actions">
           <button @click="$emit('close')" class="btn btn-secondary">Keep Confirmed</button>
-          <button @click="$emit('delete', details.booking_id)" class="btn btn-danger">Cancel Reservation</button>
+          <button type="submit" @click="$emit('delete', { ...details, status: 'cancelled' })" class="btn btn-danger">Cancel</button>
         </div>
       </div>
     </div>

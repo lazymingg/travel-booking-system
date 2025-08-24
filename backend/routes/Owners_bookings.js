@@ -60,7 +60,7 @@ router.put('/bookings/:id', requireOwner, (req, res) => {
     if (fields.length === 0) return responseHelper.validationError(res, 'No fields to update');
     params.push(id);
     db.run(
-        `UPDATE Bookings SET ${fields.join('AND ')} WHERE booking_id = ?`,
+        `UPDATE Bookings SET ${fields.join(', ')} WHERE booking_id = ?`,
         params,
         function (err) {
             if (err) return responseHelper.error(res, 'Error updating booking', 500, err.message);
@@ -77,7 +77,7 @@ router.put('/bookings/:id/cancel', requireOwner, (req, res) => {
     const { id } = req.params;
     db.run(
         'UPDATE Bookings SET status = ? WHERE booking_id = ? AND status = ?',
-        ['cancelled', id], 'confirmed',
+        ['cancelled', id, 'confirmed'],
         function (err) {
             if (err) return responseHelper.error(res, 'Error cancelling booking', 500, err.message);
             if (this.changes === 0) {
