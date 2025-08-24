@@ -46,6 +46,10 @@ export const useBookingStore = defineStore('booking', () => {
     }
   }
 
+  function setAccommodationId(id) {
+    bookingDetails.value.accommodationId = id;
+  }
+
   return {
     currentStep,
     totalSteps,
@@ -55,6 +59,7 @@ export const useBookingStore = defineStore('booking', () => {
     prevStep,
     completeBooking,
     setBookingDetails,
-    resetBooking
+    resetBooking,
+    setAccommodationId
   }
 })
