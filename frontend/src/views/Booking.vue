@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import { useBookingStore } from '@/composables/useBooking'
 
 import ProgressBar from '@/components/booking/ProgressBar.vue'

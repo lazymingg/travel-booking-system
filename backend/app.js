@@ -89,7 +89,7 @@ app.use('/reviews', reviewRouter);
 app.use('/accommodations', accommodationsRouter);
 app.use('/accommodations', accommodationsImagesRouter);
 app.use('/accommodations', accommodationsRoomsImagesRouter);
-app.use('/accommodations', accommodationRoomsRouter);;
+app.use('/accommodations', accommodationRoomsRouter);
 app.use('/accommodations', accommodationsAmenitiesRouter);
 app.use('/accommodations', accommodationsBookingsRouter);
 

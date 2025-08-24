@@ -1,4 +1,4 @@
-import { acceptHMRUpdate, defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useBookingStore = defineStore('booking', () => {
@@ -8,8 +8,8 @@ export const useBookingStore = defineStore('booking', () => {
   const reserveComplete = ref(false);
 
   const bookingDetails = ref({
-    accommodationID: null,
-    roomID: null,
+    accommodationId: 0,
+    roomId: 0,
     numberBeds: 0,
     numberGuests: 0,
     description: '',

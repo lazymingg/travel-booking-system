@@ -4,29 +4,6 @@ import { useBookingStore } from '@/composables/useBooking'
 
 const bookingStore = useBookingStore()
 const { bookingDetails } = storeToRefs(bookingStore)
-
-const props = defineProps({
-  checkIn: {
-    type: String,
-    default: '13/08/2025'
-  },
-  checkOut: {
-    type: String,
-    default: '15/08/2025'
-  },
-  selection: {
-    type: String,
-    default: '1 rooms for 2 people'
-  },
-  description: {
-    type: String,
-    default: 'Two-bedrooms apartment with balcony'
-  },
-  price: {
-    type: String,
-    default: '$ 200'
-  }
-})
 </script>
 
 <template>

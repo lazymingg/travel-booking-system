@@ -1,34 +1,53 @@
 <script setup>
 import { useBookingStore } from '@/composables/useBooking'
+import { storeToRefs } from 'pinia'
+import { useError } from '@/composables/useError'
+import api from '@/frontend-api-helper'
 
 const bookingStore = useBookingStore()
+const { bookingDetails } = storeToRefs(bookingStore)
 
-const props = defineProps({
-  bookingSuccess: { type: Boolean, required: true }
-})
-
-const emit = defineEmits(['booking-success'])
-
-const handleClick = () => {
-  if (!props.bookingSuccess) {
-    emit('booking-success')
-  }
-
-  else {
-    window.location.href = '/'
-  }
-}
+const { handleApiError } = useError()
 
 // API
 const handleBooking = async () => {
+  if(!bookingDetails.bookingSuccess) {
+    try {
+      console.log("AccommID: ", bookingDetails.value.accommodationId);
 
+      const result = await api.post(`/accommodations/:${bookingDetails.value.accommodationId}/bookings_temp`, {
+        room_id : bookingDetails.roomId,
+        check_in_date: bookingDetails.checkInDate,
+        check_out_date: bookingDetails.checkOutDate,
+        total_price: bookingDetails.price
+      });
+
+      if (result.success) {
+        console.log('Booking successful:', result.message);
+        bookingStore.completeBooking();
+      }
+
+      else {
+        console.error('Booking failed:', result.message);
+        handleApiError(result);
+      }
+    }
+
+    catch (error) {
+      handleApiError(error);
+    }
+  }
+
+  else {
+    router.push({ path: '/' })
+  }
 }
 
 </script>
 
 <template>
   <div class="btn-container">
-    <button class="btn" @click="handleClick">
+    <button class="btn" @click="handleBooking">
       {{ bookingStore.bookingSuccess ? 'Return to Home Page' : 'Complete Booking' }}
     </button>
   </div>

@@ -13,7 +13,6 @@ const router = useRouter()
 const { handleApiError } = useError()
 
 const handleSignUp = async () => {
-  // Validate password confirmation
   if (password.value !== confirmPassword.value) {
     handleApiError({ message: 'Passwords do not match' })
     return

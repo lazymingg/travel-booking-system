@@ -1,6 +1,7 @@
 <script setup>
 import greenCheck from '@/assets/bookingIcon/pros.svg'
 
+import { storeToRefs } from 'pinia'
 import { useBookingStore } from '@/composables/useBooking'
 
 const bookingStore = useBookingStore()
@@ -16,8 +17,11 @@ const emit = defineEmits(['reserve']);
 const priceNote = '* including taxes and charges';
 
 const handleClickReserve = () => {
+  console.log("Amen: ", props.room.amenities);
+  console.log("Accom - Room: ", props.room.accommodationId)
+
   bookingStore.setBookingDetails({
-    accommodationID: props.room.accommodationID,
+    accommodationId: 15,
     roomId: props.room.id,
     numberBeds: props.room.numberBeds,
     numberGuests: props.room.numberGuests,
@@ -41,8 +45,8 @@ const handleClickReserve = () => {
           <td class="room-type-cell">
             <div class="room-info">
               <div class="guest-bed-info">
-                <div class="info-item">Number of beds: {{ room.numberOfBeds }}</div>
-                <div class="info-item">Number of guests: {{ room.numberOfGuests }}</div>
+                <div class="info-item">Number of beds: {{ room.numberBeds }}</div>
+                <div class="info-item">Number of guests: {{ room.numberGuests }}</div>
               </div>
 
               <div class="amenities-list">

@@ -1,6 +1,4 @@
 <script setup>
-import { ref } from 'vue'
-
 import BookingSummary from '@/components/booking/BookingSummary.vue'
 import CompleteButton from '@/components/booking/CompleteButton.vue'
 
@@ -21,10 +19,7 @@ const bookingStore = useBookingStore()
   </div>
 
   <div id="btn-complete">
-    <CompleteButton 
-      :booking-success="bookingStore.bookingSuccess"
-      @booking-success="bookingStore.completeBooking"
-    />
+    <CompleteButton/>
   </div>
 </template>
 

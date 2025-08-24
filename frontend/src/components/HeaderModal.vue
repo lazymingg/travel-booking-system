@@ -10,7 +10,7 @@
         <!-- Chưa đăng nhập -->
         <template v-if="!isLoggedIn">
           <router-link to="Login" class="nav_link">Sign in</router-link>
-          <router-link to="#" class="nav_link">Sign up</router-link>
+          <router-link to="SignUp" class="nav_link">Sign up</router-link>
         </template>
 
         <!-- Đã đăng nhập -->
