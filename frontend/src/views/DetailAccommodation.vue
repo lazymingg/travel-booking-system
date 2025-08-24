@@ -146,8 +146,8 @@
                 />
 
                 <!-- Điều hướng -->
-                <button v-if="current_image_index > 0" class="nav_btn left" @click="prevImage">‹</button>
-                <button v-if="current_image_index < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
+                <button v-if="current_image_index > 0" class="nav_btn prev" @click="prevImage">‹</button>
+                <button v-if="current_image_index < selectedRoomImages.length - 1" class="nav_btn next" @click="nextImage">›</button>
 
                 <!-- Số ảnh -->
                 <div class="image_counter">
@@ -246,6 +246,21 @@ const to_snake_case = (str) => {
     .replace(/[^\w_]/g, "") + "_icon"// bỏ ký tự đặc biệt (nếu có)
 }
 
+function formatImageUrl(rootPath, localPath) {
+  if (!localPath || typeof localPath !== "string") {
+    console.error("Invalid image path:", localPath);
+    return "";
+  }
+
+  // Thay \ thành /
+  const normalizedPath = localPath.replace(/\\/g, "/");
+
+  // Cắt sau "db/images/"
+  const relativePath = normalizedPath.split("db/images/")[1];
+
+  return rootPath + relativePath;
+}
+
 const fetch_accommodation = async (accommodationID) => {
   try {
     const result = await api.get(`/accommodations/${accommodationID}`)
@@ -259,12 +274,22 @@ const fetch_accommodation = async (accommodationID) => {
         }))
       }
 
-      const images = await api.get(`/images/accommodation_images/${accommodationID}`).then(res => res.success ? res.data : [])
+      const images_db = await api.get(`/accommodations/${accommodationID}/images`).then(res => res.success ? res.data : [])
+      const formatted_images = images_db.map(img => formatImageUrl(`http://localhost:3000/images/`, img.image_url));
+
       const rooms = await api.get(`/rooms/accommodation/${accommodationID}`).then(res => res.success ? res.data : [])
+
+      for (const room of rooms) {
+        const roomImages = await api.get(`/images/room_images/${room.room_id}`).then(res => res.success ? res.data : [])
+        room.value = {
+          ...room,
+          images: roomImages
+        }
+      }
 
       accommodation.value = {
         ...data,
-        images,
+        images: formatted_images,
         rooms
       };
 
@@ -590,11 +615,11 @@ onMounted(() => {
   z-index: 1100;
 }
 
-.nav_btn.left {
+.nav_btn.prev {
   left: 20px;
 }
 
-.nav_btn.right {
+.nav_btn.next {
   right: 20px;
 }
 
