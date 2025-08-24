@@ -3,6 +3,15 @@
   <search-modal/>
 
   <!-- Image Gallery -->
+  <section v-if="loading">
+    <p>Loading accommodation...</p>
+  </section>
+
+  <section v-else-if="!accommodation">
+    <p>Accommodation not found.</p>
+  </section>
+
+  <section v-if="accommodation.images.len !== 0">
   <section class="gallery_section">
     <div class="container">
       <div class="gallery">
@@ -35,17 +44,16 @@
   </section>
 
   <!-- Popup Gallery -->
-  <div v-if="showPopup" class="popup_overlay" @click.self="closePopup">
+  <div v-if="showImagePopup" class="popup_overlay" @click.self="closePopup">
     <button class="close_btn" @click="closePopup">✕</button>
     <div class="popup_content">
-      <img :src="accommodation.images[currentIndex]" alt="Popup Image" />
+      <img :src="accommodation.images[current_image_index]" alt="Popup Image" />
 
       <!-- Điều hướng -->
       <button class="nav_btn prev" @click.stop="prevImage">‹</button>
       <button class="nav_btn next" @click.stop="nextImage">›</button>
     </div>
   </div>
-
 
     <!-- Accommodation Info -->
     <section class="info_section">
@@ -70,21 +78,21 @@
           <p class="address">{{ accommodation.address }}</p>
         </div>
 
-        <!-- Facilities -->
+        <!-- amenities -->
         <div class="info_card">
-          <h3 class="info_title">Facilities</h3>
-          <div class="facilities_grid">
+          <h3 class="info_title">Amenities</h3>
+          <div class="amenities_grid">
             <div 
-              v-for="facility in accommodation.facilities" 
-              :key="facility.name"
-              class="facility_item"
+              v-for="amenity in accommodation.amenities" 
+              :key="amenity.name"
+              class="amenity_item"
             >
               <img
-                class="facility_icon"
-                :src="getFacilityIcon(facility.icon_name)" 
-                :alt="facility.name" 
+                class="amenity_icon"
+                :src="get_amenities_icon(amenity.icon_name)" 
+                :alt="amenity.name" 
               />
-              <span class="facility_name">{{ facility.name }}</span>
+              <span class="amenity_name">{{ amenity.name }}</span>
             </div>
           </div>
         </div>
@@ -117,10 +125,10 @@
                     
                     <!-- Overlay ở ảnh thứ 3 -->
                     <div 
-                      v-if="img_index === 3 && room.images.length > 3" 
+                      v-if="img_index === 3 && room.images.length > 4" 
                       class="room_image_overlay"
                     >
-                      {{ room.images.length - 2 }}+
+                      +{{ room.images.length - 4 }}
                     </div>
                   </div>
                 </div>
@@ -132,18 +140,18 @@
 
                 <!-- Ảnh đang xem -->
                 <img 
-                  :src="selectedRoomImages[currentImageIndex]" 
-                  :alt="`Room image ${currentImageIndex+1}`" 
+                  :src="selectedRoomImages[current_image_index]" 
+                  :alt="`Room image ${current_image_index+1}`" 
                   class="popup_img_large"
                 />
 
                 <!-- Điều hướng -->
-                <button v-if="currentImageIndex > 0" class="nav_btn left" @click="prevImage">‹</button>
-                <button v-if="currentImageIndex < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
+                <button v-if="current_image_index > 0" class="nav_btn left" @click="prevImage">‹</button>
+                <button v-if="current_image_index < selectedRoomImages.length - 1" class="nav_btn right" @click="nextImage">›</button>
 
                 <!-- Số ảnh -->
                 <div class="image_counter">
-                  {{ currentImageIndex + 1 }} / {{ selectedRoomImages.length }}
+                  {{ current_image_index + 1 }} / {{ selectedRoomImages.length }}
                 </div>
               </div>
 
@@ -209,6 +217,8 @@
         </div>
       </div>
     </section>
+
+  </section>
   <footer-modal/>
 </template>
 
@@ -220,26 +230,71 @@ import hero_img from "@/assets/hero-img-singin.jpg";
 import info_icon from "@/assets/icon/info_icon.svg";
 import address_icon from "@/assets/icon/address_icon.svg";
 
-import { ref, onMounted } from 'vue'
+import { ref, watch, onUnmounted, onMounted } from 'vue'
+import api from '@/frontend-api-helper.js'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const accommodationId = route.params.id
+const accommodationId = "1"
 
-// Props để nhận tên accommodation từ trang list
-const props = defineProps({
-  accommodationId: {
-    type: String,
-    default: 'default_accommodation'
+const accommodation = ref(null)
+const loading = ref(true)
+
+const to_snake_case = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, "_")   // thay khoảng trắng bằng _
+    .replace(/[^\w_]/g, "") + "_icon"// bỏ ký tự đặc biệt (nếu có)
+}
+
+const fetch_accommodation = async (id) => {
+  try {
+    const result = await api.get(`/accommodations/${id}`)
+    if (result.success) {
+      const data = result.data
+
+      if (Array.isArray(data.amenities)) {
+        data.amenities = data.amenities.map(a => ({
+          ...a,
+          icon_name: to_snake_case(a.name)
+        }))
+      }
+
+      accommodation.value = data
+
+      console.log('Accommodation:', accommodation.value)
+    } else {
+      console.error('Failed to fetch accommodation:', result.message)
+      accommodation.value = null
+    }
+  } catch (error) {
+    console.error('Error fetching accommodation:', error)
+    accommodation.value = null
+  } finally {
+    loading.value = false
   }
-})
+}
 
-// Reactive data
-const searchData = ref({
-  destination: 'Ho Chi Minh City',
-  checkIn: '',
-  checkOut: ''
-})
+const rooms = ref(null)
+
+const fetch_rooms = async (id) => {
+  loading.value = true
+  try {
+    const result = await api.get(`/accommodations/accommodation/${id}`)
+    if (result.success) {
+      rooms.value = result.data  // <-- sửa ở đây
+      console.log('Rooms:', rooms.value)
+    } else {
+      console.error('Failed to fetch rooms:', result.message)
+      rooms.value = null  // <-- sửa ở đây
+    }
+  } catch (error) {
+    console.error('Error fetching rooms:', error)
+    rooms.value = null  // <-- sửa ở đây
+  } finally {
+    loading.value = false
+  }
+}
 
 const modules = import.meta.glob("@/assets/AmenityIcons/*.svg", { eager: true });
 
@@ -250,129 +305,39 @@ const amenities_icons = Object.entries(modules).map(([path, module]) => {
   };
 });
 
-const getFacilityIcon = (iconName) => {
-  const found = amenities_icons.find(icon => icon.name === iconName)
+const get_amenities_icon = (amenityName) => {
+  if (!amenityName) return ""
+  const found = amenities_icons.find(icon => icon.name === amenityName)
   return found ? found.src : ""
 }
 
 const showImagePopup = ref(false)
 const selectedRoomImages = ref([])
-const currentImageIndex = ref(0)
+const current_image_index = ref(0)
 
 const openImagePopup = (images, startIndex = 0) => {
   selectedRoomImages.value = images
-  currentImageIndex.value = startIndex
+  current_image_index.value = startIndex
   showImagePopup.value = true
 }
 
 const closeImagePopup = () => {
   showImagePopup.value = false
   selectedRoomImages.value = []
-  currentImageIndex.value = 0
+  current_image_index.value = 0
 }
 
 const nextImage = () => {
-  if (currentImageIndex.value < selectedRoomImages.value.length - 1) {
-    currentImageIndex.value++
+  if (current_image_index.value < selectedRoomImages.value.length - 1) {
+    current_image_index.value++
   }
 }
 
 const prevImage = () => {
-  if (currentImageIndex.value > 0) {
-    currentImageIndex.value--
+  if (current_image_index.value > 0) {
+    current_image_index.value--
   }
 }
-
-
-const accommodation = ref({
-  id: "ac1",
-  name: "Accommodation's name",
-  description: "Provide a brief description for this accommodation",
-  address: "XX, Street XX, Ward XX, Province XX, City XX, Vietnam",
-  images: [
-    hero_img,
-    hero_img, 
-    hero_img
-  ],
-  facilities: [
-    { name: "Free wifi", icon_name: "wifi_icon" },
-    { name: "Restaurant", icon_name: "dish_icon" },
-    { name: "Gym", icon_name: "gym_icon" },
-    { name: "Swimming pool", icon_name: "pool_icon" },
-    { name: "Smoking room", icon_name: "smoking_icon" },
-    { name: "Sauna", icon_name: "sauna_icon" },
-    { name: "Parking lot", icon_name: "parking_icon" },
-    { name: "Spa", icon_name: "spa_icon" }
-  ],
-  rooms: [
-    {
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 2000
-    },
-    {
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 30
-    },
-    {
-      images: [
-
-      ],
-      detail: "Provide your roomn detail here",
-      maxGuests: 3,
-      price: 25
-    }
-  ],
-  ratings: [
-    {
-      username: "User name",
-      score: 4.5,
-      comment: "Provide your comments here",
-      images: [
-  
-      ],
-    },
-    {
-      username: "User name",
-      score: 4.5,
-      comment: "Provide your comments here",
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img
-      ],
-    },
-    {
-      username: "User name",
-      score: 4.8,
-      comment: "Provide your comments here",
-      images: [
-        hero_img,
-        hero_img, 
-        hero_img,
-        hero_img,
-        hero_img,
-        hero_img
-      ],
-    }
-  ]
-})
-
-
 
 // Methods
 const formatPrice = (price) => {
@@ -383,9 +348,9 @@ const formatPrice = (price) => {
 }
 
 onMounted(() => {
-  // Load accommodation data based on accommodationId
-  console.log('Loading accommodation:', props.accommodationId)
   console.log(accommodation.value)
+  fetch_accommodation(accommodationId)
+  fetch_rooms(accommodationId)
 })
 </script>
 
@@ -491,20 +456,20 @@ onMounted(() => {
   line-height: 1.6;
 }
 
-.facilities_grid {
+.amenities_grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
 }
 
-.facility_item {
+.amenity_item {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #374151;
 }
 
-.facility_icon {
+.amenity_icon {
   height: 1.5em;
 }
 
