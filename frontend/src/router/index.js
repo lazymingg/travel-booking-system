@@ -64,7 +64,7 @@ const router = createRouter({
       component: () => import('../views/Booking.vue'),
     },
     {
-      path: '/detail',
+      path: '/detail/:id',
       name: 'DetailPage',
       component: () => import('../views/DetailAccommodation.vue'),
     },

@@ -29,6 +29,7 @@
             <div class="owner_actions">
               <button class="edit_btn" @click="editAccommodation(accommodation)">Edit</button>
               <button class="manage_btn" @click="manageAccommodation(accommodation)">Manage</button>
+              <button class="view_btn" @click="viewAccommodationDetails(accommodation)">View</button>
             </div>
           </template>
         </AccommodationCard>
@@ -67,6 +68,8 @@ import AccommodationCard from '@/components/AccommodationCard.vue'
 const heroImg = '@/assets/hero-img-signin.jpg'
 import api from '@/frontend-api-helper.js'
 import { useError } from '@/composables/useError.js'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const accommodations = ref([])
 const loading = ref(false)
@@ -126,6 +129,11 @@ function manageAccommodation(accommodation) {
   console.log('Manage accommodation:', accommodation.id)
   // You can implement navigation to manage page here
   // this.$router.push(`/manage-accommodation/${accommodation.id}`)
+}
+
+function viewAccommodationDetails(accommodation) {
+  console.log('View details for accommodation:', accommodation.id)
+  router.push(`/detail/${accommodation.id}`)
 }
 
 const displayedAccommodations = computed(() => 
@@ -196,7 +204,7 @@ body {
   gap: 0.5rem;
 }
 
-.edit_btn, .manage_btn {
+.edit_btn, .manage_btn, .view_btn {
   flex: 1;
   padding: 0.5rem 1rem;
   border: none;
@@ -223,6 +231,15 @@ body {
 
 .manage_btn:hover {
   background-color: #059669;
+}
+
+.view_btn {
+  background-color: #6B7280;
+  color: white;
+}
+
+.view_btn:hover {
+  background-color: #4B5563;
 }
 
 .no-results {
