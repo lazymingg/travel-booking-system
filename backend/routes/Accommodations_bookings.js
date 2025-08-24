@@ -42,7 +42,7 @@ router.post('/:accommodation_id/bookings', requireAuth, (req, res) => {
   const { room_id, check_in_date, check_out_date, total_price } = req.body;
 
   if (!room_id || !check_in_date || !check_out_date || !total_price) {
-    return responseHelper.validationError(res, 'Missing required fields');
+    return responseHelper.error(res, 'Missing required fields');
   }
 
   const created_at = new Date().toISOString();
@@ -65,8 +65,10 @@ router.post('/:accommodation_id/bookings_temp', (req, res) => {
   const user_id = 1; // Temp
   const { room_id, check_in_date, check_out_date, total_price } = req.body;
 
+  console.log("Temp Booking:", { room_id, check_in_date, check_out_date, total_price });
+
   if (!room_id || !check_in_date || !check_out_date || !total_price) {
-    return responseHelper.validationError(res, 'Missing required fields');
+    return responseHelper.error(res, 'Missing required fields');
   }
 
   const created_at = new Date().toISOString();

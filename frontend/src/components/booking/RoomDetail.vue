@@ -17,12 +17,9 @@ const emit = defineEmits(['reserve']);
 const priceNote = '* including taxes and charges';
 
 const handleClickReserve = () => {
-  console.log("Amen: ", props.room.amenities);
-  console.log("Accom - Room: ", props.room.accommodationId)
-
   bookingStore.setBookingDetails({
-    accommodationId: 15,
-    roomId: props.room.id,
+    accommodationId: props.room.accommodationId,
+    roomId: props.room.roomId,
     numberBeds: props.room.numberBeds,
     numberGuests: props.room.numberGuests,
     description: props.room.description,

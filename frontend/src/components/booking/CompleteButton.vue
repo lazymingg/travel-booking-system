@@ -13,13 +13,11 @@ const { handleApiError } = useError()
 const handleBooking = async () => {
   if(!bookingDetails.bookingSuccess) {
     try {
-      console.log("AccommID: ", bookingDetails.value.accommodationId);
-
-      const result = await api.post(`/accommodations/:${bookingDetails.value.accommodationId}/bookings_temp`, {
-        room_id : bookingDetails.roomId,
-        check_in_date: bookingDetails.checkInDate,
-        check_out_date: bookingDetails.checkOutDate,
-        total_price: bookingDetails.price
+      const result = await api.post(`/accommodations/${bookingDetails.value.accommodationId}/bookings_temp`, {
+        room_id : bookingDetails.value.roomId,
+        check_in_date: bookingDetails.value.checkInDate,
+        check_out_date: bookingDetails.value.checkOutDate,
+        total_price: bookingDetails.value.price
       });
 
       if (result.success) {
@@ -39,7 +37,7 @@ const handleBooking = async () => {
   }
 
   else {
-    router.push({ path: '/' })
+    window.location.href = '/';
   }
 }
 
