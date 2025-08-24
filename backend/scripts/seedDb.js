@@ -712,6 +712,97 @@ const seedDatabase = () => {
     { amenity_id: 9, name: 'Spa' }
   ];
 
+  const accommodationAmenities = [
+    // Accommodation 1: The Oriental Jade Hotel
+    { accommodation_id: 1, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 1, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 1, amenity_id: 7 }, // Gym
+    { accommodation_id: 1, amenity_id: 8 }, // Free Wifi
+
+    // Accommodation 2: Lotte Hotel Saigon
+    { accommodation_id: 2, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 2, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 2, amenity_id: 3 }, // Sauna
+    { accommodation_id: 2, amenity_id: 7 }, // Gym
+    { accommodation_id: 2, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 2, amenity_id: 9 }, // Spa
+
+    // Accommodation 3: Windsor Plaza
+    { accommodation_id: 3, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 3, amenity_id: 6 }, // Parking lot
+    { accommodation_id: 3, amenity_id: 7 }, // Gym
+    { accommodation_id: 3, amenity_id: 8 }, // Free Wifi
+
+    // Accommodation 4: Sherwood Residence
+    { accommodation_id: 4, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 4, amenity_id: 7 }, // Gym
+    { accommodation_id: 4, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 4, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 5: Reverie Saigon
+    { accommodation_id: 5, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 5, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 5, amenity_id: 7 }, // Gym
+    { accommodation_id: 5, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 5, amenity_id: 9 }, // Spa
+
+    // Accommodation 6: Hotel Majestic Saigon
+    { accommodation_id: 6, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 6, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 6, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 7: Fusion Original Saigon Centre
+    { accommodation_id: 7, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 7, amenity_id: 7 }, // Gym
+    { accommodation_id: 7, amenity_id: 8 }, // Free Wifi
+
+    // Accommodation 8: Serene Beach Resort (Da Nang)
+    { accommodation_id: 8, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 8, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 8, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 8, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 9: Ancient Town Homestay (Hoi An)
+    { accommodation_id: 9, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 9, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 10: Imperial River View Hotel (Hue)
+    { accommodation_id: 10, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 10, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 10, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 11: Nha Trang Oceanfront Apartment (Nha Trang)
+    { accommodation_id: 11, amenity_id: 1 }, // Swimming pool (often in apartment complexes)
+    { accommodation_id: 11, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 11, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 12: Phu Quoc Jungle Retreat (Phu Quoc)
+    { accommodation_id: 12, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 12, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 13: Vung Tau Beachfront Villa (Vung Tau)
+    { accommodation_id: 13, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 13, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 13, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 14: Can Tho Floating Market Inn (Can Tho)
+    { accommodation_id: 14, amenity_id: 8 }, // Free Wifi
+
+    // Accommodation 15: Ha Long Bay View Hotel (Ha Long)
+    { accommodation_id: 15, amenity_id: 2 }, // Restaurant
+    { accommodation_id: 15, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 15, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 16: Dalat Pine Hill Residence (Dalat)
+    { accommodation_id: 16, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 16, amenity_id: 6 }, // Parking lot
+
+    // Accommodation 17: Mui Ne Sand Dunes Bungalow (Phan Thiet)
+    { accommodation_id: 17, amenity_id: 1 }, // Swimming pool
+    { accommodation_id: 17, amenity_id: 8 }, // Free Wifi
+    { accommodation_id: 17, amenity_id: 6 } // Parking lot
+  ];
+
   const reviews = [
     {
       user_id: 4,
@@ -1166,6 +1257,19 @@ const seedDatabase = () => {
     });
   });
   amenityStmt.finalize();
+
+  // Insert accommodation_amenities
+    const accomAmenityStmt = db.prepare(`
+      INSERT OR IGNORE INTO accommodations_amenities (accommodation_id, amenity_id)
+      VALUES (?, ?)
+    `);
+    accommodationAmenities.forEach(aa => {
+      accomAmenityStmt.run([aa.accommodation_id, aa.amenity_id], function(err) {
+        if (err) console.error('Error inserting accommodation amenity:', err.message);
+        // else console.log(`Inserted accommodation_amenity for acc_id: ${aa.accommodation_id}, amenity_id: ${aa.amenity_id}`);
+      });
+    });
+    accomAmenityStmt.finalize();
 
   db.close((err) => {
     if (err) {

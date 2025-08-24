@@ -1,26 +1,9 @@
 <script setup>
-const props = defineProps({
-  checkIn: {
-    type: String,
-    default: '13/08/2025'
-  },
-  checkOut: {
-    type: String,
-    default: '15/08/2025'
-  },
-  selection: {
-    type: String,
-    default: '1 rooms for 2 people'
-  },
-  description: {
-    type: String,
-    default: 'Two-bedrooms apartment with balcony'
-  },
-  price: {
-    type: String,
-    default: '$ 200'
-  }
-})
+import { storeToRefs } from 'pinia'
+import { useBookingStore } from '@/composables/useBooking'
+
+const bookingStore = useBookingStore()
+const { bookingDetails } = storeToRefs(bookingStore)
 </script>
 
 <template>
@@ -31,30 +14,30 @@ const props = defineProps({
     <div class="booking-row">
       <label class="booking-label">Check in</label>
       <div class="booking-inputs">
-        <input type="text" class="booking-input" :value="checkIn" readonly />
+        <input type="text" class="booking-input" :value="bookingDetails.checkInDate" readonly />
       </div>
     </div>
     
     <div class="booking-row">
       <label class="booking-label">Check out</label>
       <div class="booking-inputs">
-        <input type="text" class="booking-input" :value="checkOut" readonly />
+        <input type="text" class="booking-input" :value="bookingDetails.checkOutDate" readonly />
       </div>
     </div>
     
     <div class="booking-row">
       <label class="booking-label">Your selection</label>
-      <input type="text" class="booking-input full-width" :value="selection" readonly />
+      <input type="text" class="booking-input full-width" :value="`1 room for ${bookingDetails.numberGuests} guests`" readonly />
     </div>
     
     <div class="booking-row">
       <label class="booking-label">Description</label>
-      <textarea class="booking-textarea" :value="description" readonly></textarea>
+      <textarea class="booking-textarea" :value="bookingDetails.description" readonly></textarea>
     </div>
     
     <div class="price-section">
       <span class="price-label">Price</span>
-      <span class="price-amount">{{ price }}</span>
+      <span class="price-amount">{{ bookingDetails.price }} VND</span>
     </div>
   </div>
 </template>

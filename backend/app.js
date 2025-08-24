@@ -38,10 +38,13 @@ const amenitiesRouter = require('./routes/Amenities');
 const accommodationsAmenitiesRouter = require('./routes/Accommodations_amenities');
 const accommodationsRoomsImagesRouter = require('./routes/Accommodations_rooms_images');
 const bookingsRouter = require('./routes/Bookings');
+const roomsRouter = require('./routes/Rooms');
 const accommodationRoomsRouter = require('./routes/Accommodations_rooms');
 const accommodationsBookingsRouter = require('./routes/Accommodations_bookings');
 const ownersRouter = require('./routes/Owners');
+const ownersAccommodationsRouter = require('./routes/Owners_Accommodations');
 const authRouter = require('./routes/Auth');
+const ownersBookingsRouter = require('./routes/Owners_bookings');
 
 const home = require("./routes/index");
 // connect to db
@@ -89,11 +92,15 @@ app.use('/reviews', reviewRouter);
 app.use('/accommodations', accommodationsRouter);
 app.use('/accommodations', accommodationsImagesRouter);
 app.use('/accommodations', accommodationsRoomsImagesRouter);
-app.use('/accommodations', accommodationRoomsRouter);;
+app.use('/accommodations', accommodationRoomsRouter);
 app.use('/accommodations', accommodationsAmenitiesRouter);
 app.use('/accommodations', accommodationsBookingsRouter);
+app.use('owners', ownersBookingsRouter);
+
+app.use('/owners', ownersAccommodationsRouter);
 
 app.use('/bookings', bookingsRouter);
+app.use('/rooms', roomsRouter);
 app.use('/owners', ownersRouter);
 app.use('/auth', authRouter);
 app.use('/amenities', amenitiesRouter);
