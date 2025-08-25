@@ -12,7 +12,7 @@
   </section>
 
   <section v-else>
-    <section v-if = "accommodation.images?.length !== 0" class="gallery_section">
+    <section v-if="accommodation && accommodation.images && accommodation.images.length > 0" class="gallery_section">
       <div class="container">
         <div class="gallery">
           <!-- Ảnh to bên trái -->
@@ -23,7 +23,7 @@
           <!-- 2 ảnh nhỏ bên phải -->
           <div class="side_images">
             <div
-              v-for="(image, index) in accommodation.images?.slice(1, 3)"
+              v-for="(image, index) in accommodation.images.slice(1, 3)"
               :key="index"
               class="thumbnail"
               @click="openImagePopup(accommodation.images, index + 1)"
@@ -44,7 +44,7 @@
     </section>
 
     <!-- Popup Gallery -->
-    <div v-if="showImagePopup" class="popup_overlay" @click.self="closePopup">
+    <div v-if="showImagePopup && accommodation && accommodation.images" class="popup_overlay" @click.self="closePopup">
       <button class="close_btn" @click="closePopup">✕</button>
       <div class="popup_content">
         <img :src="accommodation.images[current_image_index]" alt="Popup Image" />
@@ -79,7 +79,7 @@
         </div>
 
         <!-- amenities -->
-        <div v-if="accommodation.amenities.length !== 0" class="info_card">
+        <div v-if="accommodation.amenities && accommodation.amenities.length > 0" class="info_card">
           <h3 class="info_title">Amenities</h3>
           <div class="amenities_grid">
             <div 
@@ -103,7 +103,7 @@
     <section class="rooms_section">
       <div class="container">
         <h2 class="section_title">Rooms</h2>
-        <div v-if="accommodation.rooms?.length > 0" class="rooms_list">
+        <div v-if="accommodation.rooms && accommodation.rooms.length > 0" class="rooms_list">
           <div 
             v-for="(room, index) in accommodation.rooms" 
             :key="index"
@@ -114,9 +114,9 @@
               
               <!-- Room Images -->
               <div class="room_image">
-                <div v-if="accommodation.rooms.images?.length >0" class="room_image_grid">
+                <div v-if="room.images && room.images.length > 0" class="room_image_grid">
                   <div
-                    v-for="(img, img_index) in room.images?.slice(0, 4)"
+                    v-for="(img, img_index) in room.images.slice(0, 4)"
                     :key="img_index"
                     class="room_image_item"
                     @click="openImagePopup(room.images, img_index)"
@@ -135,7 +135,7 @@
               </div>
 
               <!-- Popup Fullscreen Slideshow -->
-              <div v-if="showImagePopup" class="popup_fullscreen">
+              <div v-if="showImagePopup && selectedRoomImages && selectedRoomImages.length > 0" class="popup_fullscreen">
                 <button class="popup_close" @click="closeImagePopup">✖</button>
 
                 <!-- Ảnh đang xem -->
@@ -183,7 +183,7 @@
     <section class="reviews_section">
       <div class="container">
         <h2 class="section_title">Reviews</h2>
-        <div v-if="accommodation.reviews?.length > 0" class="reviews_list">
+        <div v-if="accommodation.reviews && accommodation.reviews.length > 0" class="reviews_list">
           <div 
             v-for="(review, index) in accommodation.reviews" 
             :key="index"
@@ -196,10 +196,10 @@
             <p class="review_comment">{{ review.comment }}</p>
 
             <!-- review Images -->
-            <div class="review_images">
+            <div v-if="review.images && review.images.length > 0" class="review_images">
               <div class="review_images_row">
                 <div
-                  v-for="(img, imgIndex) in review.images?.slice(0, 5)"
+                  v-for="(img, imgIndex) in review.images.slice(0, 5)"
                   :key="imgIndex"
                   class="review_image_item"
                   @click="openImagePopup(review.images, imgIndex)"
@@ -237,7 +237,7 @@ import { ref, watch, onUnmounted, onMounted } from 'vue'
 import api from '@/frontend-api-helper.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useBookingStore } from '@/composables/useBooking.js'
-
+const defaultThumb = new URL('@/assets/hero-img-signin.jpg', import.meta.url).href
 const router = useRouter()
 const route = useRoute()
 
@@ -254,7 +254,12 @@ watch(() => route.params.id || route.query.id, (newVal) => {
   }
 })
 
-const accommodation = ref(null)
+const accommodation = ref({
+  images: [],
+  amenities: [],
+  rooms: [],
+  reviews: []
+})
 const loading = ref(true)
 const bookingStore = useBookingStore()
 
@@ -355,6 +360,12 @@ const openImagePopup = (images, startIndex = 0) => {
 }
 
 const closeImagePopup = () => {
+  showImagePopup.value = false
+  selectedRoomImages.value = []
+  current_image_index.value = 0
+}
+
+const closePopup = () => {
   showImagePopup.value = false
   selectedRoomImages.value = []
   current_image_index.value = 0

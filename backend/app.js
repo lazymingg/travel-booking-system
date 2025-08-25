@@ -30,6 +30,7 @@ dotenv.config();
 
 // declare routes
 const usersRouter = require('./routes/users');
+const userBookingsRouter = require('./routes/user_bookings');
 const paymentsRouter = require('./routes/payments');
 const reviewRouter = require('./routes/Review');
 const accommodationsRouter = require('./routes/Accommodations');
@@ -44,7 +45,6 @@ const accommodationsBookingsRouter = require('./routes/Accommodations_bookings')
 const ownersRouter = require('./routes/Owners');
 const ownersBookingsRouter = require('./routes/Owners_bookings');
 const ownersAccommodationsRouter = require('./routes/Owners_Accommodations');
-
 const authRouter = require('./routes/Auth');
 
 const home = require("./routes/index");
@@ -87,6 +87,7 @@ app.use('/images/Rooms', express.static(path.join(__dirname, 'db/images/Rooms'))
 
 // Routes
 app.use('/users', usersRouter);
+app.use('/users', userBookingsRouter);
 app.use('/payments', paymentsRouter);
 app.use('/reviews', reviewRouter);
 

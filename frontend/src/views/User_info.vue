@@ -138,10 +138,10 @@
                 Edit profile
               </button>
               
-              <button @click="manageBookings" class="btn btn-secondary w-full">
+              <router-link to="/my-bookings" class="btn btn-secondary w-full">
                 <span class="btn-icon">📋</span>
                 My bookings
-              </button>
+              </router-link>
             </div>
           </div>
 
@@ -358,10 +358,6 @@ const handleLogout = async () => {
     userStore.logout()
     router.push('/')
   }
-}
-
-const manageBookings = () => {
-  alert('Chuyển đến trang quản lý đặt chỗ...')
 }
 
 const handleDeleteAccount = () => {

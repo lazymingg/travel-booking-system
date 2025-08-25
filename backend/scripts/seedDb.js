@@ -33,7 +33,7 @@ const seedDatabase = () => {
       password_hash: 'hashed_password_3',
       phone_number: '+1234567892',
       address: '789 Business St, City, Country',
-      role: 'customer'
+      role: 'owner'
     },
     {
       full_name: 'Alice Smith',
