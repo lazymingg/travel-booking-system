@@ -16,14 +16,14 @@
       <div class="container">
         <div class="gallery">
           <!-- Ảnh to bên trái -->
-          <div class="main_image" @click="openImagePopup(accommodation.images, 0)">
-            <img :src="accommodation.images[0]" :alt="accommodation.name" />
+          <div v-if="accommodation.images && accommodation.images[0]" class="main_image" @click="openImagePopup(accommodation.images, 0)">
+            <img :src="accommodation.images[0]" :alt="accommodation.name || 'Accommodation'" />
           </div>
 
           <!-- 2 ảnh nhỏ bên phải -->
           <div class="side_images">
             <div
-              v-for="(image, index) in accommodation.images.slice(1, 3)"
+              v-for="(image, index) in (accommodation.images || []).slice(1, 3)"
               :key="index"
               class="thumbnail"
               @click="openImagePopup(accommodation.images, index + 1)"
@@ -32,7 +32,7 @@
 
               <!-- Overlay ở ảnh thứ 3 trở đi -->
               <div
-                v-if="index === 1 && accommodation.images.length > 3"
+                v-if="index === 1 && accommodation.images && accommodation.images.length > 3"
                 class="more_overlay"
               >
                 +{{ accommodation.images.length - 3 }}
@@ -116,7 +116,7 @@
               <div class="room_image">
                 <div v-if="room.images && room.images.length > 0" class="room_image_grid">
                   <div
-                    v-for="(img, img_index) in room.images.slice(0, 4)"
+                    v-for="(img, img_index) in (room.images || []).slice(0, 4)"
                     :key="img_index"
                     class="room_image_item"
                     @click="openImagePopup(room.images, img_index)"
@@ -125,7 +125,7 @@
                     
                     <!-- Overlay ở ảnh thứ 3 -->
                     <div 
-                      v-if="img_index === 3 && room.images.length > 4" 
+                      v-if="img_index === 3 && room.images && room.images.length > 4" 
                       class="room_image_overlay"
                     >
                       +{{ room.images.length - 4 }}
@@ -199,7 +199,7 @@
             <div v-if="review.images && review.images.length > 0" class="review_images">
               <div class="review_images_row">
                 <div
-                  v-for="(img, imgIndex) in review.images.slice(0, 5)"
+                  v-for="(img, imgIndex) in (review.images || []).slice(0, 5)"
                   :key="imgIndex"
                   class="review_image_item"
                   @click="openImagePopup(review.images, imgIndex)"
@@ -208,7 +208,7 @@
 
                   <!-- Overlay ở ảnh thứ 5 -->
                   <div
-                    v-if="imgIndex === 4 && review.images.length > 5"
+                    v-if="imgIndex === 4 && review.images && review.images.length > 5"
                     class="review_image_overlay"
                   >
                     +{{ review.images.length - 4 }}
@@ -317,18 +317,30 @@ const fetch_accommodation = async (accommodationID) => {
 
       accommodation.value = {
         ...data,
-        images: formatted_images,
-        rooms
+        images: formatted_images || [],
+        amenities: data.amenities || [],
+        rooms: rooms || [],
+        reviews: data.reviews || []
       };
 
       console.log('Accommodation:', accommodation.value)
     } else {
       console.error('Failed to fetch accommodation:', result.message)
-      accommodation.value = null
+      accommodation.value = {
+        images: [],
+        amenities: [],
+        rooms: [],
+        reviews: []
+      }
     }
   } catch (error) {
     console.error('Error fetching accommodation:', error)
-    accommodation.value = null
+    accommodation.value = {
+      images: [],
+      amenities: [],
+      rooms: [],
+      reviews: []
+    }
   } finally {
     loading.value = false
   }

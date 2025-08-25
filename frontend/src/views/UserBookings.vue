@@ -7,6 +7,11 @@
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">My Bookings</h1>
         <p class="text-gray-600">View and manage your accommodation bookings</p>
+        
+        <!-- Debug button for testing API -->
+        <button @click="testAPI" class="btn btn-secondary mt-4">
+          🔧 Test API Connection
+        </button>
       </div>
 
       <!-- Loading State -->
@@ -289,11 +294,21 @@ const canReview = (status) => {
 const cancelBooking = async (bookingId) => {
   if (confirm('Are you sure you want to cancel this booking?')) {
     try {
-      const result = await api.put(`users/bookings/${bookingId}/cancel`)
-      console.log(result)
+      console.log('Attempting to cancel booking:', bookingId)
+      
+      // Try PUT first, then fallback to POST if needed
+      let result = await api.put(`/users/bookings/${bookingId}/cancel`, {})
+      
+      // If PUT fails, try POST
+      if (!result.success && result.status === 404) {
+        console.log('PUT failed, trying POST...')
+        result = await api.post(`/users/bookings/${bookingId}/cancel`, {})
+      }
+      
+      console.log('Cancel booking result:', result)
       if (result.success) {
         alert('Booking cancelled successfully')
-        fetchBookings()
+        fetchBookings() // Refresh the list
       } else {
         throw new Error(result.message || 'Failed to cancel booking')
       }
@@ -307,6 +322,19 @@ const cancelBooking = async (bookingId) => {
 const writeReview = (accommodationId) => {
   // Navigate to review page or open review modal
   alert(`Review functionality for accommodation ${accommodationId} will be implemented`)
+}
+
+// Debug function to test API
+const testAPI = async () => {
+  try {
+    console.log('Testing API connection...')
+    const result = await api.get('/users/bookings')
+    console.log('API Test Result:', result)
+    alert(`API Test: ${result.success ? 'Success' : 'Failed'} - ${result.message}`)
+  } catch (err) {
+    console.error('API Test Error:', err)
+    alert('API Test Failed: ' + err.message)
+  }
 }
 
 // Lifecycle

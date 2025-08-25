@@ -26,7 +26,7 @@ router.get('/bookings', requireAuth, (req, res, next) => {
 router.put('/bookings/:id/cancel', requireAuth, (req, res, next) => {
     const { id } = req.params;
     const user_id = req.session.user.user_id;
-    const updated_at = new Date().toISOString();
+    // const updated_at = new Date().toISOString();
     console.log('test')
     // First, verify the booking belongs to the user
     db.get(`SELECT * FROM Bookings WHERE booking_id = ? AND user_id = ?
@@ -36,12 +36,12 @@ router.put('/bookings/:id/cancel', requireAuth, (req, res, next) => {
                 return responseHelper.error(res, 'Booking not found or already cancelled', 404);
           }
     
-          // Proceed to cancel the booking
-          db.run(`UPDATE Bookings SET status = 'cancelled', updated_at = ? WHERE booking_id = ?`,
-                [updated_at, id], function (err) {
-                 if (err) return next(err);
-                 return responseHelper.success(res, null, 'Booking cancelled successfully');
-                });
+        // Proceed to cancel the booking (only update status)
+        db.run(`UPDATE Bookings SET status = 'cancelled' WHERE booking_id = ?`,
+            [id], function (err) {
+             if (err) return next(err);
+             return responseHelper.success(res, null, 'Booking cancelled successfully');
+            });
      });
 });
 
